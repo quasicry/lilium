@@ -230,7 +230,11 @@ export const isTibetanUnicode = (text: string): boolean => {
 };
 
 /** Wylie 側偵測：含藏文輔音或典型 Wylie 結構特徵 */
-export const looksLikeWylie = (text: string): boolean => {
+/** 彎引號 → ASCII 撇號：手機輸入法/自動更正把 ' 寫成 ‘/’（實錘 mkha’/mtha’ 整詞透傳） */
+const normalizeWylieApostrophe = (text: string): string => text.replace(/[\u2018\u2019]/g, "'");
+
+export const looksLikeWylie = (raw: string): boolean => {
+  const text = normalizeWylieApostrophe(raw);
   if (!text) return false;
   if (isTibetanUnicode(text)) return false; // 已是藏文
   // 含其它文種（漢/蒙/滿/彝）則不判 Wylie
@@ -675,6 +679,8 @@ const normalizeSeparator = (sep: string): string => cp(TSHEG) + (/\n/.test(sep) 
 
 /** Wylie → 藏文 Unicode */
 export function wylieToTibetan(input: string): string {
+  // 彎引號正規化（手機輸入法常態）：’/'  在 Wylie 中皆為 'a-chung，入口統一為 ASCII 撇號
+  input = normalizeWylieApostrophe(input);
   // NO_TSHEG（`<->`）：分段解析但段間**不插 tsheg**（梵咒無 tsheg 連寫的反向還原）
   if (input.includes(NO_TSHEG)) {
     return input.split(NO_TSHEG).map((seg) => wylieToTibetan(seg)).join("");

@@ -2101,3 +2101,23 @@ test("r59d 資產根遷移：常數新路徑、掃描排除前綴化、硬編碼
   const flow = fs.readFileSync(path.join(ROOT, "test/dict-import-flow.mjs"), "utf8");
   assert.ok(!flow.includes('startsWith("lilium-assets/') && flow.includes('startsWith("lilium/assets/'), "dict-import-flow 斷言同步新路徑");
 });
+
+/* ---------- 藏文 Wylie 彎引號（手機輸入法常態）透傳零容忍 ----------
+ * 手機鍵盤/自動更正把 ASCII 撇號 ' 寫成 U+2018/U+2019（mkha’/mtha’/’das），
+ * 舊版整詞透傳（真機實錘）。入口正規化後 R2N 必須全轉、往返無損。
+ */
+test("藏文 Wylie 彎引號正規化：mkha’/mtha’/’das 掃描層零透傳", () => {
+  const s = lib.getScheme("tibetan-wylie");
+  const ascii = "de rnam pa thams cad du nam mkha' mtha' yas skye mched las yang dag par 'das te rnam par shes pa mtha' yas so snyam nas rnam shes mtha' yas skye mched rdzogs par byas te gnas pa 'di ni gzil yis gnon pa'i skye mched brgyad pa'o";
+  const curly = ascii.replace(/'/g, "\u2019");
+  const r = lib.transliterateLongText(curly, s, true);
+  const TIB = /[\u0F00-\u0FFF]/;
+  const leftover = r.text.split(/\s+/).filter((w) => /[a-zA-Z]/.test(w) && !TIB.test(w));
+  assert.deepStrictEqual(leftover, [], "彎引號句掃描層零透傳 " + JSON.stringify(leftover));
+  // ASCII 版與彎引號版輸出一致
+  const rA = lib.transliterateLongText(ascii, s, true);
+  assert.equal(r.text, rA.text, "彎引號版輸出＝ASCII 版");
+  // 往返
+  const back = lib.transliterateLongText(r.text, s, false);
+  assert.equal(back.text.replace(/\u2019/g, "'"), ascii, "R-N 往返無損");
+});
