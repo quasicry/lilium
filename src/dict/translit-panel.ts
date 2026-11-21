@@ -299,7 +299,7 @@ export function renderTranslitPanel(body: HTMLElement, _view: LiDictView, plugin
   const applySubjoinLineHeight = (el: HTMLElement, text: string, group: string | null): void => {
     const explicit: Record<string, number> = { zanabazar: 0x11a47, soyombo: 0x11a99 };
     // 自動辨識／未選方案（group=null）時按文本碼位自探——否則粘貼原生文字後行距恆回落
-    // 樣式表值（用戶實測實錘：輸入框行距不夠的首要場景）。自探與正文版 SCRIPT_RANGES 同構。
+    // 樣式表值（輸入框行距不夠的首要場景）。自探與正文版 SCRIPT_RANGES 同構。
     const detectGroup = (t: string): string | null => {
       for (const ch of t) {
         const cp = ch.codePointAt(0) ?? 0;
@@ -487,7 +487,7 @@ export function renderTranslitPanel(body: HTMLElement, _view: LiDictView, plugin
   // 連寫切分）由引擎屬性級雙讀，出向單選依用戶風格取捨（引擎 opts.tibAmbig）。
   let ambigSel: HTMLSelectElement | null = null;
   let ambigField: HTMLLabelElement | null = null;
-  // X-近似歧義偏好（r45c）：X-近似方案組＋「原生 → 羅馬字」方向顯示（opts.xApprox）
+  // X-近似歧義偏好：X-近似方案組＋「原生 → 羅馬字」方向顯示（opts.xApprox）
   let xApproxSel: HTMLSelectElement | null = null;
   let xApproxField: HTMLLabelElement | null = null;
   // Ali Gali 同音異碼取樣 select（agBackForm）
@@ -542,7 +542,7 @@ export function renderTranslitPanel(body: HTMLElement, _view: LiDictView, plugin
       agBackField = null;
       agBackSel = null;
     }
-    // X-近似歧義 select（r45c 全套）：悉曇 oṃ 專用碼位 vs 拼出、sinhala 長式 ē/ō、
+    // X-近似歧義 select（全套）：悉曇 oṃ 專用碼位 vs 拼出、sinhala 長式 ē/ō、
     // 缺項 esc 可逆 vs 近似拼出（不提供選項＝轉寫有問題）
     if (sid && grp && X_APPROX_GROUPS.has(grp) && !xApproxSel) {
       xApproxField = ctl.createEl('label', { cls: 'li-col-translit-field' });
@@ -754,7 +754,7 @@ export function renderTranslitPanel(body: HTMLElement, _view: LiDictView, plugin
         priKey = 'dict.translit.ambAgHomophoneBtn0';
         altKey = 'dict.translit.ambAgHomophoneBtn1';
       } else if (a.kind === 'mnglLha') {
-        // M 類（r31）：蒙古文 LHA ⇄ LA+HAA（藏語借詞 vs 漢語借詞兩讀）
+        // M 類：蒙古文 LHA ⇄ LA+HAA（藏語借詞 vs 漢語借詞兩讀）
         priKey = 'dict.translit.ambMnglLhaBtn0';
         altKey = 'dict.translit.ambMnglLhaBtn1';
       } else if (a.kind === 'mnglNg') {
@@ -764,7 +764,7 @@ export function renderTranslitPanel(body: HTMLElement, _view: LiDictView, plugin
         priKey = 'dict.translit.ambMnglGalikBtn0';
         altKey = 'dict.translit.ambMnglGalikBtn1';
       } else if (a.kind === 'tibSpelling') {
-        // W 類（r67）：按鈕 label＝拼式本身（ambTibBtn0/1 含 {w} 佔位）
+        // W 類：按鈕 label＝拼式本身（ambTibBtn0/1 含 {w} 佔位）
         priKey = 'dict.translit.ambTibBtn0';
         altKey = 'dict.translit.ambTibBtn1';
       }
@@ -786,7 +786,7 @@ export function renderTranslitPanel(body: HTMLElement, _view: LiDictView, plugin
         });
       };
       if (a.kind === 'agHomophone' && a.variants) {
-        // r50e：N 選一（同音組全候選）——逐 variant 一顆按鈕，label＝字形＋碼位（hex）
+        // N 選一（同音組全候選）——逐 variant 一顆按鈕，label＝字形＋碼位（hex）
         a.variants.forEach((v, n) => {
           const cp = v.codePointAt(0) ?? 0;
           const b = opts.createEl('button', {
