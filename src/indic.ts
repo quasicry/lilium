@@ -1357,6 +1357,11 @@ export function hkToIast(input: string): string {
 const ITRANS_CONS: Record<string, number> = {
   k: 0x0915, kh: 0x0916, g: 0x0917, gh: 0x0918, "~N": 0x0919,
   ch: 0x091a, Ch: 0x091b, j: 0x091c, jh: 0x091d, "~n": 0x091e,
+  // ITRANS 5.30 官方同碼位多拼（B1 w 案同型）：च＝ch c、छ＝chh Ch C。
+  // 舊表漏收致按官方文檔輸入遏傳（ca→cअ 實鎚）；出向 REV 維持 ch/Ch 統一形。
+  c: 0x091a, C: 0x091b,
+  // 官方多拼：श＝sh S（出向 REV 維持 sh）
+  S: 0x0936,
   T: 0x091f, Th: 0x0920, D: 0x0921, Dh: 0x0922, N: 0x0923,
   t: 0x0924, th: 0x0925, d: 0x0926, dh: 0x0927, n: 0x0928,
   p: 0x092a, ph: 0x092b, b: 0x092c, bh: 0x092d, m: 0x092e,
@@ -1373,6 +1378,9 @@ const ITRANS_CONS_REV: Record<number, string> = (() => {
   return m;
 })();
 ITRANS_CONS_REV[0x0935] = "v";
+// c/C 為 ch/Ch 的官方等價鍵（同碼位）：REV 產生時後到鍵覆寫，出向統一回 ch/Ch
+ITRANS_CONS_REV[0x091a] = "ch";
+ITRANS_CONS_REV[0x091b] = "Ch";
 const ITRANS_VOWEL: Record<string, string> = {
   a: "a", A: "ā", i: "i", I: "ī", u: "u", U: "ū",
   RRi: "ṛ", RRI: "ṝ", LLi: "ḷ", LLI: "ḹ",
@@ -1403,7 +1411,7 @@ const ITRANS_ORDER: string[] = [
   // 4-char
   "j~na",
   // 3-char
-  "kSh", "dny", "RRi", "RRI", "LLi", "LLI", "AUM",
+  "ksh", "kSh", "chh", "shh", "dny", "RRi", "RRI", "LLi", "LLI", "AUM",
   // 2-char（含送氣、鼻音、複合、符號）
   "ai", "au", "kh", "gh", "ph", "bh", "th", "dh",
   "~N", "ch", "Ch", "jh", "~n", "Th", "Dh",
@@ -1411,7 +1419,7 @@ const ITRANS_ORDER: string[] = [
   // 1-char
   "A", "I", "U", "a", "i", "u", "e", "o",
   "k", "g", "c", "j", "T", "D", "N", "t", "d", "n",
-  "p", "b", "m", "y", "r", "l", "v", "w", "s", "h", "L", "M", "H",
+  "p", "b", "m", "y", "r", "l", "v", "w", "s", "h", "L", "M", "H", "C", "S",
 ];
 type ItransUnit =
   | { t: "cons"; cp: number }
@@ -1425,6 +1433,9 @@ type ItransUnit =
   | { t: "esc"; cpValue: number }
   | { t: "other"; ch: string };
 function emitItrans(tok: string): ItransUnit[] {
+  if (tok === "chh") return [{ t: "cons", cp: 0x091b }];
+  if (tok === "shh") return [{ t: "cons", cp: 0x0937 }];
+  if (tok === "ksh") return ITRANS_COMPOUND["kSh"].map((c) => ({ t: "cons", cp: c }));
   if (ITRANS_COMPOUND[tok]) return ITRANS_COMPOUND[tok].map((c) => ({ t: "cons", cp: c }));
   if (tok === "OM" || tok === "AUM") return [{ t: "om" }];
   if (ITRANS_CONS[tok]) return [{ t: "cons", cp: ITRANS_CONS[tok] }];

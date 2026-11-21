@@ -2149,3 +2149,29 @@ test("蘭札字體映射：天城碼位文本棧尾含 Nithya Ranjana DU 且排�
   assert.ok(!src.includes("0x11d40"), "舊 11D40 映射已移除");
   assert.ok(src.includes('[0x0900, 0x097f, "Nithya Ranjana DU"]'), "映射對準天城碼位");
 });
+
+/* ---------- ITRANS 5.30 官方同碼位多拼鍵補收（B1 w 案同型） ----------
+ * 官方表：च＝ch c、छ＝chh Ch C、श＝sh S、ष＝Sh shh、क्ष＝ksh kSh。
+ * 舊表漏收 c/C/S/chh/shh/ksh 致按官方文檔輸入透傳（ca→cअ 實錘）。
+ * 入向補收；出向 REV 維持 ch/Ch/sh/Sh/kSh 統一形（與 B1 出向統一 v 同理）。
+ */
+test("ITRANS 官方多拼鍵：c C S chh shh ksh 不再透傳且出向統一形不變", () => {
+  const s = lib.listSchemes().find((x) => x.id === "sanskrit-itrans");
+  const cases = [
+    ["ca", "च"], ["ca.ha", "चअ"], ["Ca", "छ"], ["chha", "छ"],
+    ["Sa", "श"], ["shha", "ष"], ["ksha", "क्ष"],
+  ];
+  for (const [w, exp] of cases) {
+    const r = lib.transliterateLongText(w, s, true);
+    assert.ok(r.text.startsWith(exp), w + " -> " + JSON.stringify(r.text) + " 應含 " + exp);
+  }
+  // 出向統一形不變
+  assert.equal(s.nativeToRoman("च", {}), "cha", "出向 च 統一 cha");
+  assert.equal(s.nativeToRoman("छ", {}), "Cha", "出向 छ 統一 Cha");
+  assert.equal(s.nativeToRoman("श", {}), "sha", "出向 श 統一 sha");
+  assert.equal(s.nativeToRoman("ष", {}), "Sha", "出向 ष 統一 Sha");
+  // 既有鍵零變化
+  assert.equal(lib.transliterateLongText("ch", s, true).text, "च", "ch 零變化");
+  assert.equal(lib.transliterateLongText("Sh", s, true).text, "ष", "Sh 零變化");
+  assert.equal(lib.transliterateLongText("kSh", s, true).text, "क्ष", "kSh 零變化");
+});
