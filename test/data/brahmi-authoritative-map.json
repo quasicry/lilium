@@ -1,0 +1,399 @@
+{
+  "meta": {
+    "source": "indic-transliteration brahmi.toml (MIT)",
+    "url": "https://raw.githubusercontent.com/indic-transliteration/common_maps/master/brahmic/brahmi.toml",
+    "license": "MIT",
+    "note": "Devanagari key -> Brahmi value map from indic-transliteration/common_maps (git submodule of indic_transliteration_py), MIT licensed. All Brahmi values verified assigned in Unicode.",
+    "entry_count": 97
+  },
+  "pairs": [
+    {
+      "deva": "ँ",
+      "brahmi": "𑀀"
+    },
+    {
+      "deva": "ं",
+      "brahmi": "𑀁"
+    },
+    {
+      "deva": "ः",
+      "brahmi": "𑀂"
+    },
+    {
+      "deva": "अ",
+      "brahmi": "𑀅"
+    },
+    {
+      "deva": "आ",
+      "brahmi": "𑀆"
+    },
+    {
+      "deva": "इ",
+      "brahmi": "𑀇"
+    },
+    {
+      "deva": "ई",
+      "brahmi": "𑀈"
+    },
+    {
+      "deva": "उ",
+      "brahmi": "𑀉"
+    },
+    {
+      "deva": "ऊ",
+      "brahmi": "𑀊"
+    },
+    {
+      "deva": "ऋ",
+      "brahmi": "𑀋"
+    },
+    {
+      "deva": "ऌ",
+      "brahmi": "𑀍"
+    },
+    {
+      "deva": "ऎ",
+      "brahmi": "𑀏𑁆"
+    },
+    {
+      "deva": "ए",
+      "brahmi": "𑀏"
+    },
+    {
+      "deva": "ऐ",
+      "brahmi": "𑀐"
+    },
+    {
+      "deva": "ऒ",
+      "brahmi": "𑀑𑁆"
+    },
+    {
+      "deva": "ओ",
+      "brahmi": "𑀑"
+    },
+    {
+      "deva": "औ",
+      "brahmi": "𑀒"
+    },
+    {
+      "deva": "क",
+      "brahmi": "𑀓"
+    },
+    {
+      "deva": "क्ष",
+      "brahmi": "𑀓𑁆𑀱"
+    },
+    {
+      "deva": "ख",
+      "brahmi": "𑀔"
+    },
+    {
+      "deva": "ग",
+      "brahmi": "𑀕"
+    },
+    {
+      "deva": "घ",
+      "brahmi": "𑀖"
+    },
+    {
+      "deva": "ङ",
+      "brahmi": "𑀗"
+    },
+    {
+      "deva": "च",
+      "brahmi": "𑀘"
+    },
+    {
+      "deva": "छ",
+      "brahmi": "𑀙"
+    },
+    {
+      "deva": "ज",
+      "brahmi": "𑀚"
+    },
+    {
+      "deva": "ज्ञ",
+      "brahmi": "𑀚𑁆𑀜"
+    },
+    {
+      "deva": "झ",
+      "brahmi": "𑀛"
+    },
+    {
+      "deva": "ञ",
+      "brahmi": "𑀜"
+    },
+    {
+      "deva": "ट",
+      "brahmi": "𑀝"
+    },
+    {
+      "deva": "ठ",
+      "brahmi": "𑀞"
+    },
+    {
+      "deva": "ड",
+      "brahmi": "𑀟"
+    },
+    {
+      "deva": "ढ",
+      "brahmi": "𑀠"
+    },
+    {
+      "deva": "ढ़",
+      "brahmi": "𑀠"
+    },
+    {
+      "deva": "ण",
+      "brahmi": "𑀡"
+    },
+    {
+      "deva": "त",
+      "brahmi": "𑀢"
+    },
+    {
+      "deva": "थ",
+      "brahmi": "𑀣"
+    },
+    {
+      "deva": "द",
+      "brahmi": "𑀤"
+    },
+    {
+      "deva": "ध",
+      "brahmi": "𑀥"
+    },
+    {
+      "deva": "न",
+      "brahmi": "𑀦"
+    },
+    {
+      "deva": "प",
+      "brahmi": "𑀧"
+    },
+    {
+      "deva": "फ",
+      "brahmi": "𑀨"
+    },
+    {
+      "deva": "ब",
+      "brahmi": "𑀩"
+    },
+    {
+      "deva": "भ",
+      "brahmi": "𑀪"
+    },
+    {
+      "deva": "म",
+      "brahmi": "𑀫"
+    },
+    {
+      "deva": "य",
+      "brahmi": "𑀬"
+    },
+    {
+      "deva": "र",
+      "brahmi": "𑀭"
+    },
+    {
+      "deva": "ऱ",
+      "brahmi": "𑀭"
+    },
+    {
+      "deva": "ल",
+      "brahmi": "𑀮"
+    },
+    {
+      "deva": "ळ",
+      "brahmi": "𑀴"
+    },
+    {
+      "deva": "व",
+      "brahmi": "𑀯"
+    },
+    {
+      "deva": "श",
+      "brahmi": "𑀰"
+    },
+    {
+      "deva": "ष",
+      "brahmi": "𑀱"
+    },
+    {
+      "deva": "स",
+      "brahmi": "𑀲"
+    },
+    {
+      "deva": "ह",
+      "brahmi": "𑀳"
+    },
+    {
+      "deva": "ा",
+      "brahmi": "𑀸"
+    },
+    {
+      "deva": "ि",
+      "brahmi": "𑀺"
+    },
+    {
+      "deva": "ी",
+      "brahmi": "𑀻"
+    },
+    {
+      "deva": "ु",
+      "brahmi": "𑀼"
+    },
+    {
+      "deva": "ू",
+      "brahmi": "𑀽"
+    },
+    {
+      "deva": "ृ",
+      "brahmi": "𑀾"
+    },
+    {
+      "deva": "ॄ",
+      "brahmi": "𑀿"
+    },
+    {
+      "deva": "ॅ",
+      "brahmi": "𑁂"
+    },
+    {
+      "deva": "ॆ",
+      "brahmi": "𑁂"
+    },
+    {
+      "deva": "े",
+      "brahmi": "𑁂"
+    },
+    {
+      "deva": "ै",
+      "brahmi": "𑁃"
+    },
+    {
+      "deva": "ॊ",
+      "brahmi": "𑁄"
+    },
+    {
+      "deva": "ो",
+      "brahmi": "𑁄"
+    },
+    {
+      "deva": "ौ",
+      "brahmi": "𑁅"
+    },
+    {
+      "deva": "्",
+      "brahmi": "𑁆"
+    },
+    {
+      "deva": "ॐ",
+      "brahmi": "𑀑𑀁"
+    },
+    {
+      "deva": "॑",
+      "brahmi": "॑"
+    },
+    {
+      "deva": "॒",
+      "brahmi": "॒"
+    },
+    {
+      "deva": "क़",
+      "brahmi": "𑀓"
+    },
+    {
+      "deva": "ख़",
+      "brahmi": "𑀔"
+    },
+    {
+      "deva": "ग़",
+      "brahmi": "𑀕"
+    },
+    {
+      "deva": "ज़",
+      "brahmi": "𑀚"
+    },
+    {
+      "deva": "ड़",
+      "brahmi": "𑀟"
+    },
+    {
+      "deva": "फ़",
+      "brahmi": "𑀨"
+    },
+    {
+      "deva": "य़",
+      "brahmi": "𑀬"
+    },
+    {
+      "deva": "ॠ",
+      "brahmi": "𑀌"
+    },
+    {
+      "deva": "ॡ",
+      "brahmi": "𑀎"
+    },
+    {
+      "deva": "ॢ",
+      "brahmi": "𑁀"
+    },
+    {
+      "deva": "ॣ",
+      "brahmi": "𑁁"
+    },
+    {
+      "deva": "।",
+      "brahmi": "𑁇"
+    },
+    {
+      "deva": "॥",
+      "brahmi": "𑁈"
+    },
+    {
+      "deva": "०",
+      "brahmi": "𑁦"
+    },
+    {
+      "deva": "१",
+      "brahmi": "𑁧"
+    },
+    {
+      "deva": "२",
+      "brahmi": "𑁨"
+    },
+    {
+      "deva": "३",
+      "brahmi": "𑁩"
+    },
+    {
+      "deva": "४",
+      "brahmi": "𑁪"
+    },
+    {
+      "deva": "५",
+      "brahmi": "𑁫"
+    },
+    {
+      "deva": "६",
+      "brahmi": "𑁬"
+    },
+    {
+      "deva": "७",
+      "brahmi": "𑁭"
+    },
+    {
+      "deva": "८",
+      "brahmi": "𑁮"
+    },
+    {
+      "deva": "९",
+      "brahmi": "𑁯"
+    },
+    {
+      "deva": "‍",
+      "brahmi": "‍"
+    }
+  ]
+}

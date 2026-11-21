@@ -1,0 +1,35 @@
+{
+  "groups": [
+    [
+      "test/run.mjs",
+      "test/translit-run.mjs",
+      "test/translit-panel.mjs",
+      "test/translit-ambiguity.mjs",
+      "test/brahmic.mjs",
+      "test/translit.mjs",
+      "test/buddhist-corpus.mjs",
+      "test/all-schemes-corpus.mjs",
+      "test/authoritative-corpus.mjs",
+      "test/classical-corpus.mjs",
+      "test/side-char-table.mjs",
+      "test/char-table-gate.mjs",
+      "test/itrans-corpus.mjs",
+      "test/pali-canon-crossscript.mjs",
+      "test/font-name.mjs",
+      "test/siddham-lantsa-embed.mjs",
+      "test/kharoshthi.mjs",
+      "test/font-cmap.mjs",
+      "test/store-clone.mjs",
+      "scripts/check-platform.mjs",
+      "test/platform-gate.mjs",
+      "test/sandhi.mjs",
+      "test/lang-integrity.mjs",
+      "test/device-smoke.mjs",
+      "test/dict-perf.mjs",
+      "test/font-vertical-metrics.mjs",
+      "test/collision-audit.mjs",
+      "test/sanskrit-roundtrip.mjs",
+      "test/sanskrit-cross-reference.mjs"
+    ]
+  ]
+}

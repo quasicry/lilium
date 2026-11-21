@@ -1,0 +1,19 @@
+#!/bin/sh
+# lilium 提交信息格式：<type>: <subject>
+# type 白名單：feat|fix|docs|refactor|test|chore|gate（無 "ci:"，CI 相關用 gate:）
+# 版本節點提交可用 v<version> 前綴節點式（lilium 既有慣例）：v0.1.75: feat(...) ——
+# 須以白名單 type 開頭或 v<semver>: <type>(...) 形態。
+
+msg=$(cat "$1" | head -1)
+
+# 形態一：標準 <type>: <subject>
+echo "$msg" | grep -qE '^(feat|fix|docs|refactor|test|chore|gate): .+' && exit 0
+
+# 形態二：版本節點 v<semver>: <type>(<scope>) ...
+echo "$msg" | grep -qE '^v[0-9]+\.[0-9]+\.[0-9]+: (feat|fix|docs|refactor|test|chore|gate)\(' && exit 0
+echo "$msg" | grep -qE '^v[0-9]+\.[0-9]+\.[0-9]+(-r[0-9]+)?: ' && exit 0
+
+echo "提交信息不符規範：須為 '<type>: <subject>'（type ∈ feat|fix|docs|refactor|test|chore|gate）"
+echo "或版本節點式 'v<semver>: <描述>'（lilium 慣例）"
+echo "實際：$msg"
+exit 1

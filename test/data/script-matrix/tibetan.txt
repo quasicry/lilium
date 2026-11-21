@@ -1,0 +1,94 @@
+combiningsigns	ayogavaha	ྃ
+combiningsigns	ayogavaha	ཾ
+combiningsigns	ayogavaha	ཿ
+combiningsigns	ayogavaha	ྈ
+combiningsigns	ayogavaha	ྉ
+combiningsigns	nukta	༹
+consonants	main	ཀ
+consonants	main	ཁ
+consonants	main	ག
+consonants	main	གྷ
+consonants	main	ང
+consonants	main	ཙ
+consonants	main	ཚ
+consonants	main	ཛ
+consonants	main	ཛྷ
+consonants	main	ཉ
+consonants	main	ཊ
+consonants	main	ཋ
+consonants	main	ཌ
+consonants	main	ཌྷ
+consonants	main	ཎ
+consonants	main	ཏ
+consonants	main	ཐ
+consonants	main	ད
+consonants	main	དྷ
+consonants	main	ན
+consonants	main	པ
+consonants	main	ཕ
+consonants	main	བ
+consonants	main	བྷ
+consonants	main	མ
+consonants	main	ཡ
+consonants	main	ར
+consonants	main	ལ
+consonants	main	ཝ
+consonants	main	ཤ
+consonants	main	ཥ
+consonants	main	ས
+consonants	main	ཧ
+consonants	main	ཏ༹
+consonants	persoarabic	ཀ༹
+consonants	persoarabic	ཁ༹
+consonants	persoarabic	ག༹
+consonants	persoarabic	ཟ
+consonants	persoarabic	ཌ༹
+consonants	persoarabic	ཌྷ༹
+consonants	persoarabic	ཕ༹
+consonants	persoarabic	ཡ༹
+consonants	south	ལ༹
+consonants	south	ཥ༹
+consonants	south	ར༹
+consonants	south	ན༹
+numerals		༠
+numerals		༡
+numerals		༢
+numerals		༣
+numerals		༤
+numerals		༥
+numerals		༦
+numerals		༧
+numerals		༨
+numerals		༩
+others	om	ༀ
+others	symbols	྅
+others	symbols	།
+others	symbols	༎
+vowels	main	ཨ
+vowels	main	ཨཱ
+vowels	main	ཨི
+vowels	main	ཨཱི
+vowels	main	ཨུ
+vowels	main	ཨཱུ
+vowels	main	རྀ
+vowels	main	རཱྀ
+vowels	main	ལྀ
+vowels	main	ལཱྀ
+vowels	main	ཨེ
+vowels	main	ཨཻ
+vowels	main	ཨོ
+vowels	main	ཨཽ
+vowelsigns	main	ཱ
+vowelsigns	main	ི
+vowelsigns	main	ཱི
+vowelsigns	main	ུ
+vowelsigns	main	ཱུ
+vowelsigns	main	ྲྀ
+vowelsigns	main	ྲཱྀ
+vowelsigns	main	ླྀ
+vowelsigns	main	ླཱྀ
+vowelsigns	main	ེ
+vowelsigns	main	ཻ
+vowelsigns	main	ོ
+vowelsigns	main	ཽ
+vowelsigns	virama	྄

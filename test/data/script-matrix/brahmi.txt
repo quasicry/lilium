@@ -1,0 +1,80 @@
+combiningsigns	ayogavaha	𑀀
+combiningsigns	ayogavaha	𑀁
+combiningsigns	ayogavaha	𑀂
+combiningsigns	ayogavaha	𑀃
+combiningsigns	ayogavaha	𑀄
+consonants	main	𑀓
+consonants	main	𑀔
+consonants	main	𑀕
+consonants	main	𑀖
+consonants	main	𑀗
+consonants	main	𑀘
+consonants	main	𑀙
+consonants	main	𑀚
+consonants	main	𑀛
+consonants	main	𑀜
+consonants	main	𑀝
+consonants	main	𑀞
+consonants	main	𑀟
+consonants	main	𑀠
+consonants	main	𑀡
+consonants	main	𑀢
+consonants	main	𑀣
+consonants	main	𑀤
+consonants	main	𑀥
+consonants	main	𑀦
+consonants	main	𑀧
+consonants	main	𑀨
+consonants	main	𑀩
+consonants	main	𑀪
+consonants	main	𑀫
+consonants	main	𑀬
+consonants	main	𑀭
+consonants	main	𑀮
+consonants	main	𑀯
+consonants	main	𑀰
+consonants	main	𑀱
+consonants	main	𑀲
+consonants	main	𑀳
+consonants	south	𑀴
+numerals		𑁦
+numerals		𑁧
+numerals		𑁨
+numerals		𑁩
+numerals		𑁪
+numerals		𑁫
+numerals		𑁬
+numerals		𑁭
+numerals		𑁮
+numerals		𑁯
+others	om	𑀑𑀁
+others	symbols	𑁇
+others	symbols	𑁈
+vowels	main	𑀅
+vowels	main	𑀆
+vowels	main	𑀇
+vowels	main	𑀈
+vowels	main	𑀉
+vowels	main	𑀊
+vowels	main	𑀋
+vowels	main	𑀌
+vowels	main	𑀍
+vowels	main	𑀎
+vowels	main	𑀏
+vowels	main	𑀐
+vowels	main	𑀑
+vowels	main	𑀒
+vowelsigns	main	𑀸
+vowelsigns	main	𑀺
+vowelsigns	main	𑀻
+vowelsigns	main	𑀼
+vowelsigns	main	𑀽
+vowelsigns	main	𑀾
+vowelsigns	main	𑀿
+vowelsigns	main	𑁀
+vowelsigns	main	𑁁
+vowelsigns	main	𑁂
+vowelsigns	main	𑁃
+vowelsigns	main	𑁄
+vowelsigns	main	𑁅
+vowelsigns	virama	𑁆

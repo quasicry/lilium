@@ -1,0 +1,91 @@
+# lilium（v0.2.0・辭典/轉寫插件）Release workflow
+# 門禁鏈沿用 ci.yml（version-fourway→tsc→build→lint:ci→run.mjs）；tag push 觸發三件套 Release＋SLSA attestation。
+
+name: Release
+
+on:
+  push:
+    tags:
+      - '[0-9]+.[0-9]+.[0-9]+'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  id-token: write
+  attestations: write
+
+jobs:
+  release:
+    name: 構建→門禁→發佈（lilium 三件套）
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: 安裝依賴（--legacy-peer-deps；pin npm@10.8.2 繞 runner npm 10.9.x「Exit handler never called」確定性 bug——Pluscan 定案）
+        run: npm install -g npm@10.8.2 && (npm ci --legacy-peer-deps || npm install --legacy-peer-deps)
+
+      # ── 靜態合規快檢（工作流規範化）──
+      - name: 快速門禁 gate.mjs
+        run: node scripts/gate.mjs
+
+      - name: 版本四位一體（tag == manifest == package.json == versions.json）
+        run: node .github/scripts/version-fourway.cjs
+
+      - name: tsc 型別檢查
+        run: npx tsc --noEmit --skipLibCheck
+
+      - name: 構建
+        run: npm run build
+
+      - name: ESLint（obsidianmd 規則集＋基線 894）
+        run: npm run lint:ci
+
+      - name: 安裝 CI Chromium
+        run: (npx playwright-core install chromium --with-deps || npx playwright install chromium --with-deps) && CHROME=$(find ~/.cache/ms-playwright -name chrome -type f | head -1) && echo "LI_CHROMIUM=$CHROME" >> "$GITHUB_ENV" && echo "CHROME_BIN=$CHROME" >> "$GITHUB_ENV"
+
+      - name: run.mjs 主門禁
+        run: node test/run.mjs
+
+      # ── tag 與 manifest 版本最後核對（防錯tag） ──
+      - name: tag 核對
+        run: |
+          TAG="${GITHUB_REF#refs/tags/}"
+          MAN=$(node -p "require('./manifest.json').version")
+          test "$TAG" = "$MAN" || { echo "tag $TAG != manifest $MAN"; exit 1; }
+
+      # ── 產物收整（官方審核：Release 資產只准 main.js/manifest.json/styles.css 三件，
+      #    zip/icon.svg 皆判「多餘文件」）──
+      - name: 收整三件套
+        run: |
+          mkdir -p dist
+          cp main.js manifest.json styles.css dist/
+
+      - name: 產物 md5 收據
+        run: |
+          md5sum dist/main.js dist/styles.css dist/manifest.json
+          sha256sum dist/main.js dist/styles.css dist/manifest.json
+
+      - name: Attest build provenance（SLSA）
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-path: |
+            dist/main.js
+            dist/manifest.json
+            dist/styles.css
+
+      - name: GitHub Release（draft——publish 前補 CHANGELOG 對應段 body，Pluscan 定案流程）
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/main.js
+            dist/manifest.json
+            dist/styles.css
+          draft: true
+          generate_release_notes: true
+          fail_on_unmatched_files: true

@@ -1,0 +1,71 @@
+{
+  "version": 1,
+  "updated": "2026-10-11",
+  "entries": {
+    "I1-pointer-only|src/dict/hover-lookup.ts": {
+      "level": "info",
+      "count": 2,
+      "note": "滑鼠/滾輪互動；直排翻列在行動端走原生觸控捲動，需每次改動人工複核。"
+    },
+    "I1-pointer-only|src/dict/import-ui.ts": {
+      "level": "info",
+      "count": 2,
+      "note": "滑鼠/滾輪互動；直排翻列在行動端走原生觸控捲動，需每次改動人工複核。"
+    },
+    "W4-idle-callback|src/dict/plugin.ts": {
+      "level": "info",
+      "count": 3,
+      "note": "dict/plugin.ts 已做 typeof 守門 + setTimeout 降級。"
+    },
+    "W3-clipboard|src/dict/translit-panel.ts": {
+      "level": "info",
+      "count": 1,
+      "note": "剪貼簿寫入；已緩解者附 .catch，未緩解者為待辦（下一步處理）。"
+    },
+    "W3-clipboard|src/dict/view.ts": {
+      "level": "info",
+      "count": 3,
+      "note": "剪貼簿寫入；已緩解者附 .catch，未緩解者為待辦（下一步處理）。"
+    },
+    "I1-pointer-only|src/dict/view.ts": {
+      "level": "info",
+      "count": 1,
+      "note": "滑鼠/滾輪互動；直排翻列在行動端走原生觸控捲動，需每次改動人工複核。"
+    },
+    "W2-decompression-stream|src/font-name.ts": {
+      "level": "info",
+      "count": 3,
+      "note": "font-name.ts / font-cmap.ts 已做 typeof 守門，無 API 時回傳 null 走 Canvas 降級。"
+    },
+    "I1-pointer-only|src/main.ts": {
+      "level": "info",
+      "count": 1,
+      "note": "滑鼠/滾輪互動；直排翻列在行動端走原生觸控捲動，需每次改動人工複核。"
+    },
+    "I1-pointer-only|src/reader-paged.ts": {
+      "level": "info",
+      "count": 2,
+      "note": "滑鼠/滾輪互動；直排翻列在行動端走原生觸控捲動，需每次改動人工複核。"
+    },
+    "W3-clipboard|src/settings.ts": {
+      "level": "info",
+      "count": 1,
+      "note": "剪貼簿寫入；已緩解者附 .catch，未緩解者為待辦（下一步處理）。"
+    },
+    "I1-pointer-only|src/settings.ts": {
+      "level": "info",
+      "count": 2,
+      "note": "滑鼠/滾輪互動；直排翻列在行動端走原生觸控捲動，需每次改動人工複核。"
+    },
+    "I1-pointer-only|src/vertical-select.ts": {
+      "level": "info",
+      "count": 2,
+      "note": "滑鼠/滾輪互動；直排翻列在行動端走原生觸控捲動，需每次改動人工複核。"
+    },
+    "W4-idle-callback|src/reader-paged.ts": {
+      "level": "info",
+      "count": 5,
+      "note": "r42（v2.9.49）H2 大文件分頁分片讓路：requestIdleCallback 無則 setTimeout 0 回退（paginateChunked 內建 fallback），行動端走 setTimeout 降級，非風險。"
+    }
+  }
+}

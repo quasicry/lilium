@@ -1,0 +1,74 @@
+combiningsigns	ayogavaha	ᢀ
+combiningsigns	ayogavaha	ᢁ
+consonants	main	ᢉ
+consonants	main	ᠻ
+consonants	main	ᠺ
+consonants	main	ᠺᠾ
+consonants	main	ᢊ
+consonants	main	ᢋ
+consonants	main	ᠼ
+consonants	main	ᢖ
+consonants	main	ᢖᠾ
+consonants	main	ᡛ
+consonants	main	ᢌ
+consonants	main	ᢍ
+consonants	main	ᢎ
+consonants	main	ᢎᠾ
+consonants	main	ᢏ
+consonants	main	ᢐ
+consonants	main	ᠲ
+consonants	main	ᢑ
+consonants	main	ᢑᠾ
+consonants	main	ᠨ
+consonants	main	ᢒ
+consonants	main	ᠹ
+consonants	main	ᠪ
+consonants	main	ᠪᠾ
+consonants	main	ᠮ
+consonants	main	ᠶ
+consonants	main	ᠷ
+consonants	main	ᠯ
+consonants	main	ᠸ
+consonants	main	ᠱ
+consonants	main	ᢔ
+consonants	main	ᠰ
+consonants	main	ᡙ
+consonants	persoarabic	ᢖ
+numerals		᠐
+numerals		᠑
+numerals		᠒
+numerals		᠓
+numerals		᠔
+numerals		᠕
+numerals		᠖
+numerals		᠗
+numerals		᠘
+numerals		᠙
+others	om	ᢀᠣᠸᠠ
+others	symbols	᠂
+others	symbols	᠂᠂
+vowels	main	ᠠ᠋
+vowels	main	ᠠ᠋᠎ᠠ
+vowels	main	ᢈ
+vowels	main	ᠢᠢ
+vowels	main	ᠦ
+vowels	main	ᠤᠦ
+vowels	main	ᠷᠢ
+vowels	main	ᠷᠢᠢ
+vowels	main	ᠯᠢ
+vowels	main	ᠯᠢᠢ
+vowels	main	ᠧ
+vowels	main	ᠣᠸᠠ
+vowels	main	ᠣᠸᠸᠠ
+vowelsigns	main	ᠠ᠋᠎ᠠ
+vowelsigns	main	ᢈ
+vowelsigns	main	ᠢᠢ
+vowelsigns	main	ᠦ
+vowelsigns	main	ᠤᠦ
+vowelsigns	main	ᠷᠢ
+vowelsigns	main	ᠷᠢᠢ
+vowelsigns	main	ᠯᠢ
+vowelsigns	main	ᠯᠢᠢ
+vowelsigns	main	ᠧ
+vowelsigns	main	ᠣᠸᠠ
+vowelsigns	main	ᠣᠸᠸᠠ

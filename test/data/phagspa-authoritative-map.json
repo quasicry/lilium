@@ -1,0 +1,295 @@
+{
+ "meta": {
+  "source": "Unicode UCD UnicodeData.txt, block Phags-pa U+A840–A877 (56 code points, all assigned)",
+  "transcription_rom": "引擎 token 集（src/phagspa.ts）：一碼位一 token；subjoined/superfixed 以 ʷ/ʸ/ʳ/r̊，small a 為 ʼ，letter A 為 a，漢語變體 ý/ś/ẖ/fʰ，梵文捲舌 ṭ/ṭh/ḍ/ṇ，符號 ṃ、標點 ❈ ❉ . ||",
+  "sources": [
+   "https://en.wikipedia.org/wiki/%27Phags-pa_script (letter table, Shilin Guangji 百家姓, Menggu Ziyun — accessed 2026-10-09)",
+   "https://www.unicode.org/Public/UCD/latest/ucd/UnicodeData.txt (official U+A840–A877 names, cross-checked)",
+   "Poppe, Nicholas (1957). The Mongolian Monuments in hP'ags-pa Script, 2nd ed. Wiesbaden: Harrassowitz (readings as cited in the Wikipedia letter table)",
+   "Coblin, W. South (2006). A Handbook of 'Phags-pa Chinese. Honolulu: Univ. of Hawai'i Press (dai ön 大元)",
+   "rom 欄與引擎 token 集同步"
+  ]
+ },
+ "pairs": [
+  {
+   "cp": "A840",
+   "name": "PHAGS-PA LETTER KA",
+   "rom": "k"
+  },
+  {
+   "cp": "A841",
+   "name": "PHAGS-PA LETTER KHA",
+   "rom": "kh"
+  },
+  {
+   "cp": "A842",
+   "name": "PHAGS-PA LETTER GA",
+   "rom": "g"
+  },
+  {
+   "cp": "A843",
+   "name": "PHAGS-PA LETTER NGA",
+   "rom": "ŋ"
+  },
+  {
+   "cp": "A844",
+   "name": "PHAGS-PA LETTER CA",
+   "rom": "c"
+  },
+  {
+   "cp": "A845",
+   "name": "PHAGS-PA LETTER CHA",
+   "rom": "ch"
+  },
+  {
+   "cp": "A846",
+   "name": "PHAGS-PA LETTER JA",
+   "rom": "j"
+  },
+  {
+   "cp": "A847",
+   "name": "PHAGS-PA LETTER NYA",
+   "rom": "ny"
+  },
+  {
+   "cp": "A848",
+   "name": "PHAGS-PA LETTER TA",
+   "rom": "t"
+  },
+  {
+   "cp": "A849",
+   "name": "PHAGS-PA LETTER THA",
+   "rom": "th"
+  },
+  {
+   "cp": "A84A",
+   "name": "PHAGS-PA LETTER DA",
+   "rom": "d"
+  },
+  {
+   "cp": "A84B",
+   "name": "PHAGS-PA LETTER NA",
+   "rom": "n"
+  },
+  {
+   "cp": "A84C",
+   "name": "PHAGS-PA LETTER PA",
+   "rom": "p"
+  },
+  {
+   "cp": "A84D",
+   "name": "PHAGS-PA LETTER PHA",
+   "rom": "ph"
+  },
+  {
+   "cp": "A84E",
+   "name": "PHAGS-PA LETTER BA",
+   "rom": "b"
+  },
+  {
+   "cp": "A84F",
+   "name": "PHAGS-PA LETTER MA",
+   "rom": "m"
+  },
+  {
+   "cp": "A850",
+   "name": "PHAGS-PA LETTER TSA",
+   "rom": "ts"
+  },
+  {
+   "cp": "A851",
+   "name": "PHAGS-PA LETTER TSHA",
+   "rom": "tsh"
+  },
+  {
+   "cp": "A852",
+   "name": "PHAGS-PA LETTER DZA",
+   "rom": "dz"
+  },
+  {
+   "cp": "A853",
+   "name": "PHAGS-PA LETTER WA",
+   "rom": "w"
+  },
+  {
+   "cp": "A854",
+   "name": "PHAGS-PA LETTER ZHA",
+   "rom": "zh"
+  },
+  {
+   "cp": "A855",
+   "name": "PHAGS-PA LETTER ZA",
+   "rom": "z"
+  },
+  {
+   "cp": "A856",
+   "name": "PHAGS-PA LETTER SMALL A",
+   "rom": "ʼ"
+  },
+  {
+   "cp": "A857",
+   "name": "PHAGS-PA LETTER YA",
+   "rom": "y"
+  },
+  {
+   "cp": "A858",
+   "name": "PHAGS-PA LETTER RA",
+   "rom": "r"
+  },
+  {
+   "cp": "A859",
+   "name": "PHAGS-PA LETTER LA",
+   "rom": "l"
+  },
+  {
+   "cp": "A85A",
+   "name": "PHAGS-PA LETTER SHA",
+   "rom": "sh"
+  },
+  {
+   "cp": "A85B",
+   "name": "PHAGS-PA LETTER SA",
+   "rom": "s"
+  },
+  {
+   "cp": "A85C",
+   "name": "PHAGS-PA LETTER HA",
+   "rom": "h"
+  },
+  {
+   "cp": "A85D",
+   "name": "PHAGS-PA LETTER A",
+   "rom": "a"
+  },
+  {
+   "cp": "A85E",
+   "name": "PHAGS-PA LETTER I",
+   "rom": "i"
+  },
+  {
+   "cp": "A85F",
+   "name": "PHAGS-PA LETTER U",
+   "rom": "u"
+  },
+  {
+   "cp": "A860",
+   "name": "PHAGS-PA LETTER E",
+   "rom": "e"
+  },
+  {
+   "cp": "A861",
+   "name": "PHAGS-PA LETTER O",
+   "rom": "o"
+  },
+  {
+   "cp": "A862",
+   "name": "PHAGS-PA LETTER QA",
+   "rom": "q"
+  },
+  {
+   "cp": "A863",
+   "name": "PHAGS-PA LETTER XA",
+   "rom": "x"
+  },
+  {
+   "cp": "A864",
+   "name": "PHAGS-PA LETTER FA",
+   "rom": "f"
+  },
+  {
+   "cp": "A865",
+   "name": "PHAGS-PA LETTER GGA",
+   "rom": "γ"
+  },
+  {
+   "cp": "A866",
+   "name": "PHAGS-PA LETTER EE",
+   "rom": "ee"
+  },
+  {
+   "cp": "A867",
+   "name": "PHAGS-PA SUBJOINED LETTER WA",
+   "rom": "ʷ"
+  },
+  {
+   "cp": "A868",
+   "name": "PHAGS-PA SUBJOINED LETTER YA",
+   "rom": "ʸ"
+  },
+  {
+   "cp": "A869",
+   "name": "PHAGS-PA LETTER TTA",
+   "rom": "ṭ"
+  },
+  {
+   "cp": "A86A",
+   "name": "PHAGS-PA LETTER TTHA",
+   "rom": "ṭh"
+  },
+  {
+   "cp": "A86B",
+   "name": "PHAGS-PA LETTER DDA",
+   "rom": "ḍ"
+  },
+  {
+   "cp": "A86C",
+   "name": "PHAGS-PA LETTER NNA",
+   "rom": "ṇ"
+  },
+  {
+   "cp": "A86D",
+   "name": "PHAGS-PA LETTER ALTERNATE YA",
+   "rom": "ý"
+  },
+  {
+   "cp": "A86E",
+   "name": "PHAGS-PA LETTER VOICELESS SHA",
+   "rom": "ś"
+  },
+  {
+   "cp": "A86F",
+   "name": "PHAGS-PA LETTER VOICED HA",
+   "rom": "ẖ"
+  },
+  {
+   "cp": "A870",
+   "name": "PHAGS-PA LETTER ASPIRATED FA",
+   "rom": "fʰ"
+  },
+  {
+   "cp": "A871",
+   "name": "PHAGS-PA SUBJOINED LETTER RA",
+   "rom": "ʳ"
+  },
+  {
+   "cp": "A872",
+   "name": "PHAGS-PA SUPERFIXED LETTER RA",
+   "rom": "r̊"
+  },
+  {
+   "cp": "A873",
+   "name": "PHAGS-PA LETTER CANDRABINDU",
+   "rom": "ṃ"
+  },
+  {
+   "cp": "A874",
+   "name": "PHAGS-PA SINGLE HEAD MARK",
+   "rom": "❈"
+  },
+  {
+   "cp": "A875",
+   "name": "PHAGS-PA DOUBLE HEAD MARK",
+   "rom": "❉"
+  },
+  {
+   "cp": "A876",
+   "name": "PHAGS-PA MARK SHAD",
+   "rom": "."
+  },
+  {
+   "cp": "A877",
+   "name": "PHAGS-PA MARK DOUBLE SHAD",
+   "rom": "||"
+  }
+ ]
+}

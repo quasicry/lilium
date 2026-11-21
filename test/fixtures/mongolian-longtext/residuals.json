@@ -1,0 +1,122 @@
+[
+ {
+  "source": "ᠵᠠᠭᠤᠴᠢᠯᠠᠭᠤᠷᠤᠨᠬᠢᠨᠤ",
+  "canonical": "ᠵᠠᠭᠤᠴᠢᠯᠠᠭᠤᠷᠤᠩᠬᠢᠨᠤ",
+  "kind": "ngMerge"
+ },
+ {
+  "source": "ᠳᠤᠭᠤᠶᠢᠯᠠᠩᠤᠨᠬᠢᠨ",
+  "canonical": "ᠳᠤᠭᠤᠶᠢᠯᠠᠩᠤᠩᠬᠢᠨ",
+  "kind": "ngMerge"
+ },
+ {
+  "source": "ᠤᠯᠠᠭᠠᠨᠬᠠᠳᠠᠶᠢᠨ",
+  "canonical": "ᠤᠯᠠᠭᠠᠩᠬᠠᠳᠠᠶᠢᠨ",
+  "kind": "ngMerge"
+ },
+ {
+  "source": "ᠭᠤᠳᠤᠮᠵᠢᠶᠢᠨᠬᠢᠨ",
+  "canonical": "ᠭᠤᠳᠤᠮᠵᠢᠶᠢᠩᠬᠢᠨ",
+  "kind": "ngMerge"
+ },
+ {
+  "source": "ᠲᠣᠭᠤᠷᠢᠭᠤᠨᠬᠢᠨ",
+  "canonical": "ᠲᠣᠭᠤᠷᠢᠭᠤᠩᠬᠢᠨ",
+  "kind": "ngMerge"
+ },
+ {
+  "source": "ᠵᠥᠪᠯᠡᠯᠤᠨᠬᠢᠨ",
+  "canonical": "ᠵᠥᠪᠯᠡᠯᠤᠩᠬᠢᠨ",
+  "kind": "ngMerge"
+ },
+ {
+  "source": "ᠨᠠᠷᠠᠨᠬᠤᠸᠠᠷᠢ",
+  "canonical": "ᠨᠠᠷᠠᠩᠬᠤᠸᠠᠷᠢ",
+  "kind": "ngMerge"
+ },
+ {
+  "source": "ᠪᠤᠶᠠᠨᠬᠡᠰᠢᠭ",
+  "canonical": "ᠪᠤᠶᠠᠩᠬᠡᠰᠢᠭ",
+  "kind": "ngMerge"
+ },
+ {
+  "source": "ᠮᠥᠴᠢᠷᠦᠨᠬᠢᠨ",
+  "canonical": "ᠮᠥᠴᠢᠷᠦᠩᠬᠢᠨ",
+  "kind": "ngMerge"
+ },
+ {
+  "source": "ᠦᠶᠡᠶᠢᠨᠬᠢᠨᠢ",
+  "canonical": "ᠦᠶᠡᠶᠢᠩᠬᠢᠨᠢ",
+  "kind": "ngMerge"
+ },
+ {
+  "source": "ᠤᠯᠠᠭᠠᠨᠬᠠᠳᠠ",
+  "canonical": "ᠤᠯᠠᠭᠠᠩᠬᠠᠳᠠ",
+  "kind": "ngMerge"
+ },
+ {
+  "source": "ᠳᠦᠨᠬᠤᠸᠠᠩ",
+  "canonical": "ᠳᠦᠩᠬᠤᠸᠠᠩ",
+  "kind": "ngMerge"
+ },
+ {
+  "source": "ᠲᠡᠨᠭᠴᠡᠬᠦ",
+  "canonical": "ᠲᠡᠩᠴᠡᠬᠦ",
+  "kind": "ngMerge"
+ },
+ {
+  "source": "ᠬᠤᠷᠢᠨᠭᠡᠷ",
+  "canonical": "ᠬᠤᠷᠢᠩᠡᠷ",
+  "kind": "ngMerge"
+ },
+ {
+  "source": "ᠰᠢᠨᠬᠤᠧᠠ",
+  "canonical": "ᠰᠢᠩᠬᠤᠧᠠ",
+  "kind": "ngMerge"
+ },
+ {
+  "source": "ᠮᠤᠨᠭᠭᠤᠯ",
+  "canonical": "ᠮᠤᠩᠭᠤᠯ",
+  "kind": "ngMerge"
+ },
+ {
+  "source": "ᠬᠢᠨᠭᠭᠠᠨ",
+  "canonical": "ᠬᠢᠩᠭᠠᠨ",
+  "kind": "ngMerge"
+ },
+ {
+  "source": "ᠹᠸᠨᠭᠵᠸᠨ",
+  "canonical": "ᠹᠸᠩᠵᠸᠨ",
+  "kind": "ngMerge"
+ },
+ {
+  "source": "ᠰᠢᠨᠬᠤᠸᠠ",
+  "canonical": "ᠰᠢᠩᠬᠤᠸᠠ",
+  "kind": "ngMerge"
+ },
+ {
+  "source": "ᠦᠨᠡᠨᠬᠦ",
+  "canonical": "ᠦᠨᠡᠩᠬᠦ",
+  "kind": "ngMerge"
+ },
+ {
+  "source": "ᠵᠢᠨᠬᠢᠨ",
+  "canonical": "ᠵᠢᠩᠬᠢᠨ",
+  "kind": "ngMerge"
+ },
+ {
+  "source": "ᠦ᠊ᠨᠬᠢᠨ",
+  "canonical": "ᠦ᠊ᠩᠬᠢᠨ",
+  "kind": "ngMerge"
+ },
+ {
+  "source": "ᠯᠾᠬᠠᠪᠠ",
+  "canonical": "ᡀᠬᠠᠪᠠ",
+  "kind": "lhaMerge"
+ },
+ {
+  "source": "ᠫᠢᠨᠭ",
+  "canonical": "ᠫᠢᠩ",
+  "kind": "ngMerge"
+ }
+]

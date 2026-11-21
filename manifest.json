@@ -1,0 +1,9 @@
+{
+  "id": "lilium",
+  "name": "Lilium",
+  "version": "0.3.0",
+  "minAppVersion": "1.7.2",
+  "description": "Universal dictionary & transliteration — Sanskrit, Pali, Tibetan, Mongolian, Manchu, Uyghur, Siddham, 'Phags-pa and more.",
+  "author": "quasicry",
+  "isDesktopOnly": false
+}

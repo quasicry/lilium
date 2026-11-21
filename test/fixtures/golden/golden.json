@@ -1,0 +1,1612 @@
+{
+  "_meta": {
+    "generatedAt": "2026-10-03T11:18:52.730Z",
+    "version": "2.8.87",
+    "sample": "。、，：；？！「」『』（）·——……",
+    "scripts": [
+      "zh-Hans",
+      "zh-Hant",
+      "ja",
+      "ko"
+    ],
+    "note": "首錄基準：值由現行實現 dump 生成；重放 diff=0 即通過"
+  },
+  "scripts": {
+    "zh-Hans": {
+      "region": "zh-Hans",
+      "fontStack": "Noto Serif SC, Noto Serif CJK SC, Noto Serif CJK TC, Source Han Serif SC, Source Han Serif TC, Songti SC, Songti TC, SimSun, serif",
+      "chars": {
+        "2014": {
+          "char": "—",
+          "classes": [
+            "li-pc-2014",
+            "li-punct",
+            "li-punct-dash"
+          ],
+          "classesExport": [
+            "li-pc-2014",
+            "li-punct",
+            "li-punct-dash"
+          ],
+          "orientation": {
+            "vo": "R",
+            "css": "sideways",
+            "rotate": true,
+            "source": "clreq"
+          },
+          "cssOrientation": "sideways",
+          "expect": null
+        },
+        "2026": {
+          "char": "…",
+          "classes": [
+            "li-pc-2026",
+            "li-punct",
+            "li-punct-dash"
+          ],
+          "classesExport": [
+            "li-pc-2026",
+            "li-punct",
+            "li-punct-dash"
+          ],
+          "orientation": {
+            "vo": "R",
+            "css": "upright",
+            "rotate": false,
+            "source": "clreq"
+          },
+          "cssOrientation": "upright",
+          "expect": null
+        },
+        "3001": {
+          "char": "、",
+          "classes": [
+            "li-pc-3001",
+            "li-punct",
+            "li-punct-point"
+          ],
+          "classesExport": [
+            "li-hangable",
+            "li-pc-3001",
+            "li-punct",
+            "li-punct-point"
+          ],
+          "orientation": {
+            "vo": "Tu",
+            "css": "upright",
+            "rotate": false,
+            "source": "clreq"
+          },
+          "cssOrientation": "upright",
+          "expect": null
+        },
+        "3002": {
+          "char": "。",
+          "classes": [
+            "li-pc-3002",
+            "li-punct",
+            "li-punct-point"
+          ],
+          "classesExport": [
+            "li-hangable",
+            "li-pc-3002",
+            "li-punct",
+            "li-punct-point"
+          ],
+          "orientation": {
+            "vo": "Tu",
+            "css": "upright",
+            "rotate": false,
+            "source": "clreq"
+          },
+          "cssOrientation": "upright",
+          "expect": null
+        },
+        "ff0c": {
+          "char": "，",
+          "classes": [
+            "li-pc-ff0c",
+            "li-punct",
+            "li-punct-point"
+          ],
+          "classesExport": [
+            "li-hangable",
+            "li-pc-ff0c",
+            "li-punct",
+            "li-punct-point"
+          ],
+          "orientation": {
+            "vo": "Tu",
+            "css": "upright",
+            "rotate": false,
+            "source": "clreq"
+          },
+          "cssOrientation": "upright",
+          "expect": null
+        },
+        "ff1a": {
+          "char": "：",
+          "classes": [
+            "li-pc-ff1a",
+            "li-punct",
+            "li-punct-fixed"
+          ],
+          "classesExport": [
+            "li-pc-ff1a",
+            "li-punct",
+            "li-punct-fixed"
+          ],
+          "orientation": {
+            "vo": "Tr",
+            "css": "upright",
+            "rotate": false,
+            "source": "clreq"
+          },
+          "cssOrientation": "upright",
+          "expect": null
+        },
+        "ff1b": {
+          "char": "；",
+          "classes": [
+            "li-pc-ff1b",
+            "li-punct",
+            "li-punct-fixed"
+          ],
+          "classesExport": [
+            "li-pc-ff1b",
+            "li-punct",
+            "li-punct-fixed"
+          ],
+          "orientation": {
+            "vo": "Tr",
+            "css": "upright",
+            "rotate": false,
+            "source": "clreq"
+          },
+          "cssOrientation": "upright",
+          "expect": null
+        },
+        "ff1f": {
+          "char": "？",
+          "classes": [
+            "li-pc-ff1f",
+            "li-punct",
+            "li-punct-fixed"
+          ],
+          "classesExport": [
+            "li-pc-ff1f",
+            "li-punct",
+            "li-punct-fixed"
+          ],
+          "orientation": {
+            "vo": "Tu",
+            "css": "upright",
+            "rotate": false,
+            "source": "clreq"
+          },
+          "cssOrientation": "upright",
+          "expect": null
+        },
+        "ff01": {
+          "char": "！",
+          "classes": [
+            "li-pc-ff01",
+            "li-punct",
+            "li-punct-fixed"
+          ],
+          "classesExport": [
+            "li-pc-ff01",
+            "li-punct",
+            "li-punct-fixed"
+          ],
+          "orientation": {
+            "vo": "Tu",
+            "css": "upright",
+            "rotate": false,
+            "source": "clreq"
+          },
+          "cssOrientation": "upright",
+          "expect": null
+        },
+        "300c": {
+          "char": "「",
+          "classes": [
+            "li-pc-300c",
+            "li-punct",
+            "li-punct-quote"
+          ],
+          "classesExport": [
+            "li-pc-300c",
+            "li-punct",
+            "li-punct-quote"
+          ],
+          "orientation": {
+            "vo": "Tr",
+            "css": "upright",
+            "rotate": false,
+            "source": "clreq"
+          },
+          "cssOrientation": "upright",
+          "expect": null
+        },
+        "300d": {
+          "char": "」",
+          "classes": [
+            "li-pc-300d",
+            "li-punct",
+            "li-punct-quote"
+          ],
+          "classesExport": [
+            "li-pc-300d",
+            "li-punct",
+            "li-punct-quote"
+          ],
+          "orientation": {
+            "vo": "Tr",
+            "css": "upright",
+            "rotate": false,
+            "source": "clreq"
+          },
+          "cssOrientation": "upright",
+          "expect": null
+        },
+        "300e": {
+          "char": "『",
+          "classes": [
+            "li-pc-300e",
+            "li-punct",
+            "li-punct-quote"
+          ],
+          "classesExport": [
+            "li-pc-300e",
+            "li-punct",
+            "li-punct-quote"
+          ],
+          "orientation": {
+            "vo": "Tr",
+            "css": "upright",
+            "rotate": false,
+            "source": "clreq"
+          },
+          "cssOrientation": "upright",
+          "expect": null
+        },
+        "300f": {
+          "char": "』",
+          "classes": [
+            "li-pc-300f",
+            "li-punct",
+            "li-punct-quote"
+          ],
+          "classesExport": [
+            "li-pc-300f",
+            "li-punct",
+            "li-punct-quote"
+          ],
+          "orientation": {
+            "vo": "Tr",
+            "css": "upright",
+            "rotate": false,
+            "source": "clreq"
+          },
+          "cssOrientation": "upright",
+          "expect": null
+        },
+        "ff08": {
+          "char": "（",
+          "classes": [
+            "li-pc-ff08",
+            "li-punct",
+            "li-punct-bracket"
+          ],
+          "classesExport": [
+            "li-pc-ff08",
+            "li-punct",
+            "li-punct-bracket"
+          ],
+          "orientation": {
+            "vo": "Tr",
+            "css": "upright",
+            "rotate": false,
+            "source": "clreq"
+          },
+          "cssOrientation": "upright",
+          "expect": null
+        },
+        "ff09": {
+          "char": "）",
+          "classes": [
+            "li-pc-ff09",
+            "li-punct",
+            "li-punct-bracket"
+          ],
+          "classesExport": [
+            "li-pc-ff09",
+            "li-punct",
+            "li-punct-bracket"
+          ],
+          "orientation": {
+            "vo": "Tr",
+            "css": "upright",
+            "rotate": false,
+            "source": "clreq"
+          },
+          "cssOrientation": "upright",
+          "expect": null
+        },
+        "00b7": {
+          "char": "·",
+          "classes": [
+            "li-pc-00b7",
+            "li-punct",
+            "li-punct-fixed",
+            "li-punct-middot"
+          ],
+          "classesExport": [
+            "li-pc-00b7",
+            "li-punct",
+            "li-punct-fixed",
+            "li-punct-middot"
+          ],
+          "orientation": {
+            "vo": "R",
+            "css": "upright",
+            "rotate": false,
+            "source": "clreq"
+          },
+          "cssOrientation": "upright",
+          "expect": null
+        }
+      },
+      "pcf": {
+        "--li-pcf-dx-3002": "-0.536em",
+        "--li-pcf-dy-3002": "0.293em",
+        "--li-pcf-dx-3001": "-0.572em",
+        "--li-pcf-dy-3001": "0.326em",
+        "--li-pcf-dx-ff0c": "-0.583em",
+        "--li-pcf-dy-ff0c": "0.293em",
+        "--li-pcf-dx-ff1a": "0em",
+        "--li-pcf-dy-ff1a": "0em",
+        "--li-pcf-dx-ff1b": "0em",
+        "--li-pcf-dy-ff1b": "0em",
+        "--li-pcf-dx-ff1f": "0em",
+        "--li-pcf-dy-ff1f": "0em",
+        "--li-pcf-dx-ff01": "0em",
+        "--li-pcf-dy-ff01": "0em",
+        "--li-pcf-dx-300c": "0em",
+        "--li-pcf-dy-300c": "0em",
+        "--li-pcf-dx-300d": "0em",
+        "--li-pcf-dy-300d": "0em",
+        "--li-pcf-dx-300e": "0em",
+        "--li-pcf-dy-300e": "0em",
+        "--li-pcf-dx-300f": "0em",
+        "--li-pcf-dy-300f": "0em",
+        "--li-pcf-dx-201c": "0em",
+        "--li-pcf-dy-201c": "0em",
+        "--li-pcf-dx-201d": "0em",
+        "--li-pcf-dy-201d": "0em",
+        "--li-pcf-dx-2018": "0em",
+        "--li-pcf-dy-2018": "0em",
+        "--li-pcf-dx-2019": "0em",
+        "--li-pcf-dy-2019": "0em",
+        "--li-pcf-dx-ff08": "0em",
+        "--li-pcf-dy-ff08": "0em",
+        "--li-pcf-dx-ff09": "0em",
+        "--li-pcf-dy-ff09": "0em",
+        "--li-pcf-dx-3010": "0em",
+        "--li-pcf-dy-3010": "0em",
+        "--li-pcf-dx-3011": "0em",
+        "--li-pcf-dy-3011": "0em",
+        "--li-pcf-dx-3014": "0em",
+        "--li-pcf-dy-3014": "0em",
+        "--li-pcf-dx-3015": "0em",
+        "--li-pcf-dy-3015": "0em",
+        "--li-pcf-dx-300a": "0em",
+        "--li-pcf-dy-300a": "0em",
+        "--li-pcf-dx-300b": "0em",
+        "--li-pcf-dy-300b": "0em",
+        "--li-pcf-dx-3008": "0em",
+        "--li-pcf-dy-3008": "0em",
+        "--li-pcf-dx-3009": "0em",
+        "--li-pcf-dy-3009": "0em"
+      }
+    },
+    "zh-Hant": {
+      "region": "zh-Hant",
+      "fontStack": "Noto Serif TC, Source Han Serif TC, Songti TC, PMingLiU, serif",
+      "chars": {
+        "2014": {
+          "char": "—",
+          "classes": [
+            "li-pc-2014",
+            "li-punct",
+            "li-punct-dash"
+          ],
+          "classesExport": [
+            "li-pc-2014",
+            "li-punct",
+            "li-punct-dash"
+          ],
+          "orientation": {
+            "vo": "R",
+            "css": "sideways",
+            "rotate": true,
+            "source": "clreq"
+          },
+          "cssOrientation": "sideways",
+          "expect": null
+        },
+        "2026": {
+          "char": "…",
+          "classes": [
+            "li-pc-2026",
+            "li-punct",
+            "li-punct-dash"
+          ],
+          "classesExport": [
+            "li-pc-2026",
+            "li-punct",
+            "li-punct-dash"
+          ],
+          "orientation": {
+            "vo": "R",
+            "css": "upright",
+            "rotate": false,
+            "source": "clreq"
+          },
+          "cssOrientation": "upright",
+          "expect": null
+        },
+        "3001": {
+          "char": "、",
+          "classes": [
+            "li-pc-3001",
+            "li-punct",
+            "li-punct-point"
+          ],
+          "classesExport": [
+            "li-hangable",
+            "li-pc-3001",
+            "li-punct",
+            "li-punct-point"
+          ],
+          "orientation": {
+            "vo": "Tu",
+            "css": "upright",
+            "rotate": false,
+            "source": "clreq"
+          },
+          "cssOrientation": "upright",
+          "expect": null
+        },
+        "3002": {
+          "char": "。",
+          "classes": [
+            "li-pc-3002",
+            "li-punct",
+            "li-punct-point"
+          ],
+          "classesExport": [
+            "li-hangable",
+            "li-pc-3002",
+            "li-punct",
+            "li-punct-point"
+          ],
+          "orientation": {
+            "vo": "Tu",
+            "css": "upright",
+            "rotate": false,
+            "source": "clreq"
+          },
+          "cssOrientation": "upright",
+          "expect": null
+        },
+        "ff0c": {
+          "char": "，",
+          "classes": [
+            "li-pc-ff0c",
+            "li-punct",
+            "li-punct-point"
+          ],
+          "classesExport": [
+            "li-hangable",
+            "li-pc-ff0c",
+            "li-punct",
+            "li-punct-point"
+          ],
+          "orientation": {
+            "vo": "Tu",
+            "css": "upright",
+            "rotate": false,
+            "source": "clreq"
+          },
+          "cssOrientation": "upright",
+          "expect": null
+        },
+        "ff1a": {
+          "char": "：",
+          "classes": [
+            "li-pc-ff1a",
+            "li-punct",
+            "li-punct-fixed"
+          ],
+          "classesExport": [
+            "li-pc-ff1a",
+            "li-punct",
+            "li-punct-fixed"
+          ],
+          "orientation": {
+            "vo": "Tr",
+            "css": "upright",
+            "rotate": false,
+            "source": "clreq"
+          },
+          "cssOrientation": "upright",
+          "expect": null
+        },
+        "ff1b": {
+          "char": "；",
+          "classes": [
+            "li-pc-ff1b",
+            "li-punct",
+            "li-punct-fixed"
+          ],
+          "classesExport": [
+            "li-pc-ff1b",
+            "li-punct",
+            "li-punct-fixed"
+          ],
+          "orientation": {
+            "vo": "Tr",
+            "css": "upright",
+            "rotate": false,
+            "source": "clreq"
+          },
+          "cssOrientation": "upright",
+          "expect": null
+        },
+        "ff1f": {
+          "char": "？",
+          "classes": [
+            "li-pc-ff1f",
+            "li-punct",
+            "li-punct-fixed"
+          ],
+          "classesExport": [
+            "li-pc-ff1f",
+            "li-punct",
+            "li-punct-fixed"
+          ],
+          "orientation": {
+            "vo": "Tu",
+            "css": "upright",
+            "rotate": false,
+            "source": "clreq"
+          },
+          "cssOrientation": "upright",
+          "expect": null
+        },
+        "ff01": {
+          "char": "！",
+          "classes": [
+            "li-pc-ff01",
+            "li-punct",
+            "li-punct-fixed"
+          ],
+          "classesExport": [
+            "li-pc-ff01",
+            "li-punct",
+            "li-punct-fixed"
+          ],
+          "orientation": {
+            "vo": "Tu",
+            "css": "upright",
+            "rotate": false,
+            "source": "clreq"
+          },
+          "cssOrientation": "upright",
+          "expect": null
+        },
+        "300c": {
+          "char": "「",
+          "classes": [
+            "li-pc-300c",
+            "li-punct",
+            "li-punct-quote"
+          ],
+          "classesExport": [
+            "li-pc-300c",
+            "li-punct",
+            "li-punct-quote"
+          ],
+          "orientation": {
+            "vo": "Tr",
+            "css": "upright",
+            "rotate": false,
+            "source": "clreq"
+          },
+          "cssOrientation": "upright",
+          "expect": null
+        },
+        "300d": {
+          "char": "」",
+          "classes": [
+            "li-pc-300d",
+            "li-punct",
+            "li-punct-quote"
+          ],
+          "classesExport": [
+            "li-pc-300d",
+            "li-punct",
+            "li-punct-quote"
+          ],
+          "orientation": {
+            "vo": "Tr",
+            "css": "upright",
+            "rotate": false,
+            "source": "clreq"
+          },
+          "cssOrientation": "upright",
+          "expect": null
+        },
+        "300e": {
+          "char": "『",
+          "classes": [
+            "li-pc-300e",
+            "li-punct",
+            "li-punct-quote"
+          ],
+          "classesExport": [
+            "li-pc-300e",
+            "li-punct",
+            "li-punct-quote"
+          ],
+          "orientation": {
+            "vo": "Tr",
+            "css": "upright",
+            "rotate": false,
+            "source": "clreq"
+          },
+          "cssOrientation": "upright",
+          "expect": null
+        },
+        "300f": {
+          "char": "』",
+          "classes": [
+            "li-pc-300f",
+            "li-punct",
+            "li-punct-quote"
+          ],
+          "classesExport": [
+            "li-pc-300f",
+            "li-punct",
+            "li-punct-quote"
+          ],
+          "orientation": {
+            "vo": "Tr",
+            "css": "upright",
+            "rotate": false,
+            "source": "clreq"
+          },
+          "cssOrientation": "upright",
+          "expect": null
+        },
+        "ff08": {
+          "char": "（",
+          "classes": [
+            "li-pc-ff08",
+            "li-punct",
+            "li-punct-bracket"
+          ],
+          "classesExport": [
+            "li-pc-ff08",
+            "li-punct",
+            "li-punct-bracket"
+          ],
+          "orientation": {
+            "vo": "Tr",
+            "css": "upright",
+            "rotate": false,
+            "source": "clreq"
+          },
+          "cssOrientation": "upright",
+          "expect": null
+        },
+        "ff09": {
+          "char": "）",
+          "classes": [
+            "li-pc-ff09",
+            "li-punct",
+            "li-punct-bracket"
+          ],
+          "classesExport": [
+            "li-pc-ff09",
+            "li-punct",
+            "li-punct-bracket"
+          ],
+          "orientation": {
+            "vo": "Tr",
+            "css": "upright",
+            "rotate": false,
+            "source": "clreq"
+          },
+          "cssOrientation": "upright",
+          "expect": null
+        },
+        "00b7": {
+          "char": "·",
+          "classes": [
+            "li-pc-00b7",
+            "li-punct",
+            "li-punct-fixed",
+            "li-punct-middot"
+          ],
+          "classesExport": [
+            "li-pc-00b7",
+            "li-punct",
+            "li-punct-fixed",
+            "li-punct-middot"
+          ],
+          "orientation": {
+            "vo": "R",
+            "css": "upright",
+            "rotate": false,
+            "source": "clreq"
+          },
+          "cssOrientation": "upright",
+          "expect": null
+        }
+      },
+      "pcf": {
+        "--li-pcf-dx-3002": "-0.257em",
+        "--li-pcf-dy-3002": "0.004em",
+        "--li-pcf-dx-3001": "-0.252em",
+        "--li-pcf-dy-3001": "-0.014em",
+        "--li-pcf-dx-ff0c": "-0.254em",
+        "--li-pcf-dy-ff0c": "0.052em",
+        "--li-pcf-dx-ff1a": "0em",
+        "--li-pcf-dy-ff1a": "0em",
+        "--li-pcf-dx-ff1b": "0em",
+        "--li-pcf-dy-ff1b": "0em",
+        "--li-pcf-dx-ff1f": "0em",
+        "--li-pcf-dy-ff1f": "0em",
+        "--li-pcf-dx-ff01": "0em",
+        "--li-pcf-dy-ff01": "0em",
+        "--li-pcf-dx-300c": "0em",
+        "--li-pcf-dy-300c": "0em",
+        "--li-pcf-dx-300d": "0em",
+        "--li-pcf-dy-300d": "0em",
+        "--li-pcf-dx-300e": "0em",
+        "--li-pcf-dy-300e": "0em",
+        "--li-pcf-dx-300f": "0em",
+        "--li-pcf-dy-300f": "0em",
+        "--li-pcf-dx-201c": "0em",
+        "--li-pcf-dy-201c": "0em",
+        "--li-pcf-dx-201d": "0em",
+        "--li-pcf-dy-201d": "0em",
+        "--li-pcf-dx-2018": "0em",
+        "--li-pcf-dy-2018": "0em",
+        "--li-pcf-dx-2019": "0em",
+        "--li-pcf-dy-2019": "0em",
+        "--li-pcf-dx-ff08": "0em",
+        "--li-pcf-dy-ff08": "0em",
+        "--li-pcf-dx-ff09": "0em",
+        "--li-pcf-dy-ff09": "0em",
+        "--li-pcf-dx-3010": "0em",
+        "--li-pcf-dy-3010": "0em",
+        "--li-pcf-dx-3011": "0em",
+        "--li-pcf-dy-3011": "0em",
+        "--li-pcf-dx-3014": "0em",
+        "--li-pcf-dy-3014": "0em",
+        "--li-pcf-dx-3015": "0em",
+        "--li-pcf-dy-3015": "0em",
+        "--li-pcf-dx-300a": "0em",
+        "--li-pcf-dy-300a": "0em",
+        "--li-pcf-dx-300b": "0em",
+        "--li-pcf-dy-300b": "0em",
+        "--li-pcf-dx-3008": "0em",
+        "--li-pcf-dy-3008": "0em",
+        "--li-pcf-dx-3009": "0em",
+        "--li-pcf-dy-3009": "0em"
+      }
+    },
+    "ja": {
+      "region": "ja",
+      "fontStack": "Noto Serif JP, Source Han Serif, Hiragino Mincho ProN, Yu Mincho, serif",
+      "chars": {
+        "2014": {
+          "char": "—",
+          "classes": [
+            "li-pc-2014",
+            "li-punct",
+            "li-punct-dash"
+          ],
+          "classesExport": [
+            "li-pc-2014",
+            "li-punct",
+            "li-punct-dash"
+          ],
+          "orientation": {
+            "vo": "R",
+            "css": "sideways",
+            "rotate": true,
+            "source": "clreq"
+          },
+          "cssOrientation": "sideways",
+          "expect": null
+        },
+        "2026": {
+          "char": "…",
+          "classes": [
+            "li-pc-2026",
+            "li-punct",
+            "li-punct-dash"
+          ],
+          "classesExport": [
+            "li-pc-2026",
+            "li-punct",
+            "li-punct-dash"
+          ],
+          "orientation": {
+            "vo": "R",
+            "css": "upright",
+            "rotate": false,
+            "source": "clreq"
+          },
+          "cssOrientation": "upright",
+          "expect": null
+        },
+        "3001": {
+          "char": "、",
+          "classes": [
+            "li-pc-3001",
+            "li-punct",
+            "li-punct-point"
+          ],
+          "classesExport": [
+            "li-hangable",
+            "li-pc-3001",
+            "li-punct",
+            "li-punct-point"
+          ],
+          "orientation": {
+            "vo": "Tu",
+            "css": "upright",
+            "rotate": false,
+            "source": "clreq"
+          },
+          "cssOrientation": "upright",
+          "expect": null
+        },
+        "3002": {
+          "char": "。",
+          "classes": [
+            "li-pc-3002",
+            "li-punct",
+            "li-punct-point"
+          ],
+          "classesExport": [
+            "li-hangable",
+            "li-pc-3002",
+            "li-punct",
+            "li-punct-point"
+          ],
+          "orientation": {
+            "vo": "Tu",
+            "css": "upright",
+            "rotate": false,
+            "source": "clreq"
+          },
+          "cssOrientation": "upright",
+          "expect": null
+        },
+        "ff0c": {
+          "char": "，",
+          "classes": [
+            "li-pc-ff0c",
+            "li-punct",
+            "li-punct-point"
+          ],
+          "classesExport": [
+            "li-hangable",
+            "li-pc-ff0c",
+            "li-punct",
+            "li-punct-point"
+          ],
+          "orientation": {
+            "vo": "Tu",
+            "css": "upright",
+            "rotate": false,
+            "source": "clreq"
+          },
+          "cssOrientation": "upright",
+          "expect": null
+        },
+        "ff1a": {
+          "char": "：",
+          "classes": [
+            "li-pc-ff1a",
+            "li-punct",
+            "li-punct-fixed"
+          ],
+          "classesExport": [
+            "li-pc-ff1a",
+            "li-punct",
+            "li-punct-fixed"
+          ],
+          "orientation": {
+            "vo": "Tr",
+            "css": "upright",
+            "rotate": false,
+            "source": "clreq"
+          },
+          "cssOrientation": "upright",
+          "expect": null
+        },
+        "ff1b": {
+          "char": "；",
+          "classes": [
+            "li-pc-ff1b",
+            "li-punct",
+            "li-punct-fixed"
+          ],
+          "classesExport": [
+            "li-pc-ff1b",
+            "li-punct",
+            "li-punct-fixed"
+          ],
+          "orientation": {
+            "vo": "Tr",
+            "css": "upright",
+            "rotate": false,
+            "source": "clreq"
+          },
+          "cssOrientation": "upright",
+          "expect": null
+        },
+        "ff1f": {
+          "char": "？",
+          "classes": [
+            "li-pc-ff1f",
+            "li-punct",
+            "li-punct-fixed"
+          ],
+          "classesExport": [
+            "li-pc-ff1f",
+            "li-punct",
+            "li-punct-fixed"
+          ],
+          "orientation": {
+            "vo": "Tu",
+            "css": "upright",
+            "rotate": false,
+            "source": "clreq"
+          },
+          "cssOrientation": "upright",
+          "expect": null
+        },
+        "ff01": {
+          "char": "！",
+          "classes": [
+            "li-pc-ff01",
+            "li-punct",
+            "li-punct-fixed"
+          ],
+          "classesExport": [
+            "li-pc-ff01",
+            "li-punct",
+            "li-punct-fixed"
+          ],
+          "orientation": {
+            "vo": "Tu",
+            "css": "upright",
+            "rotate": false,
+            "source": "clreq"
+          },
+          "cssOrientation": "upright",
+          "expect": null
+        },
+        "300c": {
+          "char": "「",
+          "classes": [
+            "li-pc-300c",
+            "li-punct",
+            "li-punct-quote"
+          ],
+          "classesExport": [
+            "li-pc-300c",
+            "li-punct",
+            "li-punct-quote"
+          ],
+          "orientation": {
+            "vo": "Tr",
+            "css": "upright",
+            "rotate": false,
+            "source": "clreq"
+          },
+          "cssOrientation": "upright",
+          "expect": null
+        },
+        "300d": {
+          "char": "」",
+          "classes": [
+            "li-pc-300d",
+            "li-punct",
+            "li-punct-quote"
+          ],
+          "classesExport": [
+            "li-pc-300d",
+            "li-punct",
+            "li-punct-quote"
+          ],
+          "orientation": {
+            "vo": "Tr",
+            "css": "upright",
+            "rotate": false,
+            "source": "clreq"
+          },
+          "cssOrientation": "upright",
+          "expect": null
+        },
+        "300e": {
+          "char": "『",
+          "classes": [
+            "li-pc-300e",
+            "li-punct",
+            "li-punct-quote"
+          ],
+          "classesExport": [
+            "li-pc-300e",
+            "li-punct",
+            "li-punct-quote"
+          ],
+          "orientation": {
+            "vo": "Tr",
+            "css": "upright",
+            "rotate": false,
+            "source": "clreq"
+          },
+          "cssOrientation": "upright",
+          "expect": null
+        },
+        "300f": {
+          "char": "』",
+          "classes": [
+            "li-pc-300f",
+            "li-punct",
+            "li-punct-quote"
+          ],
+          "classesExport": [
+            "li-pc-300f",
+            "li-punct",
+            "li-punct-quote"
+          ],
+          "orientation": {
+            "vo": "Tr",
+            "css": "upright",
+            "rotate": false,
+            "source": "clreq"
+          },
+          "cssOrientation": "upright",
+          "expect": null
+        },
+        "ff08": {
+          "char": "（",
+          "classes": [
+            "li-pc-ff08",
+            "li-punct",
+            "li-punct-bracket"
+          ],
+          "classesExport": [
+            "li-pc-ff08",
+            "li-punct",
+            "li-punct-bracket"
+          ],
+          "orientation": {
+            "vo": "Tr",
+            "css": "upright",
+            "rotate": false,
+            "source": "clreq"
+          },
+          "cssOrientation": "upright",
+          "expect": null
+        },
+        "ff09": {
+          "char": "）",
+          "classes": [
+            "li-pc-ff09",
+            "li-punct",
+            "li-punct-bracket"
+          ],
+          "classesExport": [
+            "li-pc-ff09",
+            "li-punct",
+            "li-punct-bracket"
+          ],
+          "orientation": {
+            "vo": "Tr",
+            "css": "upright",
+            "rotate": false,
+            "source": "clreq"
+          },
+          "cssOrientation": "upright",
+          "expect": null
+        },
+        "00b7": {
+          "char": "·",
+          "classes": [
+            "li-pc-00b7",
+            "li-punct",
+            "li-punct-fixed",
+            "li-punct-middot"
+          ],
+          "classesExport": [
+            "li-pc-00b7",
+            "li-punct",
+            "li-punct-fixed",
+            "li-punct-middot"
+          ],
+          "orientation": {
+            "vo": "R",
+            "css": "upright",
+            "rotate": false,
+            "source": "clreq"
+          },
+          "cssOrientation": "upright",
+          "expect": null
+        }
+      },
+      "pcf": {
+        "--li-pcf-dx-3002": "-0.536em",
+        "--li-pcf-dy-3002": "0.293em",
+        "--li-pcf-dx-3001": "-0.572em",
+        "--li-pcf-dy-3001": "0.326em",
+        "--li-pcf-dx-ff0c": "-0.583em",
+        "--li-pcf-dy-ff0c": "0.293em",
+        "--li-pcf-dx-ff1a": "0em",
+        "--li-pcf-dy-ff1a": "0em",
+        "--li-pcf-dx-ff1b": "0em",
+        "--li-pcf-dy-ff1b": "0em",
+        "--li-pcf-dx-ff1f": "0em",
+        "--li-pcf-dy-ff1f": "0em",
+        "--li-pcf-dx-ff01": "0em",
+        "--li-pcf-dy-ff01": "0em",
+        "--li-pcf-dx-300c": "0em",
+        "--li-pcf-dy-300c": "0em",
+        "--li-pcf-dx-300d": "0em",
+        "--li-pcf-dy-300d": "0em",
+        "--li-pcf-dx-300e": "0em",
+        "--li-pcf-dy-300e": "0em",
+        "--li-pcf-dx-300f": "0em",
+        "--li-pcf-dy-300f": "0em",
+        "--li-pcf-dx-201c": "0em",
+        "--li-pcf-dy-201c": "0em",
+        "--li-pcf-dx-201d": "0em",
+        "--li-pcf-dy-201d": "0em",
+        "--li-pcf-dx-2018": "0em",
+        "--li-pcf-dy-2018": "0em",
+        "--li-pcf-dx-2019": "0em",
+        "--li-pcf-dy-2019": "0em",
+        "--li-pcf-dx-ff08": "0em",
+        "--li-pcf-dy-ff08": "0em",
+        "--li-pcf-dx-ff09": "0em",
+        "--li-pcf-dy-ff09": "0em",
+        "--li-pcf-dx-3010": "0em",
+        "--li-pcf-dy-3010": "0em",
+        "--li-pcf-dx-3011": "0em",
+        "--li-pcf-dy-3011": "0em",
+        "--li-pcf-dx-3014": "0em",
+        "--li-pcf-dy-3014": "0em",
+        "--li-pcf-dx-3015": "0em",
+        "--li-pcf-dy-3015": "0em",
+        "--li-pcf-dx-300a": "0em",
+        "--li-pcf-dy-300a": "0em",
+        "--li-pcf-dx-300b": "0em",
+        "--li-pcf-dy-300b": "0em",
+        "--li-pcf-dx-3008": "0em",
+        "--li-pcf-dy-3008": "0em",
+        "--li-pcf-dx-3009": "0em",
+        "--li-pcf-dy-3009": "0em"
+      }
+    },
+    "ko": {
+      "region": "ko",
+      "fontStack": "Noto Serif KR, Source Han Serif KR, Nanum Myeongjo, Apple SD Gothic Neo, serif",
+      "chars": {
+        "2014": {
+          "char": "—",
+          "classes": [
+            "li-pc-2014",
+            "li-punct",
+            "li-punct-dash"
+          ],
+          "classesExport": [
+            "li-pc-2014",
+            "li-punct",
+            "li-punct-dash"
+          ],
+          "orientation": {
+            "vo": "R",
+            "css": "sideways",
+            "rotate": true,
+            "source": "clreq"
+          },
+          "cssOrientation": "sideways",
+          "expect": null
+        },
+        "2026": {
+          "char": "…",
+          "classes": [
+            "li-pc-2026",
+            "li-punct",
+            "li-punct-dash"
+          ],
+          "classesExport": [
+            "li-pc-2026",
+            "li-punct",
+            "li-punct-dash"
+          ],
+          "orientation": {
+            "vo": "R",
+            "css": "upright",
+            "rotate": false,
+            "source": "clreq"
+          },
+          "cssOrientation": "upright",
+          "expect": null
+        },
+        "3001": {
+          "char": "、",
+          "classes": [
+            "li-pc-3001",
+            "li-punct",
+            "li-punct-point"
+          ],
+          "classesExport": [
+            "li-hangable",
+            "li-pc-3001",
+            "li-punct",
+            "li-punct-point"
+          ],
+          "orientation": {
+            "vo": "Tu",
+            "css": "upright",
+            "rotate": false,
+            "source": "clreq"
+          },
+          "cssOrientation": "upright",
+          "expect": null
+        },
+        "3002": {
+          "char": "。",
+          "classes": [
+            "li-pc-3002",
+            "li-punct",
+            "li-punct-point"
+          ],
+          "classesExport": [
+            "li-hangable",
+            "li-pc-3002",
+            "li-punct",
+            "li-punct-point"
+          ],
+          "orientation": {
+            "vo": "Tu",
+            "css": "upright",
+            "rotate": false,
+            "source": "clreq"
+          },
+          "cssOrientation": "upright",
+          "expect": null
+        },
+        "ff0c": {
+          "char": "，",
+          "classes": [
+            "li-pc-ff0c",
+            "li-punct",
+            "li-punct-point"
+          ],
+          "classesExport": [
+            "li-hangable",
+            "li-pc-ff0c",
+            "li-punct",
+            "li-punct-point"
+          ],
+          "orientation": {
+            "vo": "Tu",
+            "css": "upright",
+            "rotate": false,
+            "source": "clreq"
+          },
+          "cssOrientation": "upright",
+          "expect": null
+        },
+        "ff1a": {
+          "char": "：",
+          "classes": [
+            "li-pc-ff1a",
+            "li-punct",
+            "li-punct-fixed"
+          ],
+          "classesExport": [
+            "li-pc-ff1a",
+            "li-punct",
+            "li-punct-fixed"
+          ],
+          "orientation": {
+            "vo": "Tr",
+            "css": "upright",
+            "rotate": false,
+            "source": "clreq"
+          },
+          "cssOrientation": "upright",
+          "expect": null
+        },
+        "ff1b": {
+          "char": "；",
+          "classes": [
+            "li-pc-ff1b",
+            "li-punct",
+            "li-punct-fixed"
+          ],
+          "classesExport": [
+            "li-pc-ff1b",
+            "li-punct",
+            "li-punct-fixed"
+          ],
+          "orientation": {
+            "vo": "Tr",
+            "css": "upright",
+            "rotate": false,
+            "source": "clreq"
+          },
+          "cssOrientation": "upright",
+          "expect": null
+        },
+        "ff1f": {
+          "char": "？",
+          "classes": [
+            "li-pc-ff1f",
+            "li-punct",
+            "li-punct-fixed"
+          ],
+          "classesExport": [
+            "li-pc-ff1f",
+            "li-punct",
+            "li-punct-fixed"
+          ],
+          "orientation": {
+            "vo": "Tu",
+            "css": "upright",
+            "rotate": false,
+            "source": "clreq"
+          },
+          "cssOrientation": "upright",
+          "expect": null
+        },
+        "ff01": {
+          "char": "！",
+          "classes": [
+            "li-pc-ff01",
+            "li-punct",
+            "li-punct-fixed"
+          ],
+          "classesExport": [
+            "li-pc-ff01",
+            "li-punct",
+            "li-punct-fixed"
+          ],
+          "orientation": {
+            "vo": "Tu",
+            "css": "upright",
+            "rotate": false,
+            "source": "clreq"
+          },
+          "cssOrientation": "upright",
+          "expect": null
+        },
+        "300c": {
+          "char": "「",
+          "classes": [
+            "li-pc-300c",
+            "li-punct",
+            "li-punct-quote"
+          ],
+          "classesExport": [
+            "li-pc-300c",
+            "li-punct",
+            "li-punct-quote"
+          ],
+          "orientation": {
+            "vo": "Tr",
+            "css": "upright",
+            "rotate": false,
+            "source": "clreq"
+          },
+          "cssOrientation": "upright",
+          "expect": null
+        },
+        "300d": {
+          "char": "」",
+          "classes": [
+            "li-pc-300d",
+            "li-punct",
+            "li-punct-quote"
+          ],
+          "classesExport": [
+            "li-pc-300d",
+            "li-punct",
+            "li-punct-quote"
+          ],
+          "orientation": {
+            "vo": "Tr",
+            "css": "upright",
+            "rotate": false,
+            "source": "clreq"
+          },
+          "cssOrientation": "upright",
+          "expect": null
+        },
+        "300e": {
+          "char": "『",
+          "classes": [
+            "li-pc-300e",
+            "li-punct",
+            "li-punct-quote"
+          ],
+          "classesExport": [
+            "li-pc-300e",
+            "li-punct",
+            "li-punct-quote"
+          ],
+          "orientation": {
+            "vo": "Tr",
+            "css": "upright",
+            "rotate": false,
+            "source": "clreq"
+          },
+          "cssOrientation": "upright",
+          "expect": null
+        },
+        "300f": {
+          "char": "』",
+          "classes": [
+            "li-pc-300f",
+            "li-punct",
+            "li-punct-quote"
+          ],
+          "classesExport": [
+            "li-pc-300f",
+            "li-punct",
+            "li-punct-quote"
+          ],
+          "orientation": {
+            "vo": "Tr",
+            "css": "upright",
+            "rotate": false,
+            "source": "clreq"
+          },
+          "cssOrientation": "upright",
+          "expect": null
+        },
+        "ff08": {
+          "char": "（",
+          "classes": [
+            "li-pc-ff08",
+            "li-punct",
+            "li-punct-bracket"
+          ],
+          "classesExport": [
+            "li-pc-ff08",
+            "li-punct",
+            "li-punct-bracket"
+          ],
+          "orientation": {
+            "vo": "Tr",
+            "css": "upright",
+            "rotate": false,
+            "source": "clreq"
+          },
+          "cssOrientation": "upright",
+          "expect": null
+        },
+        "ff09": {
+          "char": "）",
+          "classes": [
+            "li-pc-ff09",
+            "li-punct",
+            "li-punct-bracket"
+          ],
+          "classesExport": [
+            "li-pc-ff09",
+            "li-punct",
+            "li-punct-bracket"
+          ],
+          "orientation": {
+            "vo": "Tr",
+            "css": "upright",
+            "rotate": false,
+            "source": "clreq"
+          },
+          "cssOrientation": "upright",
+          "expect": null
+        },
+        "00b7": {
+          "char": "·",
+          "classes": [
+            "li-pc-00b7",
+            "li-punct",
+            "li-punct-fixed",
+            "li-punct-middot"
+          ],
+          "classesExport": [
+            "li-pc-00b7",
+            "li-punct",
+            "li-punct-fixed",
+            "li-punct-middot"
+          ],
+          "orientation": {
+            "vo": "R",
+            "css": "upright",
+            "rotate": false,
+            "source": "clreq"
+          },
+          "cssOrientation": "upright",
+          "expect": null
+        }
+      },
+      "pcf": {
+        "--li-pcf-dx-3002": "-0.536em",
+        "--li-pcf-dy-3002": "0.293em",
+        "--li-pcf-dx-3001": "-0.572em",
+        "--li-pcf-dy-3001": "0.326em",
+        "--li-pcf-dx-ff0c": "-0.583em",
+        "--li-pcf-dy-ff0c": "0.293em",
+        "--li-pcf-dx-ff1a": "0em",
+        "--li-pcf-dy-ff1a": "0em",
+        "--li-pcf-dx-ff1b": "0em",
+        "--li-pcf-dy-ff1b": "0em",
+        "--li-pcf-dx-ff1f": "0em",
+        "--li-pcf-dy-ff1f": "0em",
+        "--li-pcf-dx-ff01": "0em",
+        "--li-pcf-dy-ff01": "0em",
+        "--li-pcf-dx-300c": "0em",
+        "--li-pcf-dy-300c": "0em",
+        "--li-pcf-dx-300d": "0em",
+        "--li-pcf-dy-300d": "0em",
+        "--li-pcf-dx-300e": "0em",
+        "--li-pcf-dy-300e": "0em",
+        "--li-pcf-dx-300f": "0em",
+        "--li-pcf-dy-300f": "0em",
+        "--li-pcf-dx-201c": "0em",
+        "--li-pcf-dy-201c": "0em",
+        "--li-pcf-dx-201d": "0em",
+        "--li-pcf-dy-201d": "0em",
+        "--li-pcf-dx-2018": "0em",
+        "--li-pcf-dy-2018": "0em",
+        "--li-pcf-dx-2019": "0em",
+        "--li-pcf-dy-2019": "0em",
+        "--li-pcf-dx-ff08": "0em",
+        "--li-pcf-dy-ff08": "0em",
+        "--li-pcf-dx-ff09": "0em",
+        "--li-pcf-dy-ff09": "0em",
+        "--li-pcf-dx-3010": "0em",
+        "--li-pcf-dy-3010": "0em",
+        "--li-pcf-dx-3011": "0em",
+        "--li-pcf-dy-3011": "0em",
+        "--li-pcf-dx-3014": "0em",
+        "--li-pcf-dy-3014": "0em",
+        "--li-pcf-dx-3015": "0em",
+        "--li-pcf-dy-3015": "0em",
+        "--li-pcf-dx-300a": "0em",
+        "--li-pcf-dy-300a": "0em",
+        "--li-pcf-dx-300b": "0em",
+        "--li-pcf-dy-300b": "0em",
+        "--li-pcf-dx-3008": "0em",
+        "--li-pcf-dy-3008": "0em",
+        "--li-pcf-dx-3009": "0em",
+        "--li-pcf-dy-3009": "0em"
+      }
+    }
+  }
+}

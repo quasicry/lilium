@@ -1,0 +1,102 @@
+combiningsigns	ayogavaha	ඁ
+combiningsigns	ayogavaha	ං
+combiningsigns	ayogavaha	ඃ
+consonants	main	ක
+consonants	main	ඛ
+consonants	main	ග
+consonants	main	ඝ
+consonants	main	ඞ
+consonants	main	ච
+consonants	main	ඡ
+consonants	main	ජ
+consonants	main	ඣ
+consonants	main	ඤ
+consonants	main	ට
+consonants	main	ඨ
+consonants	main	ඩ
+consonants	main	ඪ
+consonants	main	ණ
+consonants	main	ත
+consonants	main	ථ
+consonants	main	ද
+consonants	main	ධ
+consonants	main	න
+consonants	main	ප
+consonants	main	ඵ
+consonants	main	බ
+consonants	main	භ
+consonants	main	ම
+consonants	main	ය
+consonants	main	ර
+consonants	main	ල
+consonants	main	ව
+consonants	main	ශ
+consonants	main	ෂ
+consonants	main	ස
+consonants	main	හ
+consonants	main	ත·
+consonants	persoarabic	ක·
+consonants	persoarabic	ඛ·
+consonants	persoarabic	ග·
+consonants	persoarabic	ජ·
+consonants	persoarabic	ඩ·
+consonants	persoarabic	ඪ·
+consonants	persoarabic	ෆ
+consonants	persoarabic	ය·
+consonants	sinhala	ඟ
+consonants	sinhala	ඦ
+consonants	sinhala	ඬ
+consonants	sinhala	ඳ
+consonants	sinhala	ඹ
+consonants	south	ළ
+consonants	south	ළ·
+consonants	south	ර·
+consonants	south	න·
+numerals		෦
+numerals		෧
+numerals		෨
+numerals		෩
+numerals		෪
+numerals		෫
+numerals		෬
+numerals		෭
+numerals		෮
+numerals		෯
+others	om	ඕං
+others	symbols	(අ)
+vowels	main	අ
+vowels	main	ආ
+vowels	main	ඉ
+vowels	main	ඊ
+vowels	main	උ
+vowels	main	ඌ
+vowels	main	ඍ
+vowels	main	ඎ
+vowels	main	ඏ
+vowels	main	ඐ
+vowels	main	ඒ
+vowels	main	ඓ
+vowels	main	ඕ
+vowels	main	ඖ
+vowels	modern	ඇ
+vowels	sinhala	ඈ
+vowels	south	එ
+vowels	south	ඔ
+vowelsigns	main	ා
+vowelsigns	main	ි
+vowelsigns	main	ී
+vowelsigns	main	ු
+vowelsigns	main	ූ
+vowelsigns	main	ෘ
+vowelsigns	main	ෲ
+vowelsigns	main	ෟ
+vowelsigns	main	ෳ
+vowelsigns	main	ේ
+vowelsigns	main	ෛ
+vowelsigns	main	ෝ
+vowelsigns	main	ෞ
+vowelsigns	modern	ැ
+vowelsigns	sinhala	ෑ
+vowelsigns	south	ෙ
+vowelsigns	south	ො
+vowelsigns	virama	්

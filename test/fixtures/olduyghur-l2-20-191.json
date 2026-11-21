@@ -1,0 +1,78 @@
+{
+ "source": "Anshuman Pandey, Final proposal to encode Old Uyghur in Unicode, UTC L2/20-191 (https://www.unicode.org/L2/L2020/20191-old-uyghur.pdf), §6.6 Proposed encoded character repertoire, Letters table (Latin column); captured 2026-11-05 via pdftotext",
+ "note": "GIMEL-HETH Latin column is 'γ, x, q' (contextual readings); ZAYIN 'z, ž'; FINAL HETH '-x, -q'. Canonical single-token mapping per §8.1/§8.2 dotted readings is asserted in the gate.",
+ "letters": {
+  "ALEPH": {
+   "cp": "0x10f70",
+   "latin": "ʾ"
+  },
+  "BETH": {
+   "cp": "0x10f71",
+   "latin": "β"
+  },
+  "GIMEL-HETH": {
+   "cp": "0x10f72",
+   "latin": "γ, x, q"
+  },
+  "WAW": {
+   "cp": "0x10f73",
+   "latin": "w"
+  },
+  "ZAYIN": {
+   "cp": "0x10f74",
+   "latin": "z, ž"
+  },
+  "FINAL HETH": {
+   "cp": "0x10f75",
+   "latin": "-x, -q"
+  },
+  "YODH": {
+   "cp": "0x10f76",
+   "latin": "y"
+  },
+  "KAPH": {
+   "cp": "0x10f77",
+   "latin": "k"
+  },
+  "LAMEDH": {
+   "cp": "0x10f78",
+   "latin": "δ"
+  },
+  "MEM": {
+   "cp": "0x10f79",
+   "latin": "m"
+  },
+  "NUN": {
+   "cp": "0x10f7a",
+   "latin": "n"
+  },
+  "SAMEKH": {
+   "cp": "0x10f7b",
+   "latin": "s"
+  },
+  "PE": {
+   "cp": "0x10f7c",
+   "latin": "p"
+  },
+  "SADHE": {
+   "cp": "0x10f7d",
+   "latin": "c"
+  },
+  "RESH": {
+   "cp": "0x10f7e",
+   "latin": "r"
+  },
+  "SHIN": {
+   "cp": "0x10f7f",
+   "latin": "š"
+  },
+  "TAW": {
+   "cp": "0x10f80",
+   "latin": "t"
+  },
+  "LESH": {
+   "cp": "0x10f81",
+   "latin": "l"
+  }
+ }
+}

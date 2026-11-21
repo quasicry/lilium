@@ -1,0 +1,106 @@
+# lilium 插件 CI（Continuous Integration 持續集成）
+#
+# 目標：把本地門禁（Spec→Plan→Patch→Proof）搬到 GitHub Actions 自動執行。
+# 門禁鏈：版本四位一體 → tsc → build → run.mjs（651 斷言）→ lint:ci（官方
+# obsidianmd 規則集＋存量基線鎖 894）→ 構建產物 md5 四檔一致性。
+#
+# 瀏覽器類門禁（run.mjs 內 chromium 探針、test:*-browser）需要 LI_CHROMIUM；
+# CI 上用 playwright 自帶 chromium（npx playwright install chromium --with-deps），
+# 本地基線 PATH 前綴 /home/agentuser/bin 的等效替代。
+#
+# 存量策略：eslint --max-warnings 894 鎖基線（docs/SECURITY-BASELINE.md）——
+# 只許減不許增；清償後同步下調 package.json 的 lint:ci 數字。
+#
+# artifact attestation：npm 包/構建產物走 actions/attest-build-provenance
+# （需要 id-token: write）。disclosures 標籤：官方 manifest.json 尚未定義
+# disclosures 欄位——先以本註釋與 SECURITY-BASELINE.md 承接，官方格式定稿後
+# 在 validate-manifest 步驟補齊（見 TODO）。
+
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  gate:
+    name: 門禁（版本→型別→構建→斷言→lint）
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: 安裝依賴（--legacy-peer-deps）
+        run: npm install -g npm@10.8.2 && (npm ci --legacy-peer-deps || npm install --legacy-peer-deps)
+
+      # ── 靜態合規快檢（8 類規則）──
+      - name: 快速門禁 gate.mjs
+        run: node scripts/gate.mjs
+
+      # ── 版本四位一體（[1.58]）──
+      - name: 版本四位一體檢查
+        run: node .github/scripts/version-fourway.cjs
+
+      # ── 型別＋構建 ──
+      - name: tsc 型別檢查
+        run: npx tsc -noEmit -skipLibCheck
+
+      - name: 構建
+        run: npm run build
+
+      # ── 官方社區掃描器規則集（存量基線鎖定）──
+      - name: ESLint（obsidianmd 規則集＋基線 894）
+        run: npm run lint:ci
+
+      # ── 主門禁（斷言；瀏覽器探針需 chromium）──
+      - name: 安裝 CI Chromium
+        run: (npx playwright-core install chromium --with-deps || npx playwright install chromium --with-deps) && CHROME=$(find ~/.cache/ms-playwright -name chrome -type f | head -1) && echo "LI_CHROMIUM=$CHROME" >> "$GITHUB_ENV" && echo "CHROME_BIN=$CHROME" >> "$GITHUB_ENV"
+
+      - name: run.mjs 門禁
+        run: node test/run.mjs
+
+      # ── 構建產物收據 ──
+      - name: 產物 md5 收據
+        run: |
+          md5sum main.js styles.css manifest.json
+          test -f main.js && test -f styles.css
+
+      - name: 上傳構建產物
+        uses: actions/upload-artifact@v4
+        with:
+          name: plugin-build
+          path: |
+            main.js
+            styles.css
+            manifest.json
+          retention-days: 14
+
+      # ── artifact attestation（SLSA build provenance）──
+      # TODO: 倉庫公開後啟用（需要 id-token 權限與 GitHub Releases 流程）
+      # - uses: actions/attest-build-provenance@v1
+      #   if: startsWith(github.ref, 'refs/tags/')
+      #   with:
+      #     subject-path: main.js
+
+  # 逐項測試池（可選矩陣；首期僅主門禁，池化待倉庫上線後開）：
+  # test-matrix:
+  #   strategy:
+  #     matrix:
+  #       pool: [corpus, epub, browser]
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - uses: actions/setup-node@v4
+  #       with: { node-version: 22, cache: npm }
+  #     - run: npm ci --legacy-peer-deps
+  #     - run: node test/parallel-runner.mjs test/test-pools.json test/build/runner-state.json --pool=${{ matrix.pool }}

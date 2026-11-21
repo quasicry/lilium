@@ -1,0 +1,237 @@
+{
+ "source": "r41 梵文 IAST 逐句對照語料（金剛經＋कृष्णाष्टकम्＋अवधानस्तोत्र）",
+ "pairs": [
+  {
+   "deva": "वज्रच्छेदिका प्रज्ञापारमिता",
+   "iast": "vajracchedikā prajñāpāramitā"
+  },
+  {
+   "deva": "नमो भगवत्या आर्यप्रज्ञापारमितायै॥",
+   "iast": "namo bhagavatyā āryaprajñāpāramitāyai ||"
+  },
+  {
+   "deva": "एवं मया श्रुतम्। एकस्मिन्समये भगवाञ्छ्रावस्त्यां विहरति स्म जेतवनेऽनाथपिण्डदस्यारामे महता भिक्षुसंघेन सार्द्धमर्धत्रयोदशभिर्भिक्षुशतैः संबहुलैश्च बोधिसत्त्वैर्महासत्त्वैः।",
+   "iast": "evaṃ mayā śrutam | ekasminsamaye bhagavāñchrāvastyāṃ viharati sma jetavane'nāthapiṇḍadasyārāme mahatā bhikṣusaṃghena sārddhamardhatrayodaśabhirbhikṣuśataiḥ saṃbahulaiśca bodhisattvairmahāsattvaiḥ |"
+  },
+  {
+   "deva": "अथ खलु भगवान्पूर्वाह्णकालसमये निवास्य पात्रचीवरमादाय श्रावस्तीं महानगरीं पिण्डाय प्राविक्षत्। अथ खलु भगवाञ्छ्रावस्तीं महानगरीं पिण्डाय चरित्वा कृतभक्तकृत्यः पश्चाद्भक्तपिण्डपातप्रतिक्रान्तः पात्रचीवरं प्रतिशाम्य पादौ प्रक्षल्य न्यषीदत्प्रज्ञप्त एवासने पर्यङ्कमाभुज्य ऋजुं कायं प्रणिधाय प्रतिमुखीं स्मृतिमुपस्थाप्य।",
+   "iast": "atha khalu bhagavānpūrvāhṇakālasamaye nivāsya pātracīvaramādāya śrāvastīṃ mahānagarīṃ piṇḍāya prāvikṣat | atha khalu bhagavāñchrāvastīṃ mahānagarīṃ piṇḍāya caritvā kṛtabhaktakṛtyaḥ paścādbhaktapiṇḍapātapratikrāntaḥ pātracīvaraṃ pratiśāmya pādau prakṣalya nyaṣīdatprajñapta evāsane paryaṅkamābhujya ṛjuṃ kāyaṃ praṇidhāya pratimukhīṃ smṛtimupasthāpya |"
+  },
+  {
+   "deva": "अथ खलु संबहुला भिक्षवो येन भगवांस्तेनोपसंक्रमन्। उपसंक्रम्य भगवतः पादौ शिरोभिरभिवन्द्य भगवन्तं त्रिष्प्रदक्षिणीकृत्य एकान्ते न्यषीदन्॥१॥",
+   "iast": "atha khalu saṃbahulā bhikṣavo yena bhagavāṃstenopasaṃkraman | upasaṃkramya bhagavataḥ pādau śirobhirabhivandya bhagavantaṃ triṣpradakṣiṇīkṛtya ekānte nyaṣīdan ||1||"
+  },
+  {
+   "deva": "वज्रच्छेदिका प्रज्ञापारमिता",
+   "iast": "vajracchedikā prajñāpāramitā"
+  },
+  {
+   "deva": "नमो भगवत्या आर्यप्रज्ञापारमितायै॥",
+   "iast": "namo bhagavatyā āryaprajñāpāramitāyai ||"
+  },
+  {
+   "deva": "तेन खलु पुनः समयेनायुष्मान्सुभूतिस्तस्यामेव पर्षदि संनिपतितोऽभूत्संनिषण्णः। अथ खल्वायुष्मान्सुभूतिरुत्थायासनादेकांसमुत्तरासङ्गं कृत्वा दक्षिणं जानुमण्डलं पृथिव्यां प्रतिष्ठाप्य येन भगवांस्तेनाञ्जलिं प्रणम्य भगवन्तमेतदवोचत्।",
+   "iast": "tena khalu punaḥ samayenāyuṣmānsubhūtistasyāmeva parṣadi saṃnipatito'bhūtsaṃniṣaṇṇaḥ | atha khalvāyuṣmānsubhūtirutthāyāsanādekāṃsamuttarāsaṅgaṃ kṛtvā dakṣiṇaṃ jānumaṇḍalaṃ pṛthivyāṃ pratiṣṭhāpya yena bhagavāṃstenāñjaliṃ praṇamya bhagavantametadavocat |"
+  },
+  {
+   "deva": "आश्चर्यं भगवन्परमाश्चर्यं सुगत यावदेव तथागतेनार्हता सम्यक्संबुद्धेन बोधिसत्त्वा महासत्त्वा अनुपरिगृहीताः परमेणानुग्रहेण। आश्चर्यं भगवन्यावदेव तथागतेनार्हता सम्यक्संबुद्धेन बोधिसत्त्वा महासत्त्वाः परीन्दिताः परमया परीन्दनया। तत्कथं भगवन् बोधिसत्त्वयानसंप्रस्थितेन कुलपुत्रेण वा कुलदुहित्रा वा स्थातव्यं कथं प्रतिपत्तव्यं कथं चित्तं प्रग्रहीतव्यम्।",
+   "iast": "āścaryaṃ bhagavanparamāścaryaṃ sugata yāvadeva tathāgatenārhatā samyaksaṃbuddhena bodhisattvā mahāsattvā anuparigṛhītāḥ parameṇānugraheṇa | āścaryaṃ bhagavanyāvadeva tathāgatenārhatā samyaksaṃbuddhena bodhisattvā mahāsattvāḥ parīnditāḥ paramayā parīndanayā | tatkathaṃ bhagavan bodhisattvayānasaṃprasthitena kulaputreṇa vā kuladuhitrā vā sthātavyaṃ kathaṃ pratipattavyaṃ kathaṃ cittaṃ pragrahītavyam |"
+  },
+  {
+   "deva": "एवमुक्ते भगवानायुष्मन्तं सुभूतिमेतदवोचत्-- साधु साधु सुभूते एवमेतद्यथा वदसि। अनुपरिगृहीतास्तथागतेन बोधिसत्त्वा महासत्त्वाः परमेणानुग्रहेण। परीन्दितास्तथागतेन बोधिसत्त्वा महासत्त्वाः परमया परीन्दनया। तेन हि सुभूते शृणु साधु च सुष्ठु च मनसिकुरु भाषिष्येऽहं ते-- यथा बोधिसत्त्वयानसंप्रस्थितेन स्थातव्यं यथा प्रतिपत्तव्यं यथा चित्तं प्रग्रहीतव्यम्। एवं भगवन्नित्यायुष्मान्सुभूतिर्भगवतः प्रत्यश्रौषीत्॥२॥",
+   "iast": "evamukte bhagavānāyuṣmantaṃ subhūtimetadavocat-- sādhu sādhu subhūte evametadyathā vadasi | anuparigṛhītāstathāgatena bodhisattvā mahāsattvāḥ parameṇānugraheṇa | parīnditāstathāgatena bodhisattvā mahāsattvāḥ paramayā parīndanayā | tena hi subhūte śṛṇu sādhu ca suṣṭhu ca manasikuru bhāṣiṣye'haṃ te-- yathā bodhisattvayānasaṃprasthitena sthātavyaṃ yathā pratipattavyaṃ yathā cittaṃ pragrahītavyam | evaṃ bhagavannityāyuṣmānsubhūtirbhagavataḥ pratyaśrauṣīt ||2||"
+  },
+  {
+   "deva": "वज्रच्छेदिका प्रज्ञापारमिता",
+   "iast": "vajracchedikā prajñāpāramitā"
+  },
+  {
+   "deva": "नमो भगवत्या आर्यप्रज्ञापारमितायै॥",
+   "iast": "namo bhagavatyā āryaprajñāpāramitāyai ||"
+  },
+  {
+   "deva": "भगवानेतदवोचत्-- इह सुभूते बोधिसत्त्वयानसंप्रस्थितेनैवं चित्तमुत्पादयितव्यम्-- यावन्तः सुभूते सत्त्वाः सत्त्वधातौ सत्त्वसंग्रहेण संगृहीता अण्डजा वा जरायुजा वा संस्वेदजा वौपपादुका वा रूपिणो वारूपिणो वा संज्ञिनो वासंज्ञिनो वा नैव संज्ञिनो नासंज्ञिनो वा यावन् कश्चित्सत्त्वधातुः प्रज्ञप्यमानः प्रज्ञप्यते ते च मया सर्वेऽनुपधिशेषे निर्वाणधातौ परिनिर्वापयितव्याः। एवमपरिमाणानपि सत्त्वान्परिनिर्वाप्य न कश्चित्सत्त्वः परिनिर्वापितो भवति।",
+   "iast": "bhagavānetadavocat-- iha subhūte bodhisattvayānasaṃprasthitenaivaṃ cittamutpādayitavyam-- yāvantaḥ subhūte sattvāḥ sattvadhātau sattvasaṃgraheṇa saṃgṛhītā aṇḍajā vā jarāyujā vā saṃsvedajā vaupapādukā vā rūpiṇo vārūpiṇo vā saṃjñino vāsaṃjñino vā naiva saṃjñino nāsaṃjñino vā yāvan kaścitsattvadhātuḥ prajñapyamānaḥ prajñapyate te ca mayā sarve'nupadhiśeṣe nirvāṇadhātau parinirvāpayitavyāḥ | evamaparimāṇānapi sattvānparinirvāpya na kaścitsattvaḥ parinirvāpito bhavati |"
+  },
+  {
+   "deva": "तत्कस्य हेतोः सचेत्सुभूते बोधिसत्त्वस्य सत्त्वसंज्ञा प्रवर्तेत न स बोधिसत्त्व इति वक्तव्यः। तत्कस्य हेतोः न स सुभूते बोधिसत्त्वो वक्तव्यो यस्यात्मसंज्ञा प्रवर्तेत सत्त्वसंज्ञा वा जीवसंज्ञा वा पुद्गलसंज्ञा वा प्रवर्तेत॥३॥",
+   "iast": "tatkasya hetoḥ sacetsubhūte bodhisattvasya sattvasaṃjñā pravarteta na sa bodhisattva iti vaktavyaḥ | tatkasya hetoḥ na sa subhūte bodhisattvo vaktavyo yasyātmasaṃjñā pravarteta sattvasaṃjñā vā jīvasaṃjñā vā pudgalasaṃjñā vā pravarteta ||3||"
+  },
+  {
+   "deva": "वज्रच्छेदिका प्रज्ञापारमिता",
+   "iast": "vajracchedikā prajñāpāramitā"
+  },
+  {
+   "deva": "नमो भगवत्या आर्यप्रज्ञापारमितायै॥",
+   "iast": "namo bhagavatyā āryaprajñāpāramitāyai ||"
+  },
+  {
+   "deva": "अपि तु खलु पुनः सुभूते न बोधिसत्त्वेन वस्तुप्रतिष्ठितेन दानं दातव्यम् न क्वचित्प्रतिष्ठितेन दानं दातव्यम्। न रूपप्रतिष्ठितेन दानं दातव्यम्। न शब्दगन्धरसस्प्रष्टव्यधर्मेषु प्रतिष्ठितेन दानं दातव्यम्। एवं हि सुभूते बोधिसत्त्वेन महासत्त्वेन दानं दातव्यं यथा न निमित्तसंज्ञायामपि प्रतितिष्ठेत्। तत्कस्य हेतोः यः सुभूतेऽप्रतिष्ठितो दानं ददाति तस्य सुभूते पुण्यस्कन्धस्य न सुकरं प्रमाणमुद्ग्रहीतुम्। तत्किं मन्यसे सुभूते सुकरं पूर्वस्यां दिशि आकाशस्य प्रमाणमुद्ग्रहीतुं सुभूतिराह-- नो हीदं भगवन्।",
+   "iast": "api tu khalu punaḥ subhūte na bodhisattvena vastupratiṣṭhitena dānaṃ dātavyam na kvacitpratiṣṭhitena dānaṃ dātavyam | na rūpapratiṣṭhitena dānaṃ dātavyam | na śabdagandharasaspraṣṭavyadharmeṣu pratiṣṭhitena dānaṃ dātavyam | evaṃ hi subhūte bodhisattvena mahāsattvena dānaṃ dātavyaṃ yathā na nimittasaṃjñāyāmapi pratitiṣṭhet | tatkasya hetoḥ yaḥ subhūte'pratiṣṭhito dānaṃ dadāti tasya subhūte puṇyaskandhasya na sukaraṃ pramāṇamudgrahītum | tatkiṃ manyase subhūte sukaraṃ pūrvasyāṃ diśi ākāśasya pramāṇamudgrahītuṃ subhūtirāha-- no hīdaṃ bhagavan |"
+  },
+  {
+   "deva": "भगवानाह-- एवं दक्षिणपश्चिमोत्तरास्वधोर्ध्वं दिग्विदिक्षु समन्ताद्दशसु दिक्षु सुकरमाकाशस्य प्रमाणमुद्ग्रहीतुम्। सुभूतिराह-- नो हीदं भगवन्। भगवानाह-- एवमेव सुभूते यो बोधिसत्त्वोऽप्रतिष्ठितो दानं ददाति तस्य सुभूते पुण्यस्कन्धस्य न सुकरं प्रमाणमुद्ग्रहीतुम्। एवं हि सुभूते बोधिसत्त्वयानसंप्रस्थितेन दानं दातव्यं यथा न निमित्तसंज्ञायामपि प्रतितिष्ठेत्॥४॥",
+   "iast": "bhagavānāha-- evaṃ dakṣiṇapaścimottarāsvadhordhvaṃ digvidikṣu samantāddaśasu dikṣu sukaramākāśasya pramāṇamudgrahītum | subhūtirāha-- no hīdaṃ bhagavan | bhagavānāha-- evameva subhūte yo bodhisattvo'pratiṣṭhito dānaṃ dadāti tasya subhūte puṇyaskandhasya na sukaraṃ pramāṇamudgrahītum | evaṃ hi subhūte bodhisattvayānasaṃprasthitena dānaṃ dātavyaṃ yathā na nimittasaṃjñāyāmapi pratitiṣṭhet ||4||"
+  },
+  {
+   "deva": "तत्किं मन्यसे सुभूते लक्षणसंपदा तथागतो द्रष्टव्यः। सुभूतिराह-- नो हीदं भगवन्। न लक्षणसंपदा तथागतो द्रष्टव्यः। तत्कस्य हेतोः या सा भगवन् लक्षणसंपत्तथागतेन भाषिता सैवालक्षणसंपत्। एवमुक्ते भगवानायुष्मन्तं सुभूतिमेतदवोचत् यावत्सुभूते लक्षणसंपत्तावन्मृषा यावदलक्षणसंपत्तावन्न मृषेति हि लक्षणालक्षणतस्तथागतो द्रष्टव्यः॥५॥",
+   "iast": "tatkiṃ manyase subhūte lakṣaṇasaṃpadā tathāgato draṣṭavyaḥ | subhūtirāha-- no hīdaṃ bhagavan | na lakṣaṇasaṃpadā tathāgato draṣṭavyaḥ | tatkasya hetoḥ yā sā bhagavan lakṣaṇasaṃpattathāgatena bhāṣitā saivālakṣaṇasaṃpat | evamukte bhagavānāyuṣmantaṃ subhūtimetadavocat yāvatsubhūte lakṣaṇasaṃpattāvanmṛṣā yāvadalakṣaṇasaṃpattāvanna mṛṣeti hi lakṣaṇālakṣaṇatastathāgato draṣṭavyaḥ ||5||"
+  },
+  {
+   "deva": "एवमुक्त आयुष्मान् सुभूतिर्भगवन्तमेतदवोचत्-- अस्ति भगवन्केचित्सत्त्वा भविष्यन्त्यनागतेऽध्वनि पश्चिमे काले पश्चिमे समये पश्चिमायां पञ्चशत्यां सद्धर्मविप्रलोपकाले वर्तमाने य इमेष्वेवंरूपेषु सूत्रान्तपदेषु भाष्यमाणेषु भूतसंज्ञामुत्पादयिष्यन्ति।",
+   "iast": "evamukta āyuṣmān subhūtirbhagavantametadavocat-- asti bhagavankecitsattvā bhaviṣyantyanāgate'dhvani paścime kāle paścime samaye paścimāyāṃ pañcaśatyāṃ saddharmavipralopakāle vartamāne ya imeṣvevaṃrūpeṣu sūtrāntapadeṣu bhāṣyamāṇeṣu bhūtasaṃjñāmutpādayiṣyanti |"
+  },
+  {
+   "deva": "भगवानाह-- मा सुभूते त्वमेवं वोचः। अस्ति केचित्सत्त्वा भविष्यन्त्यनागतेऽध्वनि पश्चिमे काले पश्चिमे समये पश्चिमायां पञ्चशत्यां सद्धर्मविप्रलोपकाले वर्तमाने य इमेष्वेवंरूपेषु सूत्रान्तपदेषु भाष्यमानेषु भूतसंज्ञामुत्पादयिष्यन्ति। अपि तु खलु पुनः सुभूते भविष्यन्त्यनागतेऽध्वनि बोधिसत्त्वा महासत्त्वाः पश्चिमे काले पश्चिमे समये पश्चिमायां पञ्चशत्यां सद्धर्मविप्रलोपे वर्तमाने गुणवन्तः शीलवन्तः प्रज्ञावन्तश्च भविष्यन्ति य इमेष्वेवंरूपेषु सूत्रान्तपदेषु भाष्यमाणेषु भूतसंज्ञामुत्पादयिष्यन्ति।",
+   "iast": "bhagavānāha-- mā subhūte tvamevaṃ vocaḥ | asti kecitsattvā bhaviṣyantyanāgate'dhvani paścime kāle paścime samaye paścimāyāṃ pañcaśatyāṃ saddharmavipralopakāle vartamāne ya imeṣvevaṃrūpeṣu sūtrāntapadeṣu bhāṣyamāneṣu bhūtasaṃjñāmutpādayiṣyanti | api tu khalu punaḥ subhūte bhaviṣyantyanāgate'dhvani bodhisattvā mahāsattvāḥ paścime kāle paścime samaye paścimāyāṃ pañcaśatyāṃ saddharmavipralope vartamāne guṇavantaḥ śīlavantaḥ prajñāvantaśca bhaviṣyanti ya imeṣvevaṃrūpeṣu sūtrāntapadeṣu bhāṣyamāṇeṣu bhūtasaṃjñāmutpādayiṣyanti |"
+  },
+  {
+   "deva": "न खलु पुनस्ते सुभूते बोधिसत्त्वा महासत्त्वा एकबुद्धपर्युपासिता भविष्यन्ति नैकबुद्धावरोपितकुशलमूला भविष्यन्ति। अपि तु खलु पुनः सुभूते अनेकबुद्धशतसहस्रपर्युपासिता अनेकबुद्धशतसहस्रावरोपितकुशलमूलास्ते बोधिसत्त्वा महासत्त्वा भविष्यन्ति य इमेष्वेवंरूपेषु सूत्रान्तपदेषु भाष्यमाणेष्वेकचित्तप्रसादमपि प्रतिलप्स्यन्ते।",
+   "iast": "na khalu punaste subhūte bodhisattvā mahāsattvā ekabuddhaparyupāsitā bhaviṣyanti naikabuddhāvaropitakuśalamūlā bhaviṣyanti | api tu khalu punaḥ subhūte anekabuddhaśatasahasraparyupāsitā anekabuddhaśatasahasrāvaropitakuśalamūlāste bodhisattvā mahāsattvā bhaviṣyanti ya imeṣvevaṃrūpeṣu sūtrāntapadeṣu bhāṣyamāṇeṣvekacittaprasādamapi pratilapsyante |"
+  },
+  {
+   "deva": "ज्ञातास्ते सुभूते तथागतेन बुद्धज्ञानेन दृष्टास्ते सुभूते तथागतेन बुद्धचक्षुषा बुद्धास्ते सुभूते तथागतेन। सर्वे ते सुभूतेऽप्रमेयमसंख्येयं पुण्यस्कन्धं प्रसविष्यन्ति प्रतिग्रहीष्यन्ति।",
+   "iast": "jñātāste subhūte tathāgatena buddhajñānena dṛṣṭāste subhūte tathāgatena buddhacakṣuṣā buddhāste subhūte tathāgatena | sarve te subhūte'prameyamasaṃkhyeyaṃ puṇyaskandhaṃ prasaviṣyanti pratigrahīṣyanti |"
+  },
+  {
+   "deva": "तत्कस्य हेतोः न हि सुभूते तेषां बोधिसत्त्वानां महासत्त्वानामात्मसंज्ञा प्रवर्तते न सत्त्वसंज्ञा न जीवसंज्ञा न पुद्गलसंज्ञा प्रवर्तते। नापि तेषां सुभूते बोधिसत्त्वानां महासत्त्वानां धर्मसंज्ञा प्रवर्तते। एवं नाधर्मसंज्ञा। नापि तेषां सुभूते संज्ञा नासंज्ञा प्रवर्तते।",
+   "iast": "tatkasya hetoḥ na hi subhūte teṣāṃ bodhisattvānāṃ mahāsattvānāmātmasaṃjñā pravartate na sattvasaṃjñā na jīvasaṃjñā na pudgalasaṃjñā pravartate | nāpi teṣāṃ subhūte bodhisattvānāṃ mahāsattvānāṃ dharmasaṃjñā pravartate | evaṃ nādharmasaṃjñā | nāpi teṣāṃ subhūte saṃjñā nāsaṃjñā pravartate |"
+  },
+  {
+   "deva": "तत्कस्य हेतोः सचेत्सुभूते तेषां बोधिसत्त्वानां महासत्त्वानां धर्मसंज्ञा प्रवर्तेत स एव तेषामात्मग्राहो भवेत् सत्त्वग्राहो जीवग्राहः पुद्गलग्राहो भवेत्। सचेदधर्मसंज्ञा प्रवर्तेत स एव तेषामात्मग्राहो भवेत्सत्त्वग्राहो जीवग्राहः पुद्गलग्राह इति।",
+   "iast": "tatkasya hetoḥ sacetsubhūte teṣāṃ bodhisattvānāṃ mahāsattvānāṃ dharmasaṃjñā pravarteta sa eva teṣāmātmagrāho bhavet sattvagrāho jīvagrāhaḥ pudgalagrāho bhavet | sacedadharmasaṃjñā pravarteta sa eva teṣāmātmagrāho bhavetsattvagrāho jīvagrāhaḥ pudgalagrāha iti |"
+  },
+  {
+   "deva": "तत्कस्य हेतोः न खलु पुनः सुभूते बोधिसत्त्वेन महासत्त्वेन धर्म उद्ग्रहीतव्यो नाधर्मः। तस्मादियं तथागतेन संधाय वाग्भाषिता-- कोलोपमं धर्मपर्यायमाजानद्भिर्धर्मा एव प्रहातव्याः प्रागेवाधर्मा इति॥६॥",
+   "iast": "tatkasya hetoḥ na khalu punaḥ subhūte bodhisattvena mahāsattvena dharma udgrahītavyo nādharmaḥ | tasmādiyaṃ tathāgatena saṃdhāya vāgbhāṣitā-- kolopamaṃ dharmaparyāyamājānadbhirdharmā eva prahātavyāḥ prāgevādharmā iti ||6||"
+  },
+  {
+   "deva": "पुनरपरं भगवानायुष्मन्तं सुभूतिमेतदवोचत्-- तत्किं मन्यसे सुभूते अस्ति स कश्चिद्धर्मो यस्तथागतेनानुत्तरा सम्यक्संबोधिरित्यभिसंबुद्धः कश्चिद्वा धर्मस्तथागतेन देशितः।",
+   "iast": "punaraparaṃ bhagavānāyuṣmantaṃ subhūtimetadavocat-- tatkiṃ manyase subhūte asti sa kaściddharmo yastathāgatenānuttarā samyaksaṃbodhirityabhisaṃbuddhaḥ kaścidvā dharmastathāgatena deśitaḥ |"
+  },
+  {
+   "deva": "एवमुक्त आयुष्मान्सुभूतिर्भगवन्तमेतदवोचत्-- यथाहं भगवन्भगवतो भाषितस्यार्थमाजानामि नास्ति स कश्चिद्धर्मो यस्तथागतेनानुत्तरा सम्यक्संबोधिरित्यभिसंबुद्धः नास्ति धर्मो यस्तथागतेन देशितः। तत्कस्य हेतोः योऽसौ तथागतेन धर्मोऽभिसंबुद्धो देशितो वाग्राह्यः सोऽनभिलप्यः। न स धर्मो नाधर्मः। तत्कस्य हेतोः असंस्कृतप्रभाविता ह्यार्यपुद्गलाः॥७॥",
+   "iast": "evamukta āyuṣmānsubhūtirbhagavantametadavocat-- yathāhaṃ bhagavanbhagavato bhāṣitasyārthamājānāmi nāsti sa kaściddharmo yastathāgatenānuttarā samyaksaṃbodhirityabhisaṃbuddhaḥ nāsti dharmo yastathāgatena deśitaḥ | tatkasya hetoḥ yo'sau tathāgatena dharmo'bhisaṃbuddho deśito vāgrāhyaḥ so'nabhilapyaḥ | na sa dharmo nādharmaḥ | tatkasya hetoḥ asaṃskṛtaprabhāvitā hyāryapudgalāḥ ||7||"
+  },
+  {
+   "deva": "भगवानाह-- तत्किं मन्यसे सुभूते यः कश्चित्कुलपुत्रो वा कुलदुहिता वेमं त्रिसाहस्रमहासाहस्रं लोकधातुं सप्तरत्नपरिपूर्णं कृत्वा तथागतेभ्योऽर्हद्भ्यः सम्यक्संबुद्धेभ्यो दानं दद्यादपि नु स कुलपुत्रो वा कुलदुहिता वा ततोनिदानं बहु पुण्यस्कन्धं प्रसुनुयात्।",
+   "iast": "bhagavānāha-- tatkiṃ manyase subhūte yaḥ kaścitkulaputro vā kuladuhitā vemaṃ trisāhasramahāsāhasraṃ lokadhātuṃ saptaratnaparipūrṇaṃ kṛtvā tathāgatebhyo'rhadbhyaḥ samyaksaṃbuddhebhyo dānaṃ dadyādapi nu sa kulaputro vā kuladuhitā vā tatonidānaṃ bahu puṇyaskandhaṃ prasunuyāt |"
+  },
+  {
+   "deva": "सुभूतिराह-- बहु भगवत् बहु सुगत स कुलपुत्रो वा कुलदुहिता वा ततोनिदानं पुण्यस्कन्धं प्रसुनुयात्। तत्कस्य हेतोः योऽसौ भगवन् पुण्यस्कन्धस्तथागतेन भाषितोऽस्कन्धः स तथागतेन भाषितः। तस्मात्तथागतो भाषते-- पुण्यस्कन्धः पुण्यस्कन्ध इति।",
+   "iast": "subhūtirāha-- bahu bhagavat bahu sugata sa kulaputro vā kuladuhitā vā tatonidānaṃ puṇyaskandhaṃ prasunuyāt | tatkasya hetoḥ yo'sau bhagavan puṇyaskandhastathāgatena bhāṣito'skandhaḥ sa tathāgatena bhāṣitaḥ | tasmāttathāgato bhāṣate-- puṇyaskandhaḥ puṇyaskandha iti |"
+  },
+  {
+   "deva": "भगवानाह-- यश्च खलु पुनः सुभूते कुलपुत्रो वा कुलदुहिता वेमं त्रिसाहस्रमहासाहस्रं लोकधातुं सप्तरत्नपरिपूर्णं कृत्वा तथागतेभ्योऽर्हद्भ्यः सम्यक्संबुद्धेभ्यो दानं दद्यात् यश्चेतो धर्मपर्यायादन्तशश्चतुष्पादिकामपि गाथामुद्गृह्य परेभ्यो विस्तरेण देशयेत् संप्रकाशयेदयमेव ततोनिदानं बहुतरं पुण्यस्कन्धं प्रसुनुयादप्रमेयमसंख्येयम्।",
+   "iast": "bhagavānāha-- yaśca khalu punaḥ subhūte kulaputro vā kuladuhitā vemaṃ trisāhasramahāsāhasraṃ lokadhātuṃ saptaratnaparipūrṇaṃ kṛtvā tathāgatebhyo'rhadbhyaḥ samyaksaṃbuddhebhyo dānaṃ dadyāt yaśceto dharmaparyāyādantaśaścatuṣpādikāmapi gāthāmudgṛhya parebhyo vistareṇa deśayet saṃprakāśayedayameva tatonidānaṃ bahutaraṃ puṇyaskandhaṃ prasunuyādaprameyamasaṃkhyeyam |"
+  },
+  {
+   "deva": "तत्कस्य हेतोः अतोनिर्जाता हि सुभूते तथागतानामर्हतां सम्यक्संबुद्धानामनुत्तरा सम्यक्संबोधिः अतोनिर्जाताश्च बुद्धा भगवन्तः। तत्कस्य हेतोः बुद्धधर्मा बुद्धधर्मा इति सुभूतेऽबुद्धधर्माश्चैव ते तथागतेन भाषिताः। तेनोच्यन्ते बुद्धधर्मा इति॥८॥",
+   "iast": "tatkasya hetoḥ atonirjātā hi subhūte tathāgatānāmarhatāṃ samyaksaṃbuddhānāmanuttarā samyaksaṃbodhiḥ atonirjātāśca buddhā bhagavantaḥ | tatkasya hetoḥ buddhadharmā buddhadharmā iti subhūte'buddhadharmāścaiva te tathāgatena bhāṣitāḥ | tenocyante buddhadharmā iti ||8||"
+  },
+  {
+   "deva": "॥ श्रीः ॥",
+   "iast": "|| śrīḥ ||"
+  },
+  {
+   "deva": "॥ कृष्णाष्टकम् ॥",
+   "iast": "|| kṛṣṇāṣṭakam ||"
+  },
+  {
+   "deva": "श्रियाश्लिष्टो विष्णुः स्थिरचरगुरुर्वेदविषयो\nधियां साक्षी शुद्धो हरिरसुरहन्ताब्जनयनः।\nगदी शङ्खी चक्री विमलवनमाली स्थिररुचिः\nशरण्यो लोकेशो मम भवतु कृष्णोऽक्षिविषयः॥१॥",
+   "iast": "śriyāśliṣṭo viṣṇuḥ sthiracaragururvedaviṣayo\ndhiyāṃ sākṣī śuddho harirasurahantābjanayanaḥ |\ngadī śaṅkhī cakrī vimalavanamālī sthiraruciḥ\nśaraṇyo lokeśo mama bhavatu kṛṣṇo'kṣiviṣayaḥ ||1||"
+  },
+  {
+   "deva": "यतः सर्वं जातं वियदनिलमुख्यं जगदिदं\nस्थितौ निःशेषं योऽवति निजसुखांशेन मधुहा।\nलये सर्वं स्वस्मिन्हरति कलया यस्तु स विभुः\nशरण्यो लोकेशो मम भवतु कृष्णोऽक्षिविषयः॥२॥",
+   "iast": "yataḥ sarvaṃ jātaṃ viyadanilamukhyaṃ jagadidaṃ\nsthitau niḥśeṣaṃ yo'vati nijasukhāṃśena madhuhā |\nlaye sarvaṃ svasminharati kalayā yastu sa vibhuḥ\nśaraṇyo lokeśo mama bhavatu kṛṣṇo'kṣiviṣayaḥ ||2||"
+  },
+  {
+   "deva": "असूनायम्यादौ यमनियममुख्यैः सुकरणैर्\nनिरुद्ध्येदं चित्तं हृदि विलयमानीय सकलम्।\nयमीड्यं पश्यन्ति प्रवरमतयो मायिनमसौ\nशरण्यो लोकेशो मम भवतु कृष्णोऽक्षिविषयः॥३॥",
+   "iast": "asūnāyamyādau yamaniyamamukhyaiḥ sukaraṇair\nniruddhyedaṃ cittaṃ hṛdi vilayamānīya sakalam |\nyamīḍyaṃ paśyanti pravaramatayo māyinamasau\nśaraṇyo lokeśo mama bhavatu kṛṣṇo'kṣiviṣayaḥ ||3||"
+  },
+  {
+   "deva": "पृथिव्यां तिष्ठन्यो यमयति महीं वेद न धरा\nयमित्यादौ वेदो वदति जगतामीशममलम्।\nनियन्तारं ध्येयं मुनिसुरनृणां मोक्षदमसौ\nशरण्यो लोकेशो मम भवतु कृष्णोऽक्षिविषयः॥४॥",
+   "iast": "pṛthivyāṃ tiṣṭhanyo yamayati mahīṃ veda na dharā\nyamityādau vedo vadati jagatāmīśamamalam |\nniyantāraṃ dhyeyaṃ munisuranṛṇāṃ mokṣadamasau\nśaraṇyo lokeśo mama bhavatu kṛṣṇo'kṣiviṣayaḥ ||4||"
+  },
+  {
+   "deva": "महेन्द्रादिर्देवो जयति दितिजान्यस्य बलतो\nन कस्य स्वातन्त्र्यं क्वचिदपि कृतौ यत्कृतिमृते।\nबलारातेर्गर्वं परिहरति योऽसौ विजयिनः\nशरण्यो लोकेशो मम भवतु कृष्णोऽक्षिविषयः॥५॥",
+   "iast": "mahendrādirdevo jayati ditijānyasya balato\nna kasya svātantryaṃ kvacidapi kṛtau yatkṛtimṛte |\nbalārātergarvaṃ pariharati yo'sau vijayinaḥ\nśaraṇyo lokeśo mama bhavatu kṛṣṇo'kṣiviṣayaḥ ||5||"
+  },
+  {
+   "deva": "विना यस्य ध्यानं व्रजति पशुतां सूकरमुखां\nविना यस्य ज्ञानं जनिमृतिभयं याति जनता।\nविना यस्य स्मृत्या कृमिशतजनिं याति स विभुः\nशरण्यो लोकेशो मम भवतु कृष्णोऽक्षिविषयः॥६॥",
+   "iast": "vinā yasya dhyānaṃ vrajati paśutāṃ sūkaramukhāṃ\nvinā yasya jñānaṃ janimṛtibhayaṃ yāti janatā |\nvinā yasya smṛtyā kṛmiśatajaniṃ yāti sa vibhuḥ\nśaraṇyo lokeśo mama bhavatu kṛṣṇo'kṣiviṣayaḥ ||6||"
+  },
+  {
+   "deva": "नरातङ्कोट्टङ्कः शरणशरणो भ्रान्तिहरणो\nघनश्यामो वामो व्रजशिशुवयस्योऽर्जुनसखः।\nस्वयंभूर्भूतानां जनक उचिताचारसुखदः\nशरण्यो लोकेशो मम भवतु कृष्णोऽक्षिविषयः॥७॥",
+   "iast": "narātaṅkoṭṭaṅkaḥ śaraṇaśaraṇo bhrāntiharaṇo\nghanaśyāmo vāmo vrajaśiśuvayasyo'rjunasakhaḥ |\nsvayaṃbhūrbhūtānāṃ janaka ucitācārasukhadaḥ\nśaraṇyo lokeśo mama bhavatu kṛṣṇo'kṣiviṣayaḥ ||7||"
+  },
+  {
+   "deva": "यदा धर्मग्लानिर्भवति जगतां क्षोभकरणी\nतदा लोकस्वामी प्रकटितवपुः सेतुधृदजः।\nसतां धाता स्वच्छो निगमगणगीतो व्रजपतिः\nशरण्यो लोकेशो मम भवतु कृष्णोऽक्षिविषयः॥८॥",
+   "iast": "yadā dharmaglānirbhavati jagatāṃ kṣobhakaraṇī\ntadā lokasvāmī prakaṭitavapuḥ setudhṛdajaḥ |\nsatāṃ dhātā svaccho nigamagaṇagīto vrajapatiḥ\nśaraṇyo lokeśo mama bhavatu kṛṣṇo'kṣiviṣayaḥ ||8||"
+  },
+  {
+   "deva": "इति श्रीमत्परमहंसपरिव्राजकाचार्यस्य\nश्रीगोविन्दभगवत्पूज्यपादशिष्यस्य\nश्रीमच्छंकरभगवतः कृतौ\nकृष्णाष्टकं संपूर्णम्॥",
+   "iast": "iti śrīmatparamahaṃsaparivrājakācāryasya\nśrīgovindabhagavatpūjyapādaśiṣyasya\nśrīmacchaṃkarabhagavataḥ kṛtau\nkṛṣṇāṣṭakaṃ saṃpūrṇam ||"
+  },
+  {
+   "deva": "श्रीमदार्यावलोकितेश्वरभट्टारकस्यावधानस्तोत्रम्",
+   "iast": "śrīmadāryāvalokiteśvarabhaṭṭārakasyāvadhānastotram"
+  },
+  {
+   "deva": "ॐ नमो लोकनाथाय।",
+   "iast": "oṃ namo lokanāthāya |"
+  },
+  {
+   "deva": "आराधितोऽसि भुजगासुरलोकसंघैर्\nगन्धर्वयक्षमुनिभिः परिवन्दिताय।\nद्वात्रिंशदादिवरलक्षणभूषिताय\nनित्यं नमामि शिरसा करुणामयाय॥१॥",
+   "iast": "ārādhito'si bhujagāsuralokasaṃghair\ngandharvayakṣamunibhiḥ parivanditāya |\ndvātriṃśadādivaralakṣaṇabhūṣitāya\nnityaṃ namāmi śirasā karuṇāmayāya ||1||"
+  },
+  {
+   "deva": "बालार्ककोटिसमतेजकलेवराय\nआलोकिते सुगतशेखरधारिताय।\nशुभ्रांशुमौलितिलकाय जटधराय नित्यं\nनमामि शिरसा करुणामयाय॥२॥",
+   "iast": "bālārkakoṭisamatejakalevarāya\nālokite sugataśekharadhāritāya |\nśubhrāṃśumaulitilakāya jaṭadharāya\nnityaṃ namāmi śirasā karuṇāmayāya ||2||"
+  },
+  {
+   "deva": "अम्भोजपाणिकमलासनसंस्थिताय\nयज्ञोपवीतफणिराजसुमण्डिताय।\nरत्नादिहारकनकोज्ज्वलभूषिताय\nनित्यं नमामि शिरसा करुणामयाय॥३॥",
+   "iast": "ambhojapāṇikamalāsanasaṃsthitāya\nyajñopavītaphaṇirājasumaṇḍitāya |\nratnādihārakanakojjvalabhūṣitāya\nnityaṃ namāmi śirasā karuṇāmayāya ||3||"
+  },
+  {
+   "deva": "उत्पादभङ्गभवसागरतारकाय\nदुर्ग्राहदुर्गतिभुवां परिमोचकाय।\nरागादिदोषपरिमुक्त सुनिर्मलाय\nनित्यं नमामि शिरसा करुणामयाय॥४॥",
+   "iast": "utpādabhaṅgabhavasāgaratārakāya\ndurgrāhadurgatibhuvāṃ parimocakāya |\nrāgādidoṣaparimukta sunirmalāya\nnityaṃ namāmi śirasā karuṇāmayāya ||4||"
+  },
+  {
+   "deva": "मैत्र्यादिभिश्चतुरब्रह्मविहारणाय\nधारामृतैः सकलसत्त्वसुपोषणाय।\nमोहान्धकारकृतदोषविदारणाय\nनित्यं नमामि शिरसा करुणामयाय॥५॥",
+   "iast": "maitryādibhiścaturabrahmavihāraṇāya\ndhārāmṛtaiḥ sakalasattvasupoṣaṇāya |\nmohāndhakārakṛtadoṣavidāraṇāya\nnityaṃ namāmi śirasā karuṇāmayāya ||5||"
+  },
+  {
+   "deva": "दैत्येन्द्रवंशवलितारणमोक्षदाय\nसत्त्वोपकारत्वरितकृतनिश्चयाय।\nसर्वज्ञज्ञानपरिपूरितदेशनाय नित्यं\nनमामि शिरसा करुणामयाय॥६॥",
+   "iast": "daityendravaṃśavalitāraṇamokṣadāya\nsattvopakāratvaritakṛtaniścayāya |\nsarvajñajñānaparipūritadeśanāya\nnityaṃ namāmi śirasā karuṇāmayāya ||6||"
+  },
+  {
+   "deva": "अष्टादशनरकमार्गविशोधनाय\nअज्ञानगाढतिमिरपरिध्वंसनाय।\nज्ञानैकदृष्टिव्यवलोकितमोक्षदाय\nनित्यं नमामि शिरसा करुणामयाय॥७॥",
+   "iast": "aṣṭādaśanarakamārgaviśodhanāya\najñānagāḍhatimiraparidhvaṃsanāya |\njñānaikadṛṣṭivyavalokitamokṣadāya\nnityaṃ namāmi śirasā karuṇāmayāya ||7||"
+  },
+  {
+   "deva": "त्वं लोकनाथ भुवनेश्वर सुप्रदाय\nदारिद्रयदुःखमयपञ्जरदारणाय।\nत्वत्पादपङ्कजयुगप्रतिवन्दिताय\nनित्यं नमामि शिरसा करुणामयाय॥८॥",
+   "iast": "tvaṃ lokanātha bhuvaneśvara supradāya\ndāridrayaduḥkhamayapañjaradāraṇāya |\ntvatpādapaṅkajayugaprativanditāya\nnityaṃ namāmi śirasā karuṇāmayāya ||8||"
+  },
+  {
+   "deva": "मार्तण्डमण्डलरुचिस्तथतास्वभावं\nत्वां नौम्यहं सुफलदं विमलप्रभावम्।\nचिन्तामणिं सुसदृशं त्वतिदुर्भगोऽहं\nनित्यं नमामि शिरसा करुणामयाय॥९॥",
+   "iast": "mārtaṇḍamaṇḍalarucistathatāsvabhāvaṃ\ntvāṃ naumyahaṃ suphaladaṃ vimalaprabhāvam |\ncintāmaṇiṃ susadṛśaṃ tvatidurbhago'haṃ\nnityaṃ namāmi śirasā karuṇāmayāya ||9||"
+  },
+  {
+   "deva": "यद्भक्तितो दशनखाञ्जलिसोत्तमाङ्गम्\nअष्टाङ्गकैः प्रणमितं तव पादपद्म।\nदुःखार्णवे पतितमुद्धर मां कृपालो\nनित्यं नमामि शिरसा करुणामयाय॥१०॥",
+   "iast": "yadbhaktito daśanakhāñjalisottamāṅgam\naṣṭāṅgakaiḥ praṇamitaṃ tava pādapadma |\nduḥkhārṇave patitamuddhara māṃ kṛpālo\nnityaṃ namāmi śirasā karuṇāmayāya ||10||"
+  },
+  {
+   "deva": "सप्ताष्टभूतगतमाधवशुक्लपक्षे\nतारापुनर्वसु सहे भृगुसूनुवारे।\nश्रीक्रौंचदारणतिथौ च स्तुतिं करोमि\nमे देहि वाञ्छितफलं भुवनैकनाथ॥११॥",
+   "iast": "saptāṣṭabhūtagatamādhavaśuklapakṣe\ntārāpunarvasu sahe bhṛgusūnuvāre |\nśrīkrauṃcadāraṇatithau ca stutiṃ karomi\nme dehi vāñchitaphalaṃ bhuvanaikanātha ||11||"
+  },
+  {
+   "deva": "ये पठन्ति महापुण्यं पवित्रं पापनाशनम्।\nसर्वकामार्थसिद्धिं च गमिष्यन्ति सुखावतीम्॥१२॥",
+   "iast": "ye paṭhanti mahāpuṇyaṃ\npavitraṃ pāpanāśanam |\nsarvakāmārthasiddhiṃ ca\ngamiṣyanti sukhāvatīm ||12||"
+  },
+  {
+   "deva": "श्रीमदार्यावलोकितेश्वरभट्टारकस्यावधानस्तोत्रं समाप्तम्॥",
+   "iast": "śrīmadāryāvalokiteśvarabhaṭṭārakasyāvadhānastotraṃ samāptam ||"
+  }
+ ]
+}

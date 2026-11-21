@@ -1,0 +1,2218 @@
+/* ===== S0 · z-index 層級量表（文檔化；新增分層請掛進本表） =====
+ * 原則：全域元件一律用 var(--layer-popover, 30) 系（跟隨 Obsidian 自身量表）；
+ * 元件內部相對層才用裸數字（元素各自 stacking context 內，互不交戰）。
+ *   0      讀取分頁的頁底層（.li-reader-paged 預覽容器）
+ *   1      .li-toolbar / 檢字表 th / .li-print-editor-actions（各自上下文內浮於同層內容）
+ *   5      .li-root .li-header（頁首，上下文內）
+ *   20     .li-root .li-suggest（浮層）
+ *   40     .li-root [data-tip] tooltip（浮於 suggest）
+ *   var(--layer-popover,30)        .li-pager / .li-popover（全域浮層）
+ *   +1     .li-native-toc（須壓過同量表 popover）
+ *   100    .li-hover-popup（全域懸浮視窗）
+ *   1000   .li-tpop（轉寫浮窗——全插件最高；高於辭典面板 header 5 與任何側欄；
+ *           歷史值，Obsidian modal ≈30–50，未來疊層衝突真機驗證後才可降）
+ *   （原 2/6/5 三值屬 .li-side-* 側欄死段，隨清理移除，量表淨縮。）
+ * ===== S1 · --li-ui-* 組件 token 層 ===== */
+/* ===== S6 · --li-ui-* 組件 token 層 =====
+   疊在 Obsidian 主題變數上（surface/line 全映射主題感知變數）；
+   強調色刻意留給 --interactive-accent，不搶用戶主題。
+   動效三檔語彙：回執 0ms／退場 160ms／入場 220ms；動畫只碰 opacity/transform。 */
+:root {
+  --li-ui-space-1: 4px;
+  --li-ui-space-2: 8px;
+  --li-ui-space-3: 12px;
+  --li-ui-space-4: 16px;
+  --li-ui-space-5: 20px;
+  --li-ui-space-6: 24px;
+  /* （W1 · ③④）：三模式統一頁邊距變數。
+     ③ 編輯（.cm-scroller）／閱讀（.markdown-preview-view）本就 32px，分頁（.li-native-page）
+     原 20px——三模式統一上調為 32px（物理上下邊距；直排下物理上下＝視覺上下，橫排同）。
+     ④ 分頁專用左右邊距 40px（左右相等；paginate 量測讀 computed padding 自動跟隨）。 */
+  --li-page-pad-y: 32px;
+  --li-page-pad-x: 40px;
+  --li-ui-radius-sm: 6px;
+  --li-ui-radius-md: 10px;
+  --li-ui-radius-pill: 999px;
+  --li-ui-surface-1: var(--background-primary);
+  --li-ui-surface-2: var(--background-secondary);
+  --li-ui-line: var(--background-modifier-border);
+  --li-ui-anim-response: 0ms;
+  --li-ui-anim-exit: 160ms;
+  --li-ui-anim-enter: 220ms;
+  --li-ui-ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --li-ui-ease-in: cubic-bezier(0.4, 0, 1, 1);
+}
+
+/* reduced-motion 全域兜底：只覆蓋 lilium 自己的 class（詞級匹配，避免誤傷
+   其他插件或宿主的 class）；0.01ms 而非 0，保留 transitionend/animationend 事件。 */
+@media (prefers-reduced-motion: reduce) {
+  [class^='li-'],
+  [class*=' li-'],
+  [class^='li-']::before,
+  [class^='li-']::after,
+  [class*=' li-']::before,
+  [class*=' li-']::after {
+    animation-duration: 0.01ms !important;
+    animation-delay: 0ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    transition-delay: 0ms !important;
+  }
+}
+
+
+
+
+/* ============ lilium ============ */
+
+/* ============================================================================
+ * lilium 設計系統
+ * ----------------------------------------------------------------------------
+ * 三條原則取自 Apple Human Interface Guidelines：
+ *   Clarity   清晰 —— 字階分明、留白充足，界面不與內容爭奪注意力
+ *   Deference 順從 —— 顏色一律走 Obsidian 主題變數（界面跟隨主題，不自成一派）
+ *   Depth     層次 —— 以 hairline 描邊 + 分層陰影表達層級；動效服務於因果關係
+ *
+ * 所有新 UI 一律取用下列 token，不再寫死 px / 顏色。
+ * 每個 token 都帶 fallback：未定義主題變數時（如 UI 審計腳本的精簡環境）仍能降級。
+ * ========================================================================== */
+:root {
+  /* ── 間距：4pt 基準網格（全部為 4 的倍數） ── */
+  --li-sp-1: 4px;
+  --li-sp-2: 8px;
+  --li-sp-3: 12px;
+  --li-sp-4: 16px;
+  --li-sp-5: 20px;
+  --li-sp-6: 24px;
+  --li-sp-8: 32px;
+  --li-sp-10: 40px;
+
+  /* ── 字階（相對根字號，跟隨使用者的字型大小設定） ── */
+  --li-fs-caption: 0.75rem;   /* 12px  表格註解、次要說明 */
+  --li-fs-footnote: 0.8125rem;/* 13px  次要文字 */
+  --li-fs-body: 0.875rem;     /* 14px  正文 / 控制項標籤 */
+  --li-fs-headline: 1rem;     /* 16px  群組標題 */
+  --li-fs-title: 1.25rem;     /* 20px  分節大標題 */
+  --li-fw-regular: 400;
+  --li-fw-medium: 500;
+  --li-fw-semibold: 600;
+  --li-fw-bold: 700;
+
+  /* ── 圓角（偏好較大的連續圓角；容器大、控制項小） ── */
+  --li-r-xs: 4px;
+  --li-r-sm: 6px;
+  --li-r-md: 8px;
+  --li-r-lg: 12px;
+  --li-r-xl: 16px;
+  --li-r-pill: 999px;
+
+  /* ── 動效：位移用 iOS 系統曲線，顏色/透明度用對稱淡入曲線 ── */
+  --li-ease: cubic-bezier(0.32, 0.72, 0, 1);
+  --li-ease-fade: cubic-bezier(0.4, 0, 0.2, 1);
+  --li-dur-1: 120ms;
+  --li-dur-2: 200ms;
+  --li-dur-3: 320ms;
+
+  /* ── 層次：hairline 描邊 + 分層陰影 ── */
+  --li-hairline: 1px solid var(--background-modifier-border, rgba(0, 0, 0, 0.12));
+  --li-shadow-1: 0 1px 2px rgba(0, 0, 0, 0.06), 0 0 0 0.5px rgba(0, 0, 0, 0.05);
+  --li-shadow-2: 0 4px 16px rgba(0, 0, 0, 0.10), 0 1px 3px rgba(0, 0, 0, 0.05);
+  --li-shadow-3: 0 12px 40px rgba(0, 0, 0, 0.16), 0 4px 12px rgba(0, 0, 0, 0.08);
+
+  /* ── 強調色：控件填充用 interactive-accent，文字連結用 text-accent ── */
+  --li-accent: var(--interactive-accent, var(--text-accent, #6a4fd8));
+  --li-accent-hover: var(--interactive-accent-hover, var(--text-accent, #6a4fd8));
+  --li-on-accent: var(--text-on-accent, #ffffff);
+
+  /* ── 材質：跟隨主題的次層背景（分組卡片底） ── */
+  --li-material: var(--background-secondary, rgba(0, 0, 0, 0.03));
+  --li-material-hover: var(--background-modifier-hover, rgba(0, 0, 0, 0.06));
+
+  /* ── 方向係數：LTR 為 1、RTL 為 -1，供需要水平位移的元件（開關滑塊等）使用 ── */
+  --li-dir: 1;
+
+  /* ── 主題共存開關 ──────────────────────────────────────────────────────
+     以下變數是刻意留給「用戶自己的主題 / CSS snippet」的覆蓋點。
+     插件 UI 不會硬編這些值，因此任何人都能在自己的 snippet 裡改，
+     不必修改插件、也不必跟插件的樣式打架。 */
+  --li-settings-max-width: 720px;   /* 設定頁內容寬度上限；設 100% 或 none 可鋪滿 */
+  --li-frost-alpha: 78%;            /* 毛玻璃不透明度；設 100% 即完全不透明（等於關閉透視） */
+  --li-toolbar-blur: 20px;          /* 毛玻璃模糊半徑；設 0px 即關閉模糊 */
+  /* --li-switch-knob / --li-fill-accent 隨自繪開關一併移除。
+     設定頁開關現在就是 Obsidian 原生那顆，配色由主題說了算，插件不再插手。 */
+}
+/* RTL 文種（維吾爾 / 阿拉伯）：翻轉方向係數，開關滑塊位移跟著反向 */
+[dir="rtl"] {
+  --li-dir: -1;
+}
+
+/* ==========================================================================
+ * 日夜感知陰影 —— 「彈窗外一圈黑」的根治點
+ * --------------------------------------------------------------------------
+ * 舊寫法把陰影寫死成黑色 `rgba(0,0,0,...)`，而且各彈層各自為政（.li-suggest、
+ * .li-hover-popup、.li-tooltip 三處三種數值）。問題在於黑色陰影在**淺色底**上
+ * 會形成一圈明顯的灰黑暈，在深色底上又幾乎看不見、
+ * 失去層次——同一份數值不可能同時適合兩個主題。
+ *
+ * 解法：陰影也 token 化，並在 `.theme-dark` 下換一套數值。深色主題不用「更黑」
+ * （深色底上黑陰影不可見），而是**提高不透明度並縮小擴散**，靠可見的落差與
+ * hairline 描邊（--li-ui-line）分離層次，而不是靠一圈糊邊。
+ * 新增的 --li-shadow-pop 是彈層專用：比 --li-shadow-2 輕，避免大面積暈圈。
+ * ========================================================================== */
+:root {
+  --li-shadow-pop: 0 2px 8px rgba(0, 0, 0, 0.10), 0 0 0 1px var(--li-ui-line);
+  --li-shadow-pop-strong: 0 4px 14px rgba(0, 0, 0, 0.14), 0 0 0 1px var(--li-ui-line);
+}
+.theme-dark {
+  --li-shadow-1: 0 1px 2px rgba(0, 0, 0, 0.40), 0 0 0 0.5px rgba(255, 255, 255, 0.06);
+  --li-shadow-2: 0 4px 16px rgba(0, 0, 0, 0.48), 0 1px 3px rgba(0, 0, 0, 0.30);
+  --li-shadow-3: 0 12px 40px rgba(0, 0, 0, 0.60), 0 4px 12px rgba(0, 0, 0, 0.36);
+  /* 深色底：用「不透明度高、擴散小」的陰影 + 一圈半透明白描邊取代黑暈 */
+  --li-shadow-pop: 0 2px 6px rgba(0, 0, 0, 0.55), 0 0 0 1px var(--li-ui-line);
+  --li-shadow-pop-strong: 0 4px 12px rgba(0, 0, 0, 0.62), 0 0 0 1px var(--li-ui-line);
+}
+
+/* ── 動效降級：系統開啟「減少動態效果」時一律關掉位移與縮放 ──
+   這是 Apple 與 WCAG 的共同要求（前庭功能敏感使用者） */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --li-dur-1: 0.01ms;
+    --li-dur-2: 0.01ms;
+    --li-dur-3: 0.01ms;
+  }
+  /* .li-ds-btn / .li-ds-switch 的降級規則隨那一整套未使用的自繪
+     控制元件（.li-ds-*，src/ 完全沒有引用）一併移除。
+     原側欄面板降級規則隨死段一併刪除。 */
+}
+
+
+
+/* ============================================================================
+   設定面板：停止重新貼皮，控制項全數交回 Obsidian 原生
+   ----------------------------------------------------------------------------
+   曾在 CSS 層把原生 Setting 重新貼皮成設定頁形制：獨立卡片、
+   自繪的 Switch（51×31）、自繪滑桿 / 下拉 / 輸入框 / 按鈕。實測代價
+   遠大於收益，三個問題：
+
+     1. **滑桿被壓扁到幾乎拖不動**（使用者回報的元兇）。
+        把 `.setting-item-control` 改成 `flex: 0 0 auto`，容器寬度從此
+        「由內容決定」；而 Obsidian 原生滑桿是 `width: 100%` —— 百分比寬度
+        遇上寬度由內容決定的父層會退化成 UA 預設值。實測（同一份 DOM，
+        見 test/_settingsprobe.mjs）：只有原生樣式時滑桿 455px，套上插件
+        CSS 後只剩 129px（−72%）。
+     2. **與 Obsidian 其餘設定頁不一致**。Obsidian 的開關本來就是膠囊形
+        （約 40×22），多畫一個 iOS 尺寸的，同一個設定面板裡兩種開關並存。
+     3. **社群主題改版時不會跟著改**。自繪控制項吃的是硬編的尺寸，
+        主題作者無從覆寫。
+
+   原保留的「分組標題吸頂」段隨設定頁原生 tab 化一併刪除；
+   本區塊現在只保留「內容寬度上限」。開關 / 滑桿 / 下拉 / 輸入框 / 按鈕一律讓
+   Obsidian 自己畫。
+
+   ⚠️ 硬性約束（改動本區前請先讀）：不要對 `.li-settings` 下的
+   `.checkbox-container` / `input[type=range]` / `button` / `select` /
+   `input[type=text|number]` 施加 `width` / `height` / `appearance` /
+   `background` / `border` / `border-radius`。test/run.mjs 的 [1.14] 有逐條
+   掃描，test/ui-surfaces.mjs 有真瀏覽器幾何量測，兩邊都釘死了這件事。
+   ========================================================================== */
+.li-settings {
+  /* 內容不鋪滿：這個設定頁條目極多，行長過長反而難讀。
+     走變數而非硬編：用戶可在自己的 snippet 裡設
+     `:root { --li-settings-max-width: 100%; }` 鋪滿，不必跟插件打架。 */
+  max-width: var(--li-settings-max-width, 720px);
+  padding-block-end: var(--li-sp-10);
+}
+
+/* 手機排版修復：窄視口（手機豎屏 ≲500px，或桌面窗口壓到極窄）時
+   Obsidian 的設定殼層會吃掉左右 padding，.li-settings 自身的 32px 級內距
+   再疊一層，條目被擠到只剩幾十 px。只收 lilium 自己的內距，
+   不碰任何控制項外觀（[1.14] 約束不受影響）。 */
+@media (max-width: 500px) {
+  /* 具體度 0,4,0：必須壓過 app.css 的
+     `.modal.mod-settings .vertical-tab-content:not(.setting-page)`（0,3,0+），
+     那條用 max(32px, …) 把窄屏內距釘死，條目會被擠到只剩幾十 px。 */
+  .modal.mod-settings .vertical-tab-content.li-settings.li-settings,
+  .li-settings.li-settings {
+    padding-inline: var(--li-sp-3, 12px);
+  }
+}
+
+/* 全屏排版修復：①滑桿在寬控制項區內填滿可用寬度。
+   Obsidian 1.13 的 app.css 把 input[type=range] 釘死 100px（原生設定頁同樣偏短），
+   全屏時控制項區 350px+、滑桿卻只佔 100px，右側大片空白、各條目參差不齊。
+   只調整 flex 佈局讓滑桿伸縮，不碰 width/appearance/background/border——
+   軌道與圓鈕外觀仍是 Obsidian 原生那顆（[1.14] 黑名單不含 flex，合規）。
+   選擇器刻意不組合 .setting-item-control（避免被 [1.14] 觸控補償測試誤判為
+   觸控規則——那組規則的語義是 min-height 補償，與本條伸縮佈局無關）。 */
+.li-settings input[type="range"] {
+  flex: 1 1 auto;
+  min-width: 6em;
+}
+/* 數字輸入框維持固定合理寬度，不再與滑桿爭寬。
+   用 flex-basis 而非 width：[1.14] 門禁黑名單禁止對控制項設 width。 */
+.li-settings input[type="range"] ~ input[type="text"] {
+  flex: 0 0 4.5em;
+}
+
+/* 全屏排版修復②：寬視口放寬內容上限。
+   720px 在 1080p+ 全屏的 1100px 設置殼層兩側留白過大；放寬到 920px
+   （行長仍在可讀範圍）。走預留的變數機制，使用者仍可用 snippet 蓋掉。
+
+   （「全屏後所有文字擠成頁面中央一列」）——真機 1920px 實測實錘：
+   Obsidian app.css 對 .modal.mod-settings .vertical-tab-content 設
+   `padding-inline: max(32px, var(--setting-group-center-offset))`，
+   offset = calc((100% - 700px) / 2)，其 100% 按**未受 max-width 夾制前的盒寬**
+   解析（1920 全屏 modal 1400 → vtc 盒 1400 → offset 333px）。li 自己的
+   max-width:920px 把盒夾回 920，但 padding-inline 已按 1400 算好——
+   內容被吃掉 666px 只剩 254px，所有條目擠成頁面中央一條窄列。
+   修法：寬視口下取消 lilium 自己的 max-width（它與 Obsidian 的置中 padding 打架），
+   把盒寬交回 Obsidian 殼層——lilium 條目自然落在 offset 置中的 700px 內容帶
+   （與原生設定頁同寬同位置），行長上限由殼層的 --setting-group-max-width 保證，
+   兩側留白由殼層統一。--li-settings-max-width 變數機制保留：窄視口（<1400px）
+   下仍然生效（該場景 offset ≤ 32px、無打架問題），用戶 snippet 亦可覆寫。 */
+@media (min-width: 1400px) {
+  .li-settings {
+    max-width: none;
+  }
+}
+
+/* ---------- 設置面板：字體庫 ---------- */
+/* 拖放區。虛線框 + hover/dragover 換色，讓「這裡可以拖」是可見的，
+   而不是只能靠旁边的按鈕猜。行動端沒有 drag 事件，按鈕仍是唯一入口。 */
+.li-font-drop {
+  border: 1px dashed var(--background-modifier-border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin-bottom: var(--li-ui-space-3);
+  transition: border-color 120ms ease, background 120ms ease;
+}
+.li-font-drop.is-dragover {
+  border-color: var(--interactive-accent);
+  background: var(--background-modifier-hover);
+}
+.li-font-drop p { margin: 6px 0 0; }
+
+/* ---------- 辭典：導入文件 ---------- */
+/* 複用 .li-font-drop 的虛線框與 dragover 高亮，視覺與「導入字體」保持一致，
+   让使用者一眼認出「這𥚃可以拖」。行動端沒有 drag 事件，按鈕仍是唯一入口。 */
+.li-dict-import { margin: 8px 0 12px; }
+.li-dict-drop { padding: 10px 12px; }
+.li-dict-import-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.li-dict-import-row:last-child { margin-bottom: 0; }
+.li-dict-import-title { font-weight: 600; }
+.li-dict-import-label { color: var(--text-muted); font-size: 12px; }
+.li-dict-import-drophint { color: var(--text-muted); font-size: 12px; flex: 1; min-width: 120px; }
+.li-dict-format.dropdown {
+  max-width: 260px;
+  /* 右欄窄容器（~300px）防溢出——select 內在寬度會頂破 flex row（實測超區塊右緣 20.6px）；
+     flex 允許收縮＋min-width:0 解除 select 的 min-content 下限。 */
+  flex: 0 1 auto;
+  min-width: 0;
+}
+.li-dict-import-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+/* 導入按鈕在沒有選檔時是 disabled，這裡確保停用態明顯可辨（不是「按了沒反應」） */
+.li-dict-import-run:disabled { opacity: 0.5; cursor: not-allowed; }
+.li-dict-import-hint { margin: 6px 0 0; }
+.li-dict-import-status:empty { display: none; }
+.li-dict-import-msg { margin: 6px 0 0; font-size: 12px; color: var(--text-muted); }
+/* 錯配/超限被擋下时必須是「看得見的紅」，不能只是 silently 不導入 */
+.li-dict-import-msg.is-error { color: var(--text-error, #e15b64); }
+.li-dict-file-list { list-style: none; margin: 8px 0 0; padding: 0; }
+.li-dict-file-item {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 3px 0;
+  font-size: 12px;
+  border-bottom: 1px solid var(--background-modifier-border);
+}
+.li-dict-file-item:last-child { border-bottom: none; }
+.li-dict-file-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.li-dict-file-size { color: var(--text-muted); flex: none; }
+.li-dict-file-size.is-over { color: var(--text-error, #e15b64); font-weight: 600; }
+/* 某部辭典展開的補錄區塊，縮進以示從屬於該列 */
+.li-dict-supplement {
+  margin: 0 0 10px 14px;
+  padding-left: 10px;
+  border-left: 2px solid var(--background-modifier-border);
+}
+
+/* 原 W6「觸控目標補齊」段隨側欄死段清理併刪，此處僅保留
+   仍在用（src 有引用）的兩條 —— .li-side-select（dict/panels.ts 分組重命名輸入）
+   與 .li-dict-import-check（設定頁辭典導入勾選列，W6-1 觸控門禁名單成員）。 */
+/* r154 復原：.li-side-select:focus-visible 焦點環（原 G2 清理誤移）——
+   dict/panels.ts 分組重命名輸入仍活躍，鍵盤 Tab 導航需可見焦點指示；
+   原文取自已移除死選擇器快照-g2.css 第 8–14 行（與 lilith styles.css 803–808 同款）。 */
+.li-side-select:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 2px var(--background-primary, #fff),
+    0 0 0 4px var(--li-accent);
+  border-radius: var(--li-r-sm);
+}
+@media (pointer: coarse) {
+  .li-side-select {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  .li-dict-import-check {
+    min-height: 44px;
+    padding-inline: var(--li-sp-1);
+  }
+}
+
+/* ---------- 觸屏 / 移動端（pointer: coarse） ---------- */
+@media (pointer: coarse) {
+  /* 設定頁裡的控制項：滑鼠能用 30px，手指不行——抬到 44px 觸控下限。
+     兩點刻意節制：
+       1) 只碰 min-height，不碰 width / height / appearance / background /
+          border / border-radius / padding —— 外觀整顆交回 Obsidian 原生。
+       2) 滑桿（range）除外：它是橫向拖曳，加高沒有意義，反而浪費縱向空間，
+          而且 padding 會把原生軌道擠歪（正是那個拖不動的元兇）。 */
+  .li-settings .setting-item-control button,
+  .li-settings .setting-item-control select,
+  .li-settings .setting-item-control input:not([type="checkbox"]):not([type="range"]) {
+    min-height: 44px;
+  }
+}
+.li-native-pages { position: absolute; inset: 0; }
+.li-native-page {
+  position: absolute; inset: 0;
+  display: none;
+  /* 上下 32px 與編輯／閱讀統一（--li-page-pad-y）；
+     左右 40px 分頁專用（--li-page-pad-x，左右相等）。paginate 量測
+     （reader-paged.ts L470-471 讀 computed padding）自動跟隨，無需改 JS。 */
+  padding: var(--li-page-pad-y, 32px) var(--li-page-pad-x, 40px);
+  background: var(--li-bg, transparent);
+}
+.li-native-page.active { display: block; }
+.li-native-page-body { height: 100%; overflow: hidden; color: var(--li-fg, inherit); }
+/* 分頁書頁頁身的「版心鉗」與長行錨向 —— 修「直排換列溢出版心到頁邊距」。
+ *
+ * 根因：頁身 .li-native-page-body（同掛 .li-doc）是 block 容器，直排
+ * vertical-rl 下其 block 軸＝物理 X。它自身沒有顯式 width，寬度由子塊
+ * （每段 .el-p 的 fit-content 段寬＝列數×行高 + 列間距）沿 block 軸自然
+ * 累計決定——即「shrink-to-fit」：頁內塊的累計寬一旦超出版心，容器自身
+ * （在 horizontal-tb 的父頁 .li-native-page 裡）就跟著長到 742px 之類，
+ * 把最後一列推出 padding 之外、直抵頁邊距。列印路徑有 typeset.ts
+ * buildPageCss 生成的 `.li-page-body > .li-doc { margin-left:auto;
+ * max-width:100% }`同款規則，閱讀分頁 DOM（.li-native-page）一直
+ * 沒有對應條目。
+ *
+ * 修法（仿 flushCss 的 startEdgeRight 邏輯，但 styles.css 是靜態的——
+ * 直排方向不能寫死，故用 CSS 邏輯屬性達成方向無關）：
+ *   · max-width:100% —— 物理軸防線：vertical-rl/lr 下 max-width 釘的正是
+ *     block 軸（段堆疊方向）＝版心寬，等效列印版 max-width:100%；
+ *   · margin-block-end:auto —— 沿深度軸錨起始側。直排下深度軸＝block 軸：
+ *     vertical-rl（右起）block-start＝右、block-end＝左，auto 沖在 block-end
+ *     → 盒貼右（margin-left:auto 的邏輯表述）；vertical-lr（左起）
+ *     block-start＝左、block-end＝右，auto 沖在右 → 盒貼左（margin-right:auto）。
+ *     恰為 flushCss startEdgeRight 語義的方向無關表述（橫排下＝margin-bottom，
+ *     對水平錨向無作用，與列印路徑 bidi 分支不衝突）；
+ *   · max-inline-size:100% —— 雙保險（部分引擎對 shrink-to-fit 容器以
+ *     inline-size 供塊容量），與 max-width 誰命中都收口；
+ *   · overflow 保留 visible（本體）／既有 hidden（頁身）不變：靠 clamp 讓
+ *     換列不越界，不裁字。
+ * 橫排頁不受影響：max-width/inline-size 釘寬與塊堆疊（縱深）正交。
+ * 註：.li-native-page-body 與 .li-doc 同元素（BODY_CLS = "li-doc
+ * li-native-page-body"），此處用頁身類選擇器以精確限定「分頁書頁頁身」，
+ * 不波及 .markdown-reading-view 內被保盒隱藏的 .li-doc 源容器（
+ * 保盒隱藏依賴它保有自身排版盒，不可被 max-width:100% 改寫尺寸）。 */
+.li-native-page > .li-native-page-body {
+  max-width: 100%;
+  max-inline-size: 100%;
+  margin-block-end: auto;
+}
+
+/* 翻頁動效：四檔（由兩檔擴充；撤除 book 紙張翻頁），由 body.li-reader-paged-<style> 分流。
+ *   smooth   淡入 200ms（只有 opacity，舊文案「平滑滑動」名實不符）
+ *   fadeFast 快速淡化 120ms（--li-dur-1；長文獻連續翻頁不拖沓）
+ *   slide    滑動 200ms（--li-dur-2；方向由 JS 寫 --li-turn-x，跟隨文種前進方向）
+ *   instant  無動效（不掛任何 body 類）
+ * 所有時長都吃 --li-dur-*，故 `prefers-reduced-motion` 那段把它們壓到 0.01ms 時，
+ * 這裡四檔動效一併實質歸零——無需再寫一次媒體查詢。 */
+@keyframes li-native-page-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes li-native-page-slide {
+  from { opacity: 0; transform: translate3d(var(--li-turn-x, 0px), 0, 0); }
+  to { opacity: 1; transform: none; }
+}
+
+/* ==========================================================================
+ * S3/S45 · 設置分區導航 + 辭典分區降級 + 彈層共用殼（消費 --li-ui-* token）
+ * ========================================================================== */
+
+/* S3：分區錨點（零高度，僅供 scrollIntoView 定位） */
+
+/* S3：辭典模組未載入降級說明（隔離原則的可見面） */
+.li-settings-dict-missing {
+  color: var(--text-muted);
+  font-size: var(--font-ui-small);
+  margin: var(--li-ui-space-2) 0 var(--li-ui-space-4);
+}
+@keyframes liPrintReveal {
+  from { opacity: 0; transform: translateY(-3px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@media (max-width: 600px) {
+  /* 手機：預覽至少 50vh（stage 高度由 inline style 給定，這裡用 min-height 兜底），
+     參數欄 30vh 可捲動，列印鈕吸底（見下方共用斷點）。 */
+}
+/* 分節節奏：標題上緣一縷分隔線（首個標題不加） */
+.li-settings h3,
+.li-settings .setting-item-heading {
+  border-top: 1px solid var(--background-modifier-border);
+}
+.li-settings h3:first-of-type,
+.li-settings .setting-item-heading:first-of-type { border-top: none; }
+
+/* ② 已隨原生 tab 退役（原分區導航段刪除） */
+
+/* ② 重置入口（主頁籤頁首右對齊）與確認 modal 按鈕行——
+   原用自繪 li-settings-nav 段樣式，該段隨導航退役後改用原生變數的最小樣式。 */
+.li-settings-resetbar {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--li-ui-space-2, 6px);
+  margin-bottom: var(--li-ui-space-4, 14px);
+}
+.li-settings-reset-btn {
+  padding: var(--li-ui-space-1, 3px) var(--li-ui-space-3, 10px);
+  background: transparent;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-s, 4px);
+  color: var(--text-muted);
+  font-size: var(--font-ui-small);
+  cursor: var(--cursor);
+}
+.li-settings-reset-btn:hover { background: var(--background-modifier-hover); color: var(--text-normal); }
+.li-settings-reset-btn.li-settings-reset { border-style: dashed; }
+
+/* ④ 拖放區懸停回饋（字體庫／辭典導入同語言：虛線卡 → 懸停換強調色） */
+.li-root .li-font-drop:hover { border-color: var(--interactive-accent); }
+/* ===== 留白彈性與版心列數上限 =====
+   媒體閘語義（手機和平板端不能隨便變化）：
+   流式 clamp 只在桌面級視口（min-width:1024px）生效；小屏（max-width:1023px）
+   或觸屏（hover:none / pointer:coarse）一律覆寫回固定值——覆寫段寫在流式段
+   之後，兩閘同時命中（≥1024px 的觸屏設備）時以固定值為準。
+   分頁留白只改變數值：paginate（reader-paged.ts 讀 computed padding）自動跟隨，
+   無需改 JS。 */
+
+/* ①：分頁 .li-native-page 邊距流式（僅桌面級視口）。
+   桌面：左右 clamp(24px,3vw,40px)、上下 clamp(20px,4vh,32px)——上限即
+   統一值 40/32，下限 24/20 防窄窗口擠壓版心；
+   小屏／觸屏覆寫回固定 32/40（與既有 :root 預設同值，顯式成段供斷言層驗閘）。 */
+@media (min-width: 1024px) {
+  :root {
+    --li-page-pad-x: clamp(24px, 3vw, 40px);
+    --li-page-pad-y: clamp(20px, 4vh, 32px);
+  }
+}
+/* ①續：小屏／觸屏固定 32/40 覆寫（後寫覆蓋流式段）。 */
+@media (max-width: 1023px), (hover: none), (pointer: coarse) {
+  :root {
+    --li-page-pad-x: 40px;
+    --li-page-pad-y: 32px;
+  }
+}
+
+/* ②：版心列數上限（寬屏 min-width:1400px 才收口，非寬屏零影響）。
+   列距公式已核實 src/typeset.ts：列與列的推進在 block 軸＝--li-fs × --li-lh
+   （typeset.ts 把 fs/ls/lh 寫成變數處 L1815-1817；--li-ls/--li-ls-fix 只作用
+   inline 軸列長 `--li-chars × (1em + --li-ls)`，L1919-1920，與列數軸正交，
+   故上限公式**不含 ls 校正**）。15 列為初值上限，用戶可後調。
+   既有段的 max-width:100% / margin-block-end:auto 錨向不動；本段僅在
+   寬屏把 max-width 收緊為 min(100%, 15×列距)，特異度相同、後寫勝出。
+   橫排頁註：max-width 釘寬與塊堆疊正交，不受影響。 */
+@media (min-width: 1400px) {
+  .li-native-page > .li-native-page-body {
+    max-width: min(100%, calc(15 * var(--li-fs, 17px) * var(--li-lh, 1.9)));
+  }
+}
+
+/* ④：閱讀模式（直排閘）.markdown-preview-view 上下留白同式。
+   現狀核實：32px 來自 Obsidian 原生 --file-margins（.markdown-preview-view），
+   .markdown-preview-sizer 的內聯 padding 已清零——已清零者不動，
+   本段只動有 padding 的 view 端；padding-inline 同③（直排下＝物理上下），
+   block 軸交給原生。註釋「閱讀本就 32px」語義保留：上限仍 32px。 */
+@media (min-width: 1024px) {
+  body.li-editor-vertical-active:not(.li-editor-horizontal-active)
+    .workspace-leaf-content[data-type="markdown"] .markdown-preview-view,
+  body.li-editor-vertical-active
+    .workspace-leaf-content[data-type="markdown"]:not(.li-editor-horizontal-active) .markdown-preview-view {
+    padding-inline: clamp(20px, 4vh, 32px);
+  }
+}
+
+/* 三態上下留白統一——「gutter 對齊」而非「隱藏捲動條」。
+   根因（CDP 鐵證）：Obsidian 對 .markdown-preview-view / .cm-scroller 設
+   scrollbar-gutter: stable——直排下捲動軸轉到物理底部（inline 軸末端），stable 溝槽
+   從列長扣走 12px；分頁頁身非捲動容器、滿幅 → 三態列長差 12px＝底部留白不一致。
+   修法（開拓思路後取 CSS 原生對齊，棄硬編 12px——捲動軸寬度隨平台 0/12/17px 不等）：
+   讓分頁頁身 .li-native-page-body 也成為帶 stable gutter 的捲動容器——與編輯/閱讀
+   同一機制保留溝槽，寬度天然隨平台一致；內容不溢出時不出現捲動條本體（僅溝槽）。
+   編輯/閱讀維持 Obsidian 原生捲動條（可見、可指示捲動位置）。 */
+/* 桌面級視口 */
+@media (min-width: 1024px) {
+  body.li-editor-vertical-active:not(.li-editor-horizontal-active)
+    .workspace-leaf-content[data-type="markdown"] .li-native-page-body,
+  body.li-editor-vertical-active
+    .workspace-leaf-content[data-type="markdown"]:not(.li-editor-horizontal-active) .li-native-page-body {
+    overflow-y: auto;
+    scrollbar-gutter: stable;
+  }
+}
+/* 小屏／觸屏 */
+@media (max-width: 1023px), (hover: none), (pointer: coarse) {
+  body.li-editor-vertical-active:not(.li-editor-horizontal-active)
+    .workspace-leaf-content[data-type="markdown"] .li-native-page-body,
+  body.li-editor-vertical-active
+    .workspace-leaf-content[data-type="markdown"]:not(.li-editor-horizontal-active) .li-native-page-body {
+    overflow-y: auto;
+    scrollbar-gutter: stable;
+  }
+}
+
+/* 直排捲動容器 overscroll 鎖。
+   官方分層：html,body 根層 overscroll-behavior:none（app.css:3199，Obsidian 自帶）＋
+   mobile 檢視內容層再鎖（app.css:19116 bases-view 先例）。lilium 此前只鎖了彈層
+   （li-popover/li-suggest/li-tpop-body 三處 contain），直排四捲動容器自身沒鎖——
+   直排下捲動軸轉水平，捲到首/末列時橡皮筋/捲動鏈把曳引傳給外層
+   （workspace / 相鄰 leaf），是移動端「捲到底還能再拖動」的根因。
+   修法：直排閘下對四容器（編輯 .cm-scroller／閱讀 .markdown-preview-view／
+   .markdown-reading-view／分頁 .li-native-page-body）補 overscroll-behavior:none
+   （對齊 bases-view 的容器層 none；非直排不命中，橫排零影響）。
+   gutter both-edges 不採：剛以 stable 統一三態列長，
+   both-edges 兩側開溝會推翻已驗收對齊——「謹慎」指令下不動（取捨記錄於落地記錄）。 */
+body.li-editor-vertical-active:not(.li-editor-horizontal-active)
+  .workspace-leaf-content[data-type="markdown"] .cm-scroller,
+body.li-editor-vertical-active:not(.li-editor-horizontal-active)
+  .workspace-leaf-content[data-type="markdown"] .markdown-preview-view,
+body.li-editor-vertical-active:not(.li-editor-horizontal-active)
+  .workspace-leaf-content[data-type="markdown"] .markdown-reading-view,
+body.li-editor-vertical-active:not(.li-editor-horizontal-active)
+  .workspace-leaf-content[data-type="markdown"] .li-native-page-body {
+  overscroll-behavior: none;
+}
+
+@media (max-width: 1023px), (hover: none), (pointer: coarse) {
+  body.li-editor-vertical-active:not(.li-editor-horizontal-active)
+    .workspace-leaf-content[data-type="markdown"] .markdown-preview-view,
+  body.li-editor-vertical-active
+    .workspace-leaf-content[data-type="markdown"]:not(.li-editor-horizontal-active) .markdown-preview-view {
+    padding-inline: 32px;
+  }
+}
+
+
+/* —— 直排閱讀／分頁代碼塊可見滾動軸 ——
+   病竈（實測）：閱讀態與分頁態頁身 pre 均 overflow:auto
+   可滾，但垂直滾動軸實測僅 2px 寬（vs 水平軸 14px）＝物理上不可見，用戶視為
+   「沒有滾動軸」。此段顯式繪製 scrollbar：10px 寬、thumb 用 muted 系色、hover 加深。
+   水平軸（列堆疊方向溢出）同款。橫排態不受影響（宿主掛直排閘）。 */
+
+
+/* ==========================================================================
+
+/* ⑤f 撤除後保留：自有分頁書頁（li-native-page）pre 滾動軸（宿主部分已裁決撤除） */
+body.li-editor-vertical-active .li-native-page-body pre::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+
+body.li-editor-vertical-active .li-native-page-body pre::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+
+body.li-editor-vertical-active .li-native-page-body pre::-webkit-scrollbar-thumb {
+  background: var(--background-modifier-border, var(--li-muted, #999));
+  border-radius: 5px;
+}
+
+
+body.li-editor-vertical-active .li-native-page-body pre::-webkit-scrollbar-thumb:hover {
+  background: var(--text-faint, var(--li-muted, #777));
+}
+
+
+body.li-editor-vertical-active .li-native-page .MJX-TEX {
+  writing-mode: horizontal-tb;
+  text-orientation: mixed;
+}
+
+/* W9-E fonts */
+.li-font-siddham   { font-family: "Noto Sans Siddham", serif; }
+.li-font-brahmi    { font-family: "Noto Sans Brahmi", serif; }
+.li-font-ranjana   { font-family: "Nithya Ranjana DU", "Noto Sans Devanagari", serif; }
+.li-font-tibetan   { font-family: "Noto Serif Tibetan", serif; }
+/* r60：MD 正文藏文 run 字體（編輯態 mark decoration／閱讀態包 span 共用）——
+   跨字體 shaping 斷裂修復：首選內嵌 Noto Serif Tibetan 整體 shaping，serif 兜底 */
+.li-tib-run        { font-family: "Noto Serif Tibetan", serif; }
+.li-font-sanskrit  { font-family: "Noto Sans Devanagari", serif; }
+.li-font-pali      { font-family: "Noto Sans Devanagari", serif; }
+.li-font-mongolian { font-family: "Noto Sans Mongolian", sans-serif; }
+.li-font-manchu    { font-family: "Noto Sans Mongolian", sans-serif; }
+.li-font-xibe      { font-family: "Noto Sans Mongolian", sans-serif; }
+.li-font-olduyghur { font-family: "Noto Serif Old Uyghur", "Noto Sans Mongolian", sans-serif; }
+.li-font-sinhala   { font-family: "Noto Sans Sinhala", sans-serif; }
+.li-font-hebrew    { font-family: "Noto Serif Hebrew", serif; }
+.li-font-arabic    { font-family: "Noto Naskh Arabic", serif; }
+.li-font-uyghur    { font-family: "Noto Naskh Arabic", serif; }
+.li-font-phagspa   { font-family: "Noto Sans Phags Pa", serif; }
+.li-font-kharoshthi { font-family: "Noto Sans Kharoshthi", serif; }
+.li-font-marchen   { font-family: "Noto Sans Marchen", serif; }
+.li-font-zanabazar { font-family: "Noto Sans Zanabazar Square", serif; }
+
+/* 通用橋接類：套用呼叫端已設定的 --li-ct-font（與轉寫檢字表 / 校勘面板同源變數）。
+ * 筆記裡若已 inline 設好該 CSS 變數，套這個類即可生效。 */
+.li-native-font { font-family: var(--li-ct-font, inherit); }
+
+/* 還原：誤刪的活樣式——translit-ui.ts renderCharTableInto
+   消費的檢字表全套（sticky 表頭／hairline／hover／--li-ct-font 字體棧）。
+   theme-compat.mjs 六主題「表頭未吸頂」紅燈即此段缺失。 */
+/* ---------- 檢字表（設定頁與側欄共用） ----------
+   改為表單形制——外框圓角、只留水平行線（去掉格狀豎線讓密集
+   表格更透氣）、表頭吸頂且用次層底色、行 hover 高亮。
+   注意 border-collapse 由 collapse 改為 separate + border-spacing: 0：
+   collapse 模式下 sticky 表頭的邊框會在滾動時消失（已知瀏覽器行為），
+   separate 才能讓吸頂表頭保住自己的描邊。 */
+.li-root table.li-char-table,
+.li-settings table.li-char-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  border: var(--li-hairline);
+  border-radius: var(--li-r-md);
+  font-size: var(--li-fs-caption);
+  table-layout: fixed;
+}
+.li-root table.li-char-table th,
+.li-settings table.li-char-table th,
+.li-root table.li-char-table td,
+.li-settings table.li-char-table td {
+  border-bottom: var(--li-hairline);
+  padding: var(--li-sp-1) var(--li-sp-2);
+  text-align: start;
+  vertical-align: top;
+  overflow-wrap: break-word;
+}
+/* 末行不畫底線，圓角才收得乾淨 */
+.li-root table.li-char-table tbody tr:last-child td,
+.li-settings table.li-char-table tbody tr:last-child td { border-bottom: none; }
+.li-root table.li-char-table th,
+.li-settings table.li-char-table th {
+  background: var(--background-secondary);
+  /* color --text-muted → color-mix(normal 85%)——半透明玻璃主題下
+     muted 對合成 wallpaper 底掉到 3.83:1（theme-compat glass case 實測），逼近 normal
+     保留弱化視覺同時過 4.0 閘。 */
+  color: color-mix(in srgb, var(--text-normal) 85%, var(--text-muted));
+  font-weight: var(--li-fw-semibold);
+  letter-spacing: 0.02em;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+/* 表頭底色同樣減淡（與設定行卡片同一套處理）：直接用 --background-secondary
+   會讓 --text-muted 小字在深色 / 半透明主題上掉到 4:1 以下。
+   表頭與表體的區隔由 hairline 底線負責，不需要靠深色背景。 */
+@supports (background: color-mix(in srgb, red 50%, blue)) {
+  .li-root table.li-char-table th {
+    background: color-mix(in srgb, var(--background-secondary) 75%, var(--background-primary, #ffffff));
+  }
+}
+/* 圓角由表頭自己收（table 上的 overflow 對表格無效，只能這樣處理） */
+.li-root table.li-char-table thead th:first-child,
+.li-settings table.li-char-table thead th:first-child { border-start-start-radius: var(--li-r-md); }
+.li-root table.li-char-table thead th:last-child,
+.li-settings table.li-char-table thead th:last-child { border-start-end-radius: var(--li-r-md); }
+.li-root table.li-char-table tbody tr:hover td,
+.li-settings table.li-char-table tbody tr:hover td { background: var(--li-material-hover); }
+.li-root table.li-char-table td:first-child,
+.li-settings table.li-char-table td:first-child {
+  font-size: var(--li-fs-body);
+  text-align: center;
+  white-space: nowrap;
+  /* 第 1 列是各文種的原生文字，必須走該文種的字體棧。
+     變數由 renderCharTableInto() 依轉寫方案分組寫入（見 src/translit-ui.ts 的
+     SCHEME_GROUP_SCRIPT）；未設值時 fallback 到 inherit 保持舊行為。
+     少了這行，沒裝對應字體的電腦就只會看到整列豆腐塊——插件內嵌的
+     Noto 藏文 / 蒙古文 / 悉曇 / 蘭札等字體全派不上用場。 */
+  font-family: var(--li-ct-font, inherit);
+}
+.li-root table.li-char-table td:nth-child(2),
+.li-settings table.li-char-table td:nth-child(2) {
+  /* r53：Doulos SIL 兜 IAST 拉丁擴展（檢字表 roman 欄 ḷ/ṛ/ṣ/ḥ 等）。 */
+  font-family: var(--font-monospace), "Doulos SIL";
+}
+/* 備註欄：文案內嵌各文種範例字（siddham「ka＝𑖎」、indic「ka＝क」、Om「ॐ」…）。
+   這些碼位（SMP 悉曇、天城體…）系統正文字體多半沒有——只給第 1 欄套
+   --li-ct-font 會讓備註欄整列豆腐。範例字落在文種字體棧，中文說明落到
+   正文棧（文種棧對漢字/拉丁全部 miss，自動下墜），兩欄各得其所。 */
+.li-root table.li-char-table td:nth-child(3) {
+  color: var(--text-muted);
+  font-family: var(--li-ct-font, inherit), var(--font-text, inherit);
+}
+.li-root table.li-char-table tr.li-char-table-section td {
+  font-size: var(--li-fs-caption);
+  font-weight: var(--li-fw-bold);
+  background: var(--background-secondary);
+  color: var(--text-normal);
+  letter-spacing: 0.02em;
+  /* 分組標題是 UI 文字（「輔音」「元音」…），跨 td 者是 first-child 會被上面的
+     規則命中，這邊用 unset（可繼承屬性等同 inherit）退回介面字體。 */
+  font-family: unset;
+}
+.li-root .li-char-table-empty,
+.li-settings .li-char-table-empty {
+  font-size: var(--li-fs-caption);
+  color: var(--text-muted);
+  padding: var(--li-sp-2);
+}
+
+/* 還原：誤刪——main.ts promptModal（li-settings-nav 行容器
+   ＋ li-settings-nav-btn 按鈕）仍活用；報告的「重置 modal」按鈕即此。 */
+
+/* ==========================================================================
+   辭典面板
+   --------------------------------------------------------------------------
+   src/dict/ 是從另一處整包併進來的，不過又拆分了。**當年只搬了 TS，沒搬 CSS。**
+   結果是：面板 138 個 class 裡 138 個零樣式，整塊 UI 靠瀏覽器預設樣式在跑——
+   按鈕是 UA 的灰方塊、卡片沒有邊框、校勘面板 28 個 class 全裸。
+   讓人一直以為「辭典長這樣」，其實是「辭典沒穿衣服」。
+
+   這裡一次補齊。三條紀律：
+     1. 全部收在 .li-root 之下（辭典視圖的根），不污染 lilium 核心；
+     2. 只用 Obsidian 的設計變數（--background-* / --text-* / --interactive-* ...），
+        自動跟著主題與深淺色；
+     3. **不重新貼皮原生控制項**（教訓）——input / select / button
+        只給寬高、間距、圓角，外觀交給 app.css。
+   ========================================================================== */
+
+/* ---------------------------------------------------------------- 外殼 */
+.li-root {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+/* 白塊真機根因（診斷 v7/v8/v9 實錘）：官方通用規則
+   .workspace-leaf-content .view-content{padding-bottom:max(var(--safe-area-inset-bottom),32px)}
+   命中 lilium 面板（data-type 不在 padding:0 豁免名單）——該機 native 層把
+   safe-area-inset-bottom 動態寫成鍵盤高度（467=kh 精確），root pb 吃掉 467px
+   內容區＝li-body 塌陷＋root 下方露白底＝白塊。宿主讓位鏈已由
+   app-container max-height 完成（rootTop/rootH 幾何實錘），root 自身再讓位
+   即雙重讓位。清零 root 的塊向 padding（僅 .li-root 範圍，不涉其他視圖）。 */
+.li-root.view-content {
+  padding-top: 0;
+  padding-bottom: 0 !important;
+}
+/* 移動端軟鍵盤適配——src/dict/viewport-fit.ts 寫入
+   .li-vv-shrunk ＋ --li-vv-height（visualViewport.height）。覆蓋式鍵盤
+   （iOS WKWebView / Android adjustNothing）不縮 layout viewport，
+   height:100% 仍全屏 → 下半截被鍵盤蓋住；打閘時把整板高度收斂到可視高度，
+   .li-body 收斂後照常垂直捲動。Android adjustResize 系統自縮容器時
+   vv.height≈innerHeight → 不打閘，不會「縮兩次」。桌面恆不打閘。 */
+/* (0,3,0) 對齊 Obsidian .workspace-tabs .workspace-leaf .view-content 的 (0,3,0)，
+   後載入者（本檔）勝出；審核 round 已去 !important（.view-content 系規則無 !important，特異性同級後載勝）。 */
+/* 佈局零干預——.li-root 恆 100% 跟隨宿主容器（--keyboard-height 縮放），
+   不再自繪收縮/位移（競態白塊根因，見 viewport-fit.ts 頭註）。li-vv-shrunk 僅作
+   「覆蓋式鍵盤且宿主未處理」的提示閘。
+   覆蓋式鍵盤且宿主未處理時，面板高度收斂到可視高度（--li-vv-height）——
+   對齊官方 app.css「滾動容器 padding/height 吃 --keyboard-height」路線（官方
+   bases-kanban height:calc(100% + var(--keyboard-height)…)、vertical-tab-content
+   padding-bottom:max(var(--keyboard-height),…)）：面板讓位到鍵盤上方，自身捲動，
+   不再撐滿被鍵盤蓋住的全高 → 底部不露白；背景沿用 view-content 背景無縫。 */
+.li-root.view-content.li-vv-shrunk {
+  height: var(--li-vv-height, 100%);
+}
+.li-root.view-content.li-vv-shrunk .li-body {
+  padding-bottom: 28px;
+}
+.li-root .li-header {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px 12px 0;
+  /* 撤底部分隔線式陰影（移動端白色區塊下那條） */
+  background: var(--background-primary);
+  /* W8：建議彈窗（.li-suggest，absolute）掛在這個 header 裡。不給 header
+     一個自己的堆疊上下文，彈窗就可能畫在 .li-body 內容底下（同層且 .li-body
+     有背景時）。relative + z-index 讓「header 層」整體浮在內容之上。 */
+  position: relative;
+  z-index: 5;
+}
+.li-root .li-body {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  padding: 10px 12px 28px;
+}
+.li-root .li-title-row { display: flex; align-items: center; gap: 8px; }
+.li-root .li-count {
+  margin-left: auto;
+  font-size: var(--font-ui-smaller, 12px);
+  color: var(--text-muted);
+}
+.li-root .li-icon-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: var(--radius-s, 4px);
+  color: var(--text-muted);
+  font-size: 14px;
+  line-height: 1;
+}
+.li-root .li-icon-btn:hover { background: var(--background-modifier-hover); color: var(--text-normal); }
+
+/* ---------------------------------------------------------------- 頁籤 */
+/* 原生化對齊：不再自繪 segmented/pill 皮膚，改取原生變數——
+   背景 var(--background-modifier-*)、active 用 var(--interactive-accent)（is-active 慣例）、
+   圓角 var(--radius-s)，移除自繪 box-shadow；觸控目標 min-height 44px（.li-root 不受
+   [1.14] 黑名單約束——黑名單僅針對 .li-settings 下控制項）。 */
+.li-root .li-tabs {
+  display: inline-flex;
+  gap: 2px;
+  padding: 2px;
+  border-radius: var(--radius-s, 4px);
+  background: var(--background-secondary);
+  overflow-x: auto;
+  scrollbar-width: none;
+  max-width: 100%;
+}
+.li-root .li-tabs::-webkit-scrollbar { display: none; }
+.li-root .li-tab {
+  flex: 0 0 auto;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-s, 4px);
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 4px 14px;
+  font-size: var(--font-ui-smaller, 12px);
+  white-space: nowrap;
+}
+.li-root .li-tab:hover { color: var(--text-normal); background: var(--background-modifier-hover); }
+.li-root .li-tab.is-active {
+  color: var(--text-on-accent, var(--background-primary));
+  font-weight: 600;
+  background: var(--interactive-accent);
+}
+
+/* 二級子分頁：同原生 nav-item 慣例（透明底＋hover 淡底＋active accent） */
+.li-root .li-subtabs {
+  display: flex;
+  gap: 4px;
+  margin-top: 2px;
+  padding: 0 0 0 2px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.li-root .li-subtabs::-webkit-scrollbar { display: none; }
+.li-root .li-subtab {
+  flex: 0 0 auto;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-s, 4px);
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 3px 12px;
+  font-size: var(--font-ui-smaller, 12px);
+  white-space: nowrap;
+}
+.li-root .li-subtab:hover { color: var(--text-normal); background: var(--background-modifier-hover); }
+.li-root .li-subtab.is-active {
+  color: var(--text-on-accent, var(--background-primary));
+  font-weight: 600;
+  background: var(--interactive-accent);
+}
+/* 移動端觸控目標 ≥44px（僅 .li-root 範圍，不涉 .li-settings） */
+@media (pointer: coarse) {
+  .li-root .li-tab,
+  .li-root .li-subtab {
+    min-height: 44px;
+  }
+}
+
+/* ---------------------------------------------------------------- 搜尋 */
+/* 查詢頁搜尋按鈕（與管理頁全文搜尋按鈕同款 mod-cta li-ft-btn）同行排布 */
+.li-root .li-search-row { position: relative; display: flex; align-items: center; gap: 6px; padding: 4px 0 6px; }
+.li-root .li-search-wrap { position: relative; display: flex; align-items: center; flex: 1 1 auto; min-width: 0; }
+.li-root .li-search-btn { flex: 0 0 auto; padding: 4px 12px; }
+.li-root .li-search {
+  width: 100%;
+  /* W8：清除鈕（.li-clear）是 absolute 疊在右側，不留內距的話長詞會被 ✕ 蓋住 */
+  padding-inline-end: 28px;
+}
+.li-root .li-clear {
+  position: absolute;
+  right: 4px;
+  background: transparent;
+  border: none;
+  color: var(--text-faint);
+  cursor: pointer;
+  padding: 0 6px;
+  line-height: 1;
+}
+.li-root .li-clear:hover { color: var(--text-normal); }
+/* W8：建議彈窗。舊寫法用寫死黑陰影 `0 4px 14px rgb(0 0 0 / 18%)`——
+   淺色主題下那一圈就是使用者回報的「一大圈黑色」；深色主題下黑陰影又幾乎
+   看不見、等於沒有層次。現改走 token（--li-shadow-pop-strong，.theme-dark 下
+   自動換成高不透明、低擴散的一圈 + hairline 描邊）。 */
+.li-root .li-suggest {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 100%;
+  z-index: 20;
+  max-height: 220px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: var(--li-ui-space-1, 4px) 0;
+  background: var(--li-ui-surface-1, var(--background-primary));
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--li-ui-radius-sm, 6px);
+  box-shadow: var(--li-shadow-pop-strong);
+}
+.li-root .li-suggest-item {
+  padding: 5px 10px;
+  font-size: var(--font-ui-smaller, 12px);
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  /* W8：選項的互動區左右內縮一點，hover 底色才不會「貼邊」——那是廉價感的來源 */
+  margin: 0 var(--li-ui-space-1, 4px);
+  border-radius: var(--li-r-xs, 4px);
+  transition: background var(--li-ui-anim-exit, 160ms) var(--li-ui-ease-out, ease);
+}
+.li-root .li-suggest-item.is-active, .li-root .li-suggest-item:hover { background: var(--background-modifier-hover); }
+
+/* ---------------------------------------------------------------- chips */
+/* 辭典膠囊單列左右滾動（flex-wrap: wrap → nowrap + overflow-x），省垂直空間。
+   scrollbar-width thin＋細 scrollbar 保持精緻；膠囊 flex-shrink:0 防壓縮截斷。 */
+.li-root .li-chips {
+  display: flex; flex-wrap: nowrap; gap: 4px; padding: 4px 0 8px;
+  overflow-x: auto; overflow-y: hidden; scrollbar-width: thin;
+}
+.li-root .li-chips::-webkit-scrollbar { height: 4px; }
+.li-root .li-chips::-webkit-scrollbar-track { background: transparent; }
+.li-root .li-chips::-webkit-scrollbar-thumb { background: var(--background-modifier-border); border-radius: 2px; }
+.li-root .li-chip {
+  flex-shrink: 0;
+  font-size: var(--font-ui-smaller, 12px);
+  line-height: 1.7;
+  padding: 1px 9px;
+  border-radius: var(--li-ui-radius-pill);
+  border: 1px solid var(--background-modifier-border);
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.li-root .li-chip:hover { background: var(--background-modifier-hover); color: var(--text-normal); }
+.li-root .li-chip.is-active {
+  background: var(--interactive-accent, #7c6f64);
+  border-color: var(--interactive-accent, #7c6f64);
+  color: var(--text-on-accent, #fff);
+}
+/* 全文搜尋選項列（Aa 大小寫/整詞/正則/多詞分隔）——與辭典膠囊視覺區分：
+   無框透明底＋小字弱化，僅選中態 accent 實底；避免與辭典選擇膠囊混淆。 */
+.li-root .li-ft-options { display: flex; flex-wrap: nowrap; gap: 3px; padding: 0 0 6px; align-items: center; }
+.li-root .li-ft-opt {
+  font-size: var(--font-ui-smallest, 11px);
+  border: none; background: transparent; box-shadow: none;
+  padding: 0 7px; border-radius: var(--li-ui-radius-pill);
+  color: var(--text-faint);
+}
+.li-root .li-ft-opt.is-active { box-shadow: none; }
+.li-root .li-ft-opt:hover { color: var(--text-normal); background: var(--background-modifier-hover); }
+.li-root .li-ft-opt.is-active { background: var(--interactive-accent); color: var(--text-on-accent); }
+
+
+/* ---------------------------------------------------------------- 結果 */
+.li-root .li-articles { display: flex; flex-direction: column; gap: 8px; }
+/* 結果容器收縮保護＋橫向溢出禁止（全文搜尋長內容溢邊框）。 */
+.li-root .li-articles { min-width: 0; max-width: 100%; overflow-x: hidden; }
+.li-root .li-articles .li-ft-item img, .li-root .li-articles img { max-width: 100%; height: auto; }
+.li-root .li-articles table { max-width: 100%; table-layout: fixed; }
+.li-root .li-panel-title { margin: 0 0 6px; font-size: var(--font-ui-normal, 14px); font-weight: 600; }
+/* 轉寫面板標題下實驗性功能注釋行（小字淡色，不搶主標題） */
+.li-root .li-panel-subtitle { margin: -2px 0 8px; font-size: var(--font-ui-smaller, 12px); color: var(--text-faint); }
+.li-root .li-result-head { margin-bottom: var(--li-ui-space-2); }
+.li-root .li-word-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.li-root .li-word { font-size: 1.15em; font-weight: 650; letter-spacing: 0.02em; }
+.li-root .li-star {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--text-faint);
+  font-size: 16px;
+  padding: 0 2px;
+  line-height: 1;
+}
+.li-root .li-star.is-on { color: var(--interactive-accent, #7c6f64); }
+.li-root .li-gen-row { display: flex; gap: 4px; margin-left: auto; flex-wrap: wrap; }
+.li-root .li-hitcount { margin-top: 2px; font-size: var(--font-ui-smaller, 12px); color: var(--text-muted); }
+.li-root .li-mini-btn {
+  font-size: var(--font-ui-smaller, 12px);
+  padding: 2px 9px;
+  border-radius: var(--radius-s, 4px);
+  border: 1px solid var(--background-modifier-border);
+  background: var(--background-secondary);
+  color: var(--text-muted);
+  cursor: pointer;
+  white-space: nowrap;
+}
+.li-root .li-mini-btn:hover { background: var(--background-modifier-hover); color: var(--text-normal); }
+/* 轉寫歧義備選選中態——插件 .li-root .li-mini-btn（0-2-0）壓過 Obsidian
+   .mod-cta（0-1-0），選中按鈕被蓋成灰色。顯式補選中規則（同特異性、後出者勝），
+   跟隨主題 accent，加過渡讓切換自然。 */
+.li-root .li-mini-btn {
+  transition: background-color 140ms ease, color 140ms ease, border-color 140ms ease;
+}
+.li-root .li-mini-btn.mod-cta {
+  background: var(--interactive-accent);
+  border-color: var(--interactive-accent);
+  color: var(--text-on-accent);
+}
+.li-root .li-mini-btn.mod-cta:hover {
+  background: var(--interactive-accent-hover);
+  border-color: var(--interactive-accent-hover);
+  color: var(--text-on-accent);
+}
+.li-root .li-card {
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-s, 4px);
+  overflow: hidden;
+  background: var(--background-primary);
+}
+.li-root .li-frame { display: block; width: 100%; border: 0; background: transparent; }
+.li-root .li-actions {
+  display: flex;
+  gap: 4px;
+  padding: 4px 6px;
+  border-top: 1px solid var(--background-modifier-border);
+  background: var(--background-secondary);
+}
+.li-root .li-dict-sep { display: flex; align-items: center; gap: 6px; margin: 10px 0 2px; }
+.li-root .li-dict-badge {
+  font-size: var(--font-ui-smaller, 12px);
+  color: var(--text-muted);
+  background: var(--background-secondary);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--li-ui-radius-pill);
+  padding: 1px 9px;
+}
+.li-root .li-block-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  padding: var(--li-ui-space-1) var(--li-ui-space-2);
+  border: none;
+  background: var(--background-secondary);
+  color: var(--text-muted);
+  cursor: pointer;
+  text-align: left;
+  font-size: var(--font-ui-smaller, 12px);
+}
+.li-root .li-block-bar:hover { background: var(--background-modifier-hover); color: var(--text-normal); }
+.li-root .li-mdx-block {
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-s, 4px);
+  overflow: hidden;
+}
+.li-root .li-mdx-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: var(--li-ui-space-1) var(--li-ui-space-2);
+  background: var(--background-secondary);
+  cursor: pointer;
+  font-size: var(--font-ui-smaller, 12px);
+}
+.li-root .li-mdx-arrow { color: var(--text-faint); width: 10px; font-size: 10px; }
+.li-root .li-mdx-key { font-weight: 600; }
+.li-root .li-mdx-body { padding: 2px 0; }
+/* 收合從未生效——JS 只切 is-open／箭頭，CSS 從無 body 隱藏規則
+   （pre-B3 亦然，屬歷史缺陷非分拆誤刪）。補：預設收起，僅 .is-open 展開。 */
+.li-root .li-mdx-block:not(.is-open) > .li-mdx-body { display: none; }
+
+/* 外部連結 / 詞源 */
+.li-root .li-extlinks { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-top: var(--li-ui-space-1); }
+.li-root .li-extlinks-label { font-size: var(--font-ui-smaller, 12px); color: var(--text-faint); }
+.li-root .li-extlink { font-size: var(--font-ui-smaller, 12px); color: var(--text-accent, var(--link-color)); }
+.li-root .li-suggest-similar { display: flex; flex-wrap: wrap; gap: 6px; margin-top: var(--li-ui-space-2); }
+
+/* ---------------------------------------------------------------- 空狀態 */
+.li-root .li-welcome, .li-root .li-none { text-align: center; padding: 26px 12px; color: var(--text-muted); }
+.li-root .li-welcome-icon, .li-root .li-none-icon { font-size: 32px; margin-bottom: var(--li-ui-space-2); }
+.li-root .li-none-hint { margin: 4px 0; font-size: var(--font-ui-smaller, 12px); color: var(--text-faint); }
+/* 佛學模式提示橫幅樣式已移除（橫幅不再渲染，樣式退場） */
+.li-root .li-recent { margin-top: 14px; }
+.li-root .li-recent-title { margin-bottom: 6px; font-size: var(--font-ui-smaller, 12px); color: var(--text-faint); }
+.li-root .li-recent-list { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
+.li-root .li-recent-item {
+  font-size: var(--font-ui-smaller, 12px);
+  padding: 2px 10px;
+  border-radius: var(--li-ui-radius-pill);
+  border: 1px solid var(--background-modifier-border);
+  background: var(--background-secondary);
+  color: var(--text-muted);
+  cursor: pointer;
+}
+.li-root .li-recent-item:hover { background: var(--background-modifier-hover); color: var(--text-normal); }
+
+/* ---------------------------------------------------------------- 書籤 / 歷史 / 列表 */
+.li-root .li-bm-list, .li-root .li-manage-list, .li-root .li-groups-list, .li-root .li-loaded-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.li-root .li-bm-row, .li-root .li-manage-row, .li-root .li-loaded-row, .li-root .li-group-head, .li-root .li-setting-group-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 9px;
+  border-radius: var(--radius-s, 4px);
+  border: 1px solid var(--background-modifier-border);
+  background: var(--background-secondary);
+}
+.li-root .li-bm-word, .li-root .li-group-name, .li-root .li-loaded-name {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.li-root .li-bm-date, .li-root .li-group-count, .li-root .li-loaded-meta, .li-root .li-asset-summary {
+  flex: 0 0 auto;
+  font-size: var(--font-ui-smaller, 12px);
+  color: var(--text-faint);
+}
+.li-root .li-loaded-info { display: flex; flex-direction: column; font-size: var(--font-ui-smaller, 12px); color: var(--text-muted); }
+.li-root .li-hist-search { margin-bottom: var(--li-ui-space-2); }
+.li-root .li-danger { color: var(--text-error); }
+
+/* ---------------------------------------------------------------- 全文搜尋 */
+.li-root .li-ft-row { display: flex; gap: 6px; align-items: center; }
+.li-root .li-ft-row .li-search { flex: 1 1 auto; }
+.li-root .li-ft-btn { flex: 0 0 auto; }
+.li-root .li-ft-options { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; padding-bottom: 6px; }
+.li-root .li-ft-hint { font-size: var(--font-ui-smaller, 12px); color: var(--text-faint); }
+.li-root .li-ft-tools { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0; }
+.li-root .li-hits-total { margin: 6px 0; font-size: var(--font-ui-smaller, 12px); color: var(--text-muted); }
+.li-root .li-ft-item {
+  padding: 6px 9px;
+  margin-bottom: 6px;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-s, 4px);
+  background: var(--background-primary);
+  /* 長內容溢出邊框修復——flex column 子項預設 min-width:auto 不收縮，
+     長詞條內容撐破容器（真機 scrollWidth 692 vs clientWidth 240）。 */
+  min-width: 0;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+.li-root .li-ft-word { font-weight: 600; margin-bottom: 2px; white-space: normal; overflow-wrap: anywhere; word-break: break-word; text-align: left; width: 100%; }
+.li-root .li-ft-snippet { font-size: var(--font-ui-smaller, 12px); color: var(--text-muted); line-height: 1.65; overflow-wrap: anywhere; }
+.li-root .li-ft-tag { font-size: 11px; color: var(--text-faint); }
+.li-root .li-scan-row { display: flex; align-items: center; gap: 8px; margin: 6px 0; flex-wrap: wrap; }
+.li-root .li-progress { display: flex; align-items: center; gap: 8px; }
+.li-root .li-progress-bar {
+  flex: 1 1 auto;
+  height: 6px;
+  border-radius: var(--li-ui-radius-pill);
+  background: var(--background-modifier-border);
+  overflow: hidden;
+}
+.li-root .li-progress-inner { display: block; height: 100%; width: 0; background: var(--interactive-accent, #7c6f64); }
+.li-root .li-progress-text { flex: 0 0 auto; font-size: var(--font-ui-smaller, 12px); color: var(--text-faint); }
+
+/* ---------------------------------------------------------------- 管理 */
+.li-root .li-info-form { display: grid; grid-template-columns: auto 1fr; gap: 4px 8px; align-items: center; margin: 8px 0; }
+.li-root .li-field { display: flex; flex-direction: column; gap: 2px; font-size: var(--font-ui-smaller, 12px); }
+/* 辭典管理・分組重命名輸入行（行內展開；確認/取消） */
+.li-root .li-group-rename {
+  display: flex;
+  gap: var(--li-ui-space-2);
+  align-items: center;
+  padding: var(--li-ui-space-2) 0;
+}
+.li-root .li-group-rename input { flex: 1 1 auto; }
+.li-root .li-format-table { font-size: var(--font-ui-smaller, 12px); border-collapse: collapse; }
+.li-root .li-format-table td, .li-root .li-format-table th {
+  border: 1px solid var(--background-modifier-border);
+  padding: 3px 8px;
+  text-align: left;
+}
+.li-root .li-format-help { margin: 4px 0; font-size: var(--font-ui-smaller, 12px); color: var(--text-faint); }
+
+/* ⚠️ .li-input 只給寬度，不改外觀——才把設定頁的貼皮拆掉，這裡不要再犯 */
+.li-root .li-input { max-width: 100%; }
+
+/* 設置頁分組行——輸入框與「添加分組」按鈕邊緣交疊修正：
+   input 佔滿剩餘寬度（flex:1），與按鈕之間保留 gap。
+   設置頁容器（.vertical-tab-content）不含 .li-root，選擇器須覆蓋兩種場景。 */
+.li-root .li-setting-group-row .li-group-new-input,
+.vertical-tab-content .li-setting-group-row .li-group-new-input { flex: 1 1 auto; min-width: 0; }
+.li-root .li-setting-group-row,
+.vertical-tab-content .li-setting-group-row { display: flex; align-items: center; gap: 8px; }
+
+/* .li-root 域 select 通用防溢出收口——select 內在寬度（min-width:auto 的
+   min-content 下限）會在窄 flex 容器（右欄 ~300px）頂破區塊（v2匯入格式下拉
+   +20.6px、轉寫方案 +52.6px 兩起實錘）。統一解除收縮下限；個別專用規則
+   （max-width 70% 等）特異性更高，不受影響。 */
+.li-root select {
+  min-width: 0;
+  max-width: 100%;
+}
+.li-root .li-col-hint { font-size: var(--font-ui-smaller, 12px); color: var(--text-faint); }
+.li-root .li-col-area {
+  display: block;
+  width: 100%;
+  min-height: 88px;
+  resize: vertical;
+  /* 轉寫面板原生輸入方向會設 --li-ct-font（文種字體棧，疊字文種 subjoiner
+     碼位只有文種字體有字形）；羅馬輸入方向清此變量，回落接口字體。
+     r53：棧尾兜 "Doulos SIL"——IAST 拉丁擴展（0x0100-0x017F/0x1E00-0x1EFF）
+     在文種族與主題族中常缺字形（ḷ/ṛ/ṣ/ḥ 豆腐風險），Doulos 已宿主註冊。 */
+  font-family: var(--li-ct-font, inherit), "Doulos SIL";
+}
+
+/* 輸出框同理（.li-col-translit-pre）：文種族之後 Doulos 兜 IAST 拉丁擴展。 */
+
+/* 轉寫頁籤的根容器（補登）。
+   translit-panel.ts 建的是 `cls: 'li-articles li-translit'`：`.li-articles`
+   只給了 flex 縱排，頁籤自己還帶一個 `.li-translit` 鉤子——但 v2.0 併入
+   src/dict/ 時只搬了 TS，這條類定義一直沒進 styles.css。
+   缺了它，容器只能吃瀏覽器預設的 block 流：textarea、工具列、兩個 details
+   （長文本轉寫 / 連聲合成）之間沒有間隔，窄寬時整塊擠在一起。
+   這裡與姊妹頁籤 `.li-collation` 同構（一樣是 flex 縱排 + 8px 間距），
+   兩邊將來要改排版時不會各自漂移。 */
+.li-root .li-translit { display: flex; flex-direction: column; gap: 8px; }
+.li-root .li-col-translit {
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-s, 4px);
+  padding: 6px 10px 8px;
+  background: var(--background-secondary);
+}
+.li-root .li-col-translit .li-col-area { margin-bottom: 6px; }
+/* 標題行頂層切換圖示（辭典/轉寫）——選中跟隨主題 accent */
+.li-root .li-top-icon {
+  align-items: center; justify-content: center;
+  width: 28px; height: 28px; padding: 0; margin-right: 4px;
+  appearance: none; -webkit-appearance: none;
+  border: none; border-radius: var(--radius-s, 4px);
+  /* 明確 fallback——移動端若 CSS 變數解析失敗 currentColor 塌黑＝深色底上「只剩純色黑塊」 */
+  background: transparent; color: var(--text-faint, #b3b3b3); cursor: pointer;
+  box-shadow: none;
+}
+/* 無背景按鈕框、純 SVG 線條（inline lucide path，
+   不走 setIcon——移動端塌純色塊）；選中＝主題 accent 色線條。 */
+.li-root .li-top-icon svg {
+  width: 20px; height: 20px; display: block; pointer-events: none;
+  fill: none; stroke: currentColor; stroke-width: 2;
+  stroke-linecap: round; stroke-linejoin: round;
+}
+.li-root .li-top-icon:hover { color: var(--text-normal); }
+.li-root .li-top-icon.is-active { background: transparent; color: var(--interactive-accent, #8a5cf5); }
+.li-root .li-top-icon.is-active svg { stroke: var(--interactive-accent, #8a5cf5); }
+/* 標題行改字元圖示（textContent，A2 同款）——svg 三通路移動端全敗的替身 */
+.li-root .li-top-icon { font-size: 17px; line-height: 1; }
+.li-root .li-top-icon.is-active { color: var(--interactive-accent, #8a5cf5); }
+/* emoji 彩色字元不吃 color——選中態改灰階/全彩對比：未選=灰階半透明，選中=全彩 */
+.li-root .li-top-icon { filter: grayscale(1); opacity: 0.55; }
+.li-root .li-top-icon.is-active { filter: none; opacity: 1; }
+/* 移動端兜底：不依賴 .li-root 層級，任何容器內都鎖定尺寸與描邊 */
+.li-top-icon svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.li-top-icon.is-active svg { stroke: var(--interactive-accent, #8a5cf5); }
+/* 標題行改字元圖示（textContent，A2 同款）——svg 三通路移動端全敗的替身 */
+.li-root .li-top-icon { font-size: 17px; line-height: 1; }
+.li-root .li-top-icon.is-active { color: var(--interactive-accent, #8a5cf5); }
+/* emoji 彩色字元不吃 color——選中態改灰階/全彩對比：未選=灰階半透明，選中=全彩 */
+.li-root .li-top-icon { filter: grayscale(1); opacity: 0.55; }
+.li-root .li-top-icon.is-active { filter: none; opacity: 1; }
+/* 字數計數（貼文當下就知道離上限多遠；超限轉紅） */
+.li-root .li-col-translit-count {
+  margin: -2px 0 6px;
+  font-size: 11px;
+  color: var(--text-faint);
+  font-variant-numeric: tabular-nums;
+}
+.li-root .li-col-translit-count.is-over {
+  color: var(--text-error);
+  font-weight: 600;
+}
+.li-root .li-translit-export {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  margin-top: 8px;
+  padding: 6px 8px;
+  border: 1px dashed var(--background-modifier-border);
+  border-radius: var(--radius-s, 4px);
+}
+.li-root .li-translit-export-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  color: var(--text-normal);
+}
+.li-root .li-translit-export-item input { margin: 0; }
+.li-root .li-col-translit-inner { padding-top: 6px; }
+.li-root .li-col-translit-ctl {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: flex-end;
+}
+.li-root .li-col-translit-field {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 11px;
+  color: var(--text-faint);
+  /* 右欄窄容器防溢出——scheme select 內在寬度頂破區塊（實測 +52.6px），
+     min-width:0 解除 flex 收縮下限；select 同步 min-width:0＋max-width:100%。 */
+  min-width: 0;
+}
+.li-root .li-col-translit-label { white-space: nowrap; }
+.li-root .li-col-translit-stats {
+  margin: 6px 0 0;
+  font-size: 11px;
+  color: var(--text-faint);
+  min-height: 1em;
+}
+.li-root .li-col-translit-out { margin-top: 6px; }
+/* 轉寫歧義位置高亮（輸出框內 <mark>）——用主題 accent 底色＋抗默認 mark 黃底 */
+.li-root .li-col-translit-pre mark.li-translit-amb-mark {
+  background: var(--accent, #7c3aed);
+  color: var(--text-on-accent, #fff);
+  border-radius: 3px;
+  padding: 0 1px;
+}
+/* 八思巴「。」居中（Unicode 18 Core Spec §14.4 Punctuation）。
+   直排 sideways 下「。」默認靠列側；規範要求八思巴文本的表意句號居中。
+   僅 translit-panel 在八思巴方案輸出中包裝的 span 生效，中日韓語境不受影響。 */
+.li-root .li-col-translit-pre span.li-translit-ideographic-stop {
+  /* 邏輯屬性隨 writing-mode 翻轉：直排/橫排都落在行內軸居中 */
+  text-align: center;
+  /* 阻止默認的字尾對齊偏好，讓字形落到行內框中央 */
+  letter-spacing: 0;
+}
+/* 八思巴上下文自動鏡像（Unicode 18 Core Spec §14.4 Mirrored Variants）。
+   tta/ttha/dda/nna 之後的 6 鏡像候選字母應由渲染系統自動選鏡像字形；
+   字體無獨立鏡像字形碼位，以水平翻轉逼近（純顯示層，數據不變）。
+   已帶 U+FE00 的顯式 SVS 不會落到此 class（引擎判定跳過）。 */
+.li-root .li-col-translit-pre span.li-translit-context-mirror {
+  display: inline-block;
+  transform: scaleX(-1);
+}
+.li-root .li-col-translit-pre {
+  margin: 0;
+  padding: 8px 10px;
+  /* 輸出框加高——min 與輸入框對齊，max 上限放寬 */
+  min-height: 200px;
+  max-height: 520px;
+  overflow: auto;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-s, 4px);
+  background: var(--background-primary);
+  line-height: 2;
+  /* 只有「罗馬 → 原生」方向會設此變量；反方向輸出是罗馬字，回落接口字體 */
+  font-family: var(--li-ct-font, var(--font-interface));
+}
+
+/* 轉寫輸入/輸出框書寫規範跟隨：
+   直排文種（蒙古系 vertical-lr）的溢出軸是**水平**的，
+   max-height 在直排下失效 → 改用邏輯屬性 max-inline-size（隨 writing-mode
+   自動指向正確的物理軸），滾動軸自然落在正確一側；橫排文種不受影響
+   （horizontal-tb 下 max-inline-size == max-width，與舊 max-height 語義
+   不同——故舊 max-height 保留給橫排，直排時才覆蓋）。 */
+.li-root .is-vertical {
+  max-height: none;
+  max-inline-size: 320px;
+  /* 直排 block 軸（水平＝列數方向）也要封頂，否則輸出框會無限撐寬而不出滾動軸 */
+  max-width: 100%;
+  /* 直排下物理 min/max-height 作用於「列數方向」（物理垂直＝vertical-* 的
+     塊軸反向……實測行為：vertical-lr/rl 下 min-height 鉗的是物理高度，列數增減
+     直接反映為容器寬度伸縮，輸出框尺寸隨內容浮動。
+     列數方向寬度應**隨視口變化**——塊軸改吃滿容器寬：
+     width 恆等容器（width:100% 走物理屬性在 vertical-* 下仍是寬度本身，
+     直排塊軸即物理水平軸，兩者同義），min-block-size 只保最窄可用下限，
+     max-block-size 移除（讓列數方向自由跟隨視口），內容超出＝單列字數方向
+     的事，由 max-inline-size＋overflow 滾動承擔。 */
+  min-height: auto;
+  min-block-size: 200px;
+  max-block-size: none;
+  /* 直排顯示高度（inline 軸＝物理垂直＝列長方向）固定一個合理值——
+     min/max-inline-size 夾成恆等 320px，輸入/輸出框等高、利於直排閱讀；
+     列數方向（width:100%）仍隨視口伸縮。 */
+  min-inline-size: 320px;
+  /* 補：pre 直排下 width 由內容（列數）決定，不會自動吃滿容器——
+     物理寬度在 vertical-* 下即塊軸（列數方向）本身，width:100% 讓框寬
+     恆等容器、隨視口伸縮（與輸入框 textarea width:100% 對齊）。 */
+  width: 100%;
+  /* 直排 textarea 拉伸軸也翻轉：block 軸在直排下是水平方向 */
+  resize: horizontal;
+}
+.li-root textarea.is-locked {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* 轉寫歧義備選盒（「送氣單輔音 / 基輔音＋ha 合字」由用戶點選） */
+.li-root .li-col-translit-amb {
+  margin-top: 8px;
+  padding: 8px 10px;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-s, 4px);
+  background: var(--background-primary-alt, var(--background-secondary));
+  /* 原生字形渲染（合字）依賴此字體棧，由 JS 依方案注入 --li-ct-font */
+  font-family: var(--li-ct-font, var(--font-interface));
+}
+.li-root .li-col-translit-amb-title {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-accent);
+  margin-bottom: 6px;
+}
+.li-root .li-col-translit-amb-card {
+  padding: 6px 0;
+  border-top: 1px dashed var(--background-modifier-border);
+}
+.li-root .li-col-translit-amb-card:first-of-type { border-top: none; }
+.li-root .li-col-translit-amb-q {
+  font-size: 11px;
+  color: var(--text-normal);
+  margin-bottom: 5px;
+}
+.li-root .li-col-translit-amb-opts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+/* ---------------------------------------------------------------- data-tip 提示
+   校勘的異文關係、詞條的異體字都用 data-tip 攜帶說明。
+   以前完全沒有渲染規則，等於這些提示全部白寫。 */
+.li-root [data-tip] { position: relative; }
+.li-root [data-tip]:hover::after, .li-root [data-tip]:focus-visible::after {
+  content: attr(data-tip);
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 4px);
+  transform: translateX(-50%);
+  z-index: 40;
+  max-width: min(280px, 70vw);
+  width: max-content;
+  padding: var(--li-ui-space-1) var(--li-ui-space-2);
+  border-radius: var(--radius-s, 4px);
+  border: 1px solid var(--background-modifier-border);
+  background: var(--background-secondary);
+  color: var(--text-normal);
+  font-size: var(--font-ui-smaller, 12px);
+  font-weight: 400;
+  line-height: 1.5;
+  text-align: left;
+  white-space: normal;
+  pointer-events: none;
+  box-shadow: var(--li-shadow-pop);
+}
+
+/* ---------------------------------------------------------------- 編輯器內 / 懸浮 */
+.li-inline-word { font-weight: 600; }
+.li-inline-meta { font-size: var(--font-ui-smaller, 12px); color: var(--text-faint); }
+.li-hover-popup {
+  position: fixed;
+  z-index: 100;
+  max-width: 380px;
+  max-height: 320px;
+  overflow-y: auto;
+  padding: 8px 10px;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-s, 4px);
+  background: var(--background-primary);
+  box-shadow: var(--li-shadow-pop-strong);
+  font-size: var(--font-ui-smaller, 12px);
+}
+.li-hover-body { line-height: 1.6; }
+.li-hover-pin-hint { margin-top: 4px; font-size: 11px; color: var(--text-faint); }
+
+/* ---------------------------------------------------------------- 觸屏 / 窄屏 */
+@media (pointer: coarse) {
+  /* 按鈕與頁籤在小機上太小按不到，撐到 44px 下限（與 li 核心同一條規則） */
+  .li-root .li-tab,
+  .li-root .li-mini-btn,
+  .li-root .li-chip,
+  .li-root .li-icon-btn,
+  .li-root .li-star {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 0 14px;
+  }
+  .li-root .li-icon-btn,
+  .li-root .li-star { justify-content: center; min-width: 44px; padding: 0; }
+  /* 管理面板觸屏——行加大、分組⋯鈕同步 44px */
+  .li-root .li-manage-row { padding: 10px 12px; gap: 8px; }
+  .li-root .li-manage-row .li-mini-btn,
+  .li-root .li-group-head .li-mini-btn { min-width: 44px; justify-content: center; }
+  /* TOC 鈕豁免 44px；r7 已鏈接文字化，此豁免保留防父級通案回灌 */
+  .li-root .li-toc-entry-btn--mini { min-width: 0; min-height: 0; padding: 0; }
+  .li-root .li-loaded-name { padding: 10px 0; }
+}
+
+@media (max-width: 520px) {
+  .li-root .li-header { padding: 6px 8px 0; }
+  .li-root .li-body { padding: 8px 8px 28px; }
+  .li-root .li-word { font-size: 1.05em; }
+  .li-root .li-gen-row { margin-left: 0; }
+  /* 管理面板窄屏適配——行內容 flex-wrap、縮進回收、按鈕靠右下 */
+  .li-root .li-manage-row {
+    flex-wrap: wrap;
+    margin-inline-start: 0;
+    padding: 8px 10px;
+    gap: 6px 8px;
+  }
+  .li-root .li-manage-row .li-loaded-info { flex: 1 1 100%; }
+  .li-root .li-manage-row .li-mini-btn { min-height: 36px; }
+  /* 分組頭窄屏同步回收縮進空間 */
+  .li-root .li-group-head { padding: 8px 8px 4px 8px; margin-top: 4px; }
+  /* 分組更名輸入框滿寬 */
+  .li-root .li-group-rename input { width: 100%; }
+  /* 導入區單列 */
+  .li-root .li-dict-import-row { flex-direction: column; align-items: stretch; }
+  .li-root .li-dict-format.dropdown { max-width: none; }
+
+  /* 轉寫面板移動端適配——
+     窄屏（手機 ~390px）下控制列與備選按鈕防溢出。
+     ① 方案/方向下拉受控伸縮：flex-basis 160px 起步、可縮到 0（min-width:0 已有），
+        兩個下拉同行放不下時 wrap 到下一行，不再被 li-articles 的
+        overflow-x:hidden 裁掉右緣。
+     ② 歧義備選按鈕等分換行：蒙文/悉曇按鈕文案長（「蒙科立传统读法 ᠤ…」），
+        窄屏 flex-basis 100% 強制單列，文案長也不溢出；桌面（>520px）不受影響。
+     ③ 連聲合成輸入行允許換行：a + b [按鈕] 窄屏摺成兩行。
+     ④ 歧義確認列/匯出面板間距放寬＋按鈕觸屏 44px（coarse 段已覆蓋 li-mini-btn，
+        這裡補窄屏間距）。 */
+  .li-root .li-col-translit-field { flex: 1 1 160px; }
+  .li-root .li-col-translit-amb-opts button { flex: 1 1 100%; min-width: 0; }
+  .li-root .li-col-sandhi-inputrow { flex-wrap: wrap; }
+  .li-root .li-col-translit-amb-confirm { flex-wrap: wrap; }
+  .li-root .li-translit-export { gap: 10px; }
+}
+
+/* ============================================================================
+/* S8：辭典首開引導卡（li-root 域內；未載入辭典時出現，會話內可關） */
+.li-root .li-onboard {
+  position: relative; /* 修：✕ 關閉鈕 absolute 錨定本卡右上角（原未定位上飄至面板頭部） */
+  display: flex;
+  flex-direction: column;
+  gap: var(--li-ui-space-2);
+  margin: 0 var(--li-ui-space-3) var(--li-ui-space-3);
+  padding: var(--li-ui-space-3) var(--li-ui-space-4);
+  background: var(--li-ui-surface-2);
+  border: 1px solid var(--li-ui-line);
+  border-radius: var(--li-ui-radius-md);
+}
+.li-root .li-onboard-text {
+  color: var(--text-normal);
+  font-size: var(--font-ui-small);
+  padding-right: var(--li-ui-space-4);
+}
+.li-root .li-onboard-actions { display: flex; gap: var(--li-ui-space-2); }
+.li-root .li-onboard-close {
+  position: absolute;
+  top: var(--li-ui-space-2);
+  right: var(--li-ui-space-2);
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+/* 檢字表（全外掛唯一入口——轉寫頁籤下拉式；側欄與設定頁的兩份已移除）
+   與 JS 注入的 li-translit-panel-style 同名規則同步，兩邊都要有。 */
+.li-root .li-col-ctable {
+  border: 1px solid var(--li-ui-line); border-radius: var(--li-ui-radius-md);
+  padding: var(--li-ui-space-2) var(--li-ui-space-3);
+}
+.li-root .li-col-ctable-title {
+  font-size: var(--font-ui-small); font-weight: 600; color: var(--text-normal);
+  cursor: pointer; list-style: none;
+}
+.li-root .li-col-ctable-title::-webkit-details-marker { display: none; }
+.li-root .li-col-ctable-title::before {
+  content: "▸"; display: inline-block; margin-inline-end: 6px; color: var(--text-muted);
+}
+.li-root .li-col-ctable[open] .li-col-ctable-title::before { content: "▾"; }
+.li-root .li-col-ctable-ctl {
+  display: flex; align-items: center; gap: var(--li-ui-space-2); margin: var(--li-ui-space-2) 0;
+}
+.li-root .li-col-ctable-ctl .li-input { flex: 0 1 auto; min-width: 0; max-width: 70%; }
+.li-root .li-col-ctable-host {
+  max-height: 46vh; overflow: auto;
+  border-radius: var(--li-ui-radius-md); background: transparent;
+}
+
+/* 任務線 #1：校勘面板連聲合成示範區（.li-root 域內） */
+.li-root .li-col-sandhi { border: 1px solid var(--li-ui-line); border-radius: var(--li-ui-radius-md); padding: var(--li-ui-space-3); }
+.li-root .li-col-sandhi-row { display: flex; align-items: center; gap: var(--li-ui-space-2); margin-bottom: var(--li-ui-space-2); }
+.li-root .li-col-sandhi-label { min-width: 90px; color: var(--text-muted); font-size: var(--font-ui-small); }
+.li-root .li-col-sandhi-out { margin-top: var(--li-ui-space-2); }
+/* 連聲合成 UI 重排——
+   輸入行 [前詞] + [後詞] [合成] 單行緊湊；結果行與「複製／查詢」同行兩端對齊 */
+.li-root .li-col-sandhi-inputrow {
+  display: flex;
+  align-items: center;
+  gap: var(--li-ui-space-2);
+  margin-bottom: var(--li-ui-space-2);
+}
+.li-root .li-col-sandhi-inputrow .li-col-sandhi-input { flex: 1 1 0; min-width: 0; }
+.li-root .li-col-sandhi-op { color: var(--text-muted); font-size: var(--font-ui-small); user-select: none; }
+.li-root .li-col-sandhi-inputrow .li-col-sandhi-run { flex: 0 0 auto; }
+.li-root .li-col-sandhi-result {
+  font-family: var(--font-monospace);
+  font-size: var(--font-ui-small);
+  color: var(--text-normal);
+}
+.li-root .li-col-sandhi-actions {
+  display: flex;
+  gap: var(--li-ui-space-2);
+  margin-top: var(--li-ui-space-2);
+}
+/* 結果行：結果字串左、動作鈕右，同行兩端對齊；窄面板允許換行 */
+.li-root .li-col-sandhi-outrow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--li-ui-space-2);
+  flex-wrap: wrap;
+}
+.li-root .li-col-sandhi-outrow .li-col-sandhi-result {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.li-root .li-col-sandhi-outrow .li-col-sandhi-actions { margin-top: 0; }
+/* 連聲示範卡——點卡即填入輸入框合成 */
+.li-root .li-col-sandhi-demos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: var(--li-ui-space-2);
+}
+/* 示範卡第二級折疊（details/summary） */
+.li-root .li-col-sandhi-demo-box { margin: var(--li-ui-space-2) 0; }
+.li-root .li-col-sandhi-demo-box > summary {
+  cursor: pointer;
+  color: var(--text-muted);
+  font-size: var(--font-ui-small);
+  user-select: none;
+  /* 折疊指示器與檢字表同款自繪小三角 ▸/▾（隱原生 marker） */
+  list-style: none;
+}
+.li-root .li-col-sandhi-demo-box > summary::-webkit-details-marker { display: none; }
+.li-root .li-col-sandhi-demo-box > summary::before {
+  content: "▸"; display: inline-block; margin-inline-end: 6px; color: var(--text-muted);
+}
+.li-root .li-col-sandhi-demo-box[open] > summary::before { content: "▾"; }
+.li-root .li-col-sandhi-demo-box > summary:hover { color: var(--text-normal); }
+.li-root .li-col-sandhi-demo .li-col-sandhi-demo-io { font-family: var(--font-monospace, monospace); font-size: 0.92em; }
+/* MDict 目錄彈窗——分頁＋滾動 */
+.li-toc-modal .modal-content { display: flex; flex-direction: column; min-height: 0; }
+.li-toc-modal .li-toc-bar { display: flex; align-items: center; gap: var(--li-ui-space-2, 8px); margin-bottom: 8px; }
+.li-toc-modal .li-toc-count { color: var(--text-muted); font-size: var(--font-ui-small); }
+.li-toc-modal .li-toc-page-sel { max-width: 200px; }
+.li-toc-modal .li-toc-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  gap: 4px;
+  overflow-y: auto;
+  min-height: 200px;
+  max-height: min(60vh, 520px);
+  padding: 4px;
+}
+.li-toc-modal .li-toc-word {
+  text-align: left;
+  padding: 3px 6px;
+  border-radius: 4px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--text-accent, var(--text-normal));
+  font-size: var(--font-ui-small);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.li-toc-modal .li-toc-word:hover { background: var(--background-secondary); }
+.li-toc-modal .li-toc-raw { overflow-y: auto; max-height: min(65vh, 560px); }
+.li-toc-modal .li-toc-raw iframe { width: 100%; height: min(60vh, 540px); border: none; }
+.li-toc-modal .li-toc-nav { display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 8px; }
+.li-toc-modal .li-toc-pageinfo { font-size: var(--font-ui-small); color: var(--text-muted); }
+/* TOC 入口改「主題色鏈接文字」樣式（不要按鈕，只做跟隨主題色的
+   鏈接文字）——元素仍為 button（click/aria/折疊豁免不變），僅視覺去按鈕化；
+   與 Wiktionary 外鏈 .li-extlink 同一視覺語言。 */
+.li-root .li-toc-entry-btn {
+  flex-shrink: 0;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  padding: 0;
+  font-size: var(--font-ui-smaller, 12px);
+  color: var(--text-accent, var(--link-color));
+  cursor: pointer;
+}
+.li-root .li-toc-entry-btn:hover,
+.li-root .li-toc-entry-btn:focus-visible { text-decoration: underline; }
+
+/* 歧義確認定稿列 */
+.li-root .li-col-translit-amb-confirm { display: flex; justify-content: flex-end; margin-top: var(--li-ui-space-2); }
+
+/* ------------------------------------------------ 辭典面板美化
+   重點＝「各分類的顯示」：管理面板的分組頭與辭典列、詞條結果區塊的辨識度。
+   全部沿用主題變數；不引入新的陰影字面量（W8-6 門禁）。 */
+
+/* ① 管理·分組頭：強調色左標記帶 + 計數膠囊
+   分組頭「去框化」——標題而非同行；計數膠囊 muted 弱化
+   （Obsidian 原生分組頭慣例：弱化而非主題色滿底）。 */
+.li-root .li-group-head {
+  border-inline-start: 3px solid var(--interactive-accent, #7c6f64);
+  border-top: none;
+  border-inline-end: none;
+  border-bottom: none;
+  background: transparent;
+  border-radius: 0;
+  padding: 9px 9px 4px 9px;
+  margin-top: 6px;
+}
+.li-root .li-group-name { font-weight: 650; color: var(--text-normal); }
+.li-root .li-group-count {
+  flex: 0 0 auto;
+  color: var(--text-muted);
+  background: var(--background-modifier-border);
+  border-radius: var(--li-ui-radius-pill);
+  padding: 0 7px;
+  line-height: 1.7;
+  font-size: 10px;
+}
+
+/* ② 管理·辭典列：懸停/選中態 + 名稱行 + 格式膠囊
+   子項縮進歸屬分組頭；底色統一 primary 形成層次；
+   圓角統一 --radius-s。 */
+.li-root .li-manage-row { background: var(--background-primary); margin-inline-start: 14px; }
+.li-root .li-manage-row:hover { border-color: var(--interactive-accent, #7c6f64); background: var(--background-modifier-hover); }
+.li-root .li-manage-row.is-selected {
+  border-inline-start: 3px solid var(--interactive-accent, #7c6f64);
+  background: var(--background-secondary);
+}
+.li-root .li-loaded-nameline { display: flex; align-items: center; gap: 6px; min-width: 0; }
+.li-root .li-loaded-fmt {
+  flex: 0 0 auto;
+  font-size: 10px;
+  line-height: 1.7;
+  padding: 0 7px;
+  border-radius: var(--li-ui-radius-pill);
+  border: 1px solid var(--background-modifier-border);
+  background: var(--background-secondary);
+  color: var(--text-muted);
+  letter-spacing: 0.03em;
+}
+.li-root .li-loaded-meta { margin-top: 1px; }
+.li-root .li-manage-row .li-mini-btn.is-active {
+  background: var(--interactive-accent, #7c6f64);
+  border-color: var(--interactive-accent, #7c6f64);
+  color: var(--text-on-accent, #fff);
+}
+
+/* ③ 詞條結果區塊頭：格式膠囊 + 展開態辨識 */
+.li-root .li-mdx-block.is-open { border-color: var(--interactive-accent, #7c6f64); }
+.li-root .li-mdx-fmt {
+  flex: 0 0 auto;
+  font-size: 10px;
+  line-height: 1.7;
+  padding: 0 7px;
+  border-radius: var(--li-ui-radius-pill);
+  border: 1px solid var(--background-modifier-border);
+  background: var(--background-primary);
+  color: var(--text-faint);
+  letter-spacing: 0.03em;
+}
+.li-root .li-mdx-arrow { width: 12px; text-align: center; }
+.li-root .li-mdx-head .li-mdx-key { color: var(--text-muted); font-weight: 500; }
+
+/* 面板美化·設計評審微調（7.5→） */
+.li-root .li-group-count { border-radius: var(--radius-s, 4px); }
+/* 管理列圓角統一 --radius-s（與分組計數膠囊一致，去 --li-ui 混用） */
+.li-root .li-manage-row { border-radius: var(--radius-s, 4px); }
+.li-root .li-loaded-info { min-width: 0; }
+.li-root .li-loaded-meta { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.li-root .li-manage-row .li-mini-btn { flex: 0 0 auto; }
+.li-root .li-tab.is-active {
+  background: var(--background-secondary);
+  border-radius: var(--radius-s, 4px) var(--radius-s, 4px) 0 0;
+}
+
+/* ============================================================
+   TEI Lex-0 辭典條目（模塊③）——li-lex0-*
+   collision-audit 約束：全部收在 .li-root 下（辭典面板 DOM 皆在 .li-root 內）。
+   ============================================================ */
+.li-root .li-lex0-hw-line { margin-block-end: 0.25em; }
+.li-root .li-lex0-entry { padding-block: 0.25em; line-height: 1.55; }
+.li-root .li-lex0-hw { font-weight: 600; font-size: 1.05em; }
+.li-root .li-lex0-variant { color: var(--text-muted); }
+.li-root .li-lex0-pron { color: var(--text-muted); margin-inline-start: 0.3em; }
+.li-root .li-lex0-pos {
+  display: inline-block;
+  font-size: 0.78em;
+  padding: 0 0.4em;
+  margin-inline-start: 0.3em;
+  border-radius: 3px;
+  background: var(--background-modifier-hover);
+  color: var(--text-muted);
+  vertical-align: baseline;
+}
+.li-root .li-lex0-usg { font-style: italic; color: var(--text-muted); margin-inline-start: 0.3em; }
+.li-root .li-lex0-lbl { color: var(--text-muted); font-style: italic; margin-inline-start: 0.3em; }
+.li-root .li-lex0-form[data-form-type="inflected"] { color: var(--text-muted); }
+.li-root .li-lex0-sense { margin-block: 0.2em; padding-inline-start: 0.2em; }
+.li-root .li-lex0-sense-no { font-weight: 600; margin-inline-end: 0.4em; color: var(--text-accent); }
+.li-root .li-lex0-def { margin-block: 0.1em; }
+.li-root .li-lex0-lang { color: var(--text-faint); font-size: 0.85em; }
+.li-root .li-lex0-ex { font-style: italic; margin-inline-start: 1em; color: var(--text-muted); }
+.li-root .li-lex0-tr { margin-inline-start: 1em; }
+.li-root .li-lex0-tr::before { content: "\2192 "; color: var(--text-faint); }
+.li-root .li-lex0-bibl { font-size: 0.85em; color: var(--text-faint); margin-inline-start: 1em; }
+.li-root .li-lex0-note { font-size: 0.9em; color: var(--text-muted); margin-inline-start: 1em; }
+.li-root .li-lex0-subentry {
+  margin-block: 0.3em;
+  margin-inline-start: 1em;
+  padding-inline-start: 0.6em;
+  border-inline-start: 2px solid var(--li-rule, rgba(0,0,0,.12));
+}
+.li-root .li-lex0-subentry-hw { font-weight: 600; }
+.li-root .li-lex0-xr { display: inline-block; margin-inline-end: 0.8em; margin-block-start: 0.2em; }
+.li-root .li-lex0-xr-label {
+  font-style: italic;
+  font-size: 0.85em;
+  color: var(--text-faint);
+  margin-inline-end: 0.25em;
+}
+.li-root .li-lex0-ref { color: var(--text-accent); }
+.li-root .li-lex0-etym { margin-block-start: 0.3em; font-size: 0.9em; }
+.li-root .li-lex0-etym summary { cursor: pointer; color: var(--text-muted); }
+.li-root .li-lex0-pc { color: var(--text-muted); }
+.li-root .li-lex0-family {
+  font-size: 0.85em;
+  color: var(--text-faint);
+  margin-block-end: 0.2em;
+  font-style: italic;
+}
+
+/* 檢字表分組級說明（節首一行，弱化樣式）
+   secnote 文字很長且含連續 token（\uXXXX 標註、;100<jm>;4 等，無斷行點），
+   overflow-wrap: break-word 在 table-layout: fixed 下對長無空格串不夠——
+   真機實錘（藏文標點擴展／婆羅米標點節說明橫向溢出表格）。須 word-break:
+   break-all 強制逐字斷行收進表格寬度。 */
+.li-root .li-char-table-secnote td { font-size: var(--font-ui-smaller, 12px); color: var(--text-faint); font-style: italic; padding: 2px 6px; word-break: break-all; }
+
+
+
+/* ===== B10：頁內膠囊設置分頁條（桌面/移動同一結構） ===== */
+.li-settings .li-settings-tabs .li-settings-reset-inline {
+  margin-left: auto;
+  color: var(--text-muted);
+}
+.li-settings .li-settings-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0 0 14px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--background-modifier-border);
+}
+.li-settings .li-settings-tab {
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 8px;
+  background: var(--background-secondary);
+  color: var(--text-normal);
+  padding: 4px 12px;
+  font-size: var(--font-ui-small, 13px);
+  cursor: pointer;
+  transition: all 200ms ease-in-out;
+}
+.li-settings .li-settings-tab:hover { border-color: var(--interactive-accent); }
+.li-settings .li-settings-tab.is-active {
+  /* B26 改 accent 文字色後在部分主題下與按鈕底色混融——
+     恢復 B14 前樣式：實底 accent＋text-on-accent 白字。 */
+  background: var(--interactive-accent);
+  color: var(--text-on-accent);
+  border-color: var(--interactive-accent);
+}
+.li-settings .li-settings-tab:focus-visible {
+  outline: 2px solid var(--background-modifier-border-focus);
+  outline-offset: 1px;
+}
+/* 窄屏（手機）：膠囊更緊湊 */
+@media (max-width: 600px) {
+  .li-settings .li-settings-tab { padding: 5px 10px; font-size: var(--font-ui-smaller, 12px); }
+  .li-settings .li-settings-tabs { gap: 5px; }
+}
+
+/* 殲滅所有可能畫出 header 底部分隔的來源——
+   包括 Obsidian 移動端對葉片容器的原生樣式；header 改為無底色融入面板。 */
+.li-root .li-header {
+  background: transparent !important;
+  border-bottom: none !important;
+  box-shadow: none !important;
+}
+.li-root .li-header::after,
+.li-root .li-header::before { display: none !important; content: none !important; }
+/* 移動端葉片容器層級的分隔（Obsidian 原生在 mobile tab 間畫線） */
+.workspace-drawer-active-tab-container .workspace-leaf-content .view-content,
+.workspace-leaf-content[data-type="li-dictionary-view"] .view-content {
+  box-shadow: none !important;
+  border-top: none !important;
+}
+
+
+/* TEI 缺字圖形佔位（koktai img/ 未隨包發佈場景）：□ 字形框，隨主題色 */
+.li-frame .li-lex0-g-missing,
+.li-lex0-g-missing {
+  display: inline-block;
+  min-width: 1em;
+  text-align: center;
+  color: var(--text-muted, #999);
+  border: 1px solid var(--background-modifier-border, #ddd);
+  border-radius: 2px;
+  font-size: 0.9em;
+  line-height: 1.1;
+  padding: 0 1px;
+}
+
+
+/* TEI 詞頭/發音引用（oRef/pRef，TEI 10.4）：例句中詞頭佔位——muted 斜體 */
+.li-lex0-oref {
+  font-weight: 600;
+  color: var(--text-accent, #7c3aed);
+}
+.li-lex0-pref {
+  font-style: italic;
+  color: var(--text-muted, #999);
+}
+.li-lex0-hyph {
+  letter-spacing: 0.02em;
+}
+
+
+/* ── 廣韻序號橢圓（.zr）導出 MD 後歸位 ──────────────────
+   詞條在辭典 iframe 內有廣韻.css 小字號環境，.zr 的 18×16 橢圓盒與數字相配；
+   匯出筆記（lilium/筆記/notes/*.md）後 inline style 直接吃 Obsidian 全域字號
+   （FONT-SIZE:12pt!important → 16px），數字盒 17px 高於 16px 橢圓盒＋PADDING-TOP
+   3px → 數字下溢 7px 跑位（真機量測實錘）。
+   此規則只作用於「筆記渲染環境」（iframe 外），iframe 內不受影響——
+   li-frame 選擇器特異性高於此處的元素+屬性選擇器，維持辭典面板原貌。 */
+:not(.li-frame) > span.zr[style*="BACKGROUND"],
+:not(.li-frame) > a > span.zr[style*="BACKGROUND"],
+.markdown-rendered span.zr[style*="BACKGROUND"],
+.markdown-preview-view span.zr[style*="BACKGROUND"] {
+  /* 盒尺寸交給 inline style（18×16 不動）；只修垂直對齊與數字定位 */
+  vertical-align: middle !important;
+  line-height: 16px !important;
+  padding-top: 0 !important;
+  box-sizing: border-box !important;
+  text-align: center !important;
+}
+
+/* ── 疊字行距適配（正文版：編輯器 .cm-line／閱讀器段落級元素，由 subjoin-line-height.ts 寫入 --li-subjoin-lh） ── */
+/* max(現行行高, 適配值)——主題/用戶行高更鬆時不壓縮，僅按最大下加字數放大。 */
+.cm-line[style*="--li-subjoin-lh"],
+.markdown-rendered pre[style*="--li-subjoin-lh"],
+.markdown-rendered p[style*="--li-subjoin-lh"],
+.markdown-rendered li[style*="--li-subjoin-lh"],
+.markdown-rendered td[style*="--li-subjoin-lh"],
+.markdown-rendered th[style*="--li-subjoin-lh"],
+.markdown-rendered blockquote[style*="--li-subjoin-lh"],
+.markdown-rendered h1[style*="--li-subjoin-lh"], .markdown-rendered h2[style*="--li-subjoin-lh"],
+.markdown-rendered h3[style*="--li-subjoin-lh"], .markdown-rendered h4[style*="--li-subjoin-lh"],
+.markdown-rendered h5[style*="--li-subjoin-lh"], .markdown-rendered h6[style*="--li-subjoin-lh"] {
+  line-height: max(var(--li-subjoin-lh), 1.75);
+}
+
+/* ── 疊字行距適配（編輯器 class 檔位：HyperMD codeblock 背景以 inline style 動態繪製，
+   會清掉 .cm-line 上的 inline CSS 變數——class 由插件維護、CM 不動 classList，穩定） ── */
+/* 兩態行距同步：編輯態與閱讀態同一算式 max(檔位, 1.75)——主題/用戶行高更鬆時
+   編輯態同樣不壓縮（裁定：閱讀態和編輯態的行距向行距大的那個同步）。 */
+/* 整數桶（class 名保持整數）對應實值 N-0.5——檔位算式回收 0.5 後的映射，
+   階梯（檔間差 1）與修復成果保持。 */
+.cm-line.li-sj-lh-2 { line-height: max(1.5, 1.75); }
+.cm-line.li-sj-lh-3 { line-height: max(2.5, 1.75); }
+.cm-line.li-sj-lh-4 { line-height: max(3.5, 1.75); }
+.cm-line.li-sj-lh-5 { line-height: max(4.5, 1.75); }
+.cm-line.li-sj-lh-6 { line-height: max(5.5, 1.75); }
+.cm-line.li-sj-lh-7 { line-height: max(6.5, 1.75); }
+.cm-line.li-sj-lh-8 { line-height: max(7.5, 1.75); }
+
+/* 疊字行浮上層：垂串伸出本行行框的部分不被後繪的下一行 fence 背景
+   (.HyperMD-codeblock-bg 不透明底)蓋掉——手機大字號下三層垂串深逾半行距，
+   編輯態下緣被吃（真機實錘；閱讀態 PRE 整塊背景無此問題）。
+   僅提層不改佈局（position:relative 無尺寸副作用）。 */
+.cm-line[class*="li-sj-lh"] { position: relative; z-index: 1; }
+/* 編輯態 fence 專案：0.2.13 真機實錘 fence 內下疊字下緣仍被吃「與行距無關」
+   （用戶裁定）——z-index 提層（1→10＋bg 降 0）真機證偽（CM6 bg 裝飾的繪製
+   合成層不受文檔流 z-index 節制）。改物理路線：fence 疊字行加 padding-bottom
+   把垂串「拉回本行行框內」——框內內容不被下一行 bg 蓋（蓋的只是伸出框外部分）。
+   預留量 = (檔位-基準1)×0.5em 級：各檔位直接寫死，與 line-height 檔位一一對應。 */
+/* r59b：編輯態普通正文行（非 fence）物理預留——與 fence 檔位表同構。
+   手機窄幅＋大字號下藏文長段 wrap 成多視覺行，末視覺行垂串向下伸出本行框、
+   與下一文檔行字形疊印（真機實錘塌縮＋符號跑位；桌面單視覺行未暴露）。
+   fence 檔位表只覆蓋 .HyperMD-codeblock——普通行補同款 padding-bottom
+   把垂串「拉回本行行框內」（與閱讀態 --li-subjoin-pad r53 修復同構）。 */
+.cm-line[class*="li-sj-lh"]:not(.HyperMD-codeblock) { padding-bottom: 0.75em; }
+.cm-line.li-sj-lh-2:not(.HyperMD-codeblock) { padding-bottom: 0.75em; }
+.cm-line.li-sj-lh-3:not(.HyperMD-codeblock) { padding-bottom: 0.75em; }
+.cm-line.li-sj-lh-4:not(.HyperMD-codeblock) { padding-bottom: 1.25em; }
+.cm-line.li-sj-lh-5:not(.HyperMD-codeblock) { padding-bottom: 1.75em; }
+.cm-line.li-sj-lh-6:not(.HyperMD-codeblock) { padding-bottom: 2.25em; }
+.cm-line.li-sj-lh-7:not(.HyperMD-codeblock) { padding-bottom: 2.75em; }
+.cm-line.li-sj-lh-8:not(.HyperMD-codeblock) { padding-bottom: 3.25em; }
+
+/* r59b：編輯態普通正文行（非 fence）物理預留——與 fence 檔位表同構。
+   手機窄幅＋大字號下藏文長段 wrap 成多視覺行，末視覺行垂串向下伸出本行框、
+   與下一文檔行字形疊印（真機實錘塌縮＋符號跑位；桌面單視覺行未暴露）。
+   fence 檔位表只覆蓋 .HyperMD-codeblock——普通行補同款 padding-bottom
+   把垂串「拉回本行行框內」（與閱讀態 --li-subjoin-pad r53 修復同構）。 */
+.cm-line[class*="li-sj-lh"]:not(.HyperMD-codeblock) { padding-bottom: 0.75em; }
+.cm-line.li-sj-lh-2:not(.HyperMD-codeblock) { padding-bottom: 0.75em; }
+.cm-line.li-sj-lh-3:not(.HyperMD-codeblock) { padding-bottom: 0.75em; }
+.cm-line.li-sj-lh-4:not(.HyperMD-codeblock) { padding-bottom: 1.25em; }
+.cm-line.li-sj-lh-5:not(.HyperMD-codeblock) { padding-bottom: 1.75em; }
+.cm-line.li-sj-lh-6:not(.HyperMD-codeblock) { padding-bottom: 2.25em; }
+.cm-line.li-sj-lh-7:not(.HyperMD-codeblock) { padding-bottom: 2.75em; }
+.cm-line.li-sj-lh-8:not(.HyperMD-codeblock) { padding-bottom: 3.25em; }
+
+.cm-line[class*="li-sj-lh"].HyperMD-codeblock { z-index: 10; }
+.cm-line.li-sj-lh-2.HyperMD-codeblock { padding-bottom: 0.5em; }
+.cm-line.li-sj-lh-3.HyperMD-codeblock { padding-bottom: 0.75em; }
+.cm-line.li-sj-lh-4.HyperMD-codeblock { padding-bottom: 1.25em; }
+.cm-line.li-sj-lh-5.HyperMD-codeblock { padding-bottom: 1.75em; }
+.cm-line.li-sj-lh-6.HyperMD-codeblock { padding-bottom: 2.25em; }
+.cm-line.li-sj-lh-7.HyperMD-codeblock { padding-bottom: 2.75em; }
+.cm-line.li-sj-lh-8.HyperMD-codeblock { padding-bottom: 3.25em; }
+
+/* 閱讀態同機制修復：段落級疊字塊（--li-subjoin-lh 已設）提上繪製層——垂串伸出
+   本行行框的部分不被後繪的相鄰塊/背景蓋掉（真機：閱讀態正文下疊字下緣被吃、
+   編輯態不被吃，與編輯態案例互為鏡像）。position:relative 零佈局副作用。 */
+.markdown-rendered p[style*="--li-subjoin-lh"],
+.markdown-rendered li[style*="--li-subjoin-lh"],
+.markdown-rendered td[style*="--li-subjoin-lh"],
+.markdown-rendered th[style*="--li-subjoin-lh"],
+.markdown-rendered blockquote[style*="--li-subjoin-lh"],
+.markdown-rendered h1[style*="--li-subjoin-lh"], .markdown-rendered h2[style*="--li-subjoin-lh"],
+.markdown-rendered h3[style*="--li-subjoin-lh"], .markdown-rendered h4[style*="--li-subjoin-lh"],
+.markdown-rendered h5[style*="--li-subjoin-lh"], .markdown-rendered h6[style*="--li-subjoin-lh"],
+.markdown-rendered pre[style*="--li-subjoin-lh"] { position: relative; z-index: 1; }
+/* 閱讀態物理預留（編輯態 fence 同款機制）：行距回收 0.5 後（run=1→2.5）真機
+   Zanabazar 正文末行垂串又伸出行框被後繪塊蓋（用戶實錘）——提層 z-index 對
+   相鄰塊背景有效但對**下一個文字塊的不透明字形**無效（字形直接繪在本塊層）。
+   段落 padding-bottom 補垂串深度缺口（與編輯態 fence 同構：框內不被蓋）。
+   r53：預留量改讀 --li-subjoin-pad（subjoin-line-height.ts subjoinPadForText
+   按檔位寫入，與編輯態 fence 檔位表同構：run 越大垂串越深、預留越多）——
+   原固定 0.5em 對 run>=2 不足，Zanabazar 三層垂串下緣仍被吃（用戶真機複錘，
+   編輯態因 fence 檔位表分檔不受影響＝兩態差異根因）。 */
+.markdown-rendered p[style*="--li-subjoin-lh"],
+.markdown-rendered li[style*="--li-subjoin-lh"],
+.markdown-rendered td[style*="--li-subjoin-lh"],
+.markdown-rendered th[style*="--li-subjoin-lh"],
+.markdown-rendered blockquote[style*="--li-subjoin-lh"],
+.markdown-rendered h1[style*="--li-subjoin-lh"], .markdown-rendered h2[style*="--li-subjoin-lh"],
+.markdown-rendered h3[style*="--li-subjoin-lh"], .markdown-rendered h4[style*="--li-subjoin-lh"],
+.markdown-rendered h5[style*="--li-subjoin-lh"], .markdown-rendered h6[style*="--li-subjoin-lh"],
+.markdown-rendered pre[style*="--li-subjoin-lh"] { padding-bottom: var(--li-subjoin-pad, 0.5em); }
+
+/* ── 藏文梵咒主字符下疊顯示補丁（subjoiner widget）：顯示層字形替換，
+   底層文本不動；widget 是獨立 span，字體按單碼位 shaping，無需特殊樣式，
+   僅保基線對齊（vertical-align 避免行內高度抖動） ── */
+.cm-line .li-tib-subjoin-glyph { vertical-align: baseline; }
+
+/* ── 顯隱／樣式工具類（審核 no-static-styles-assignment 對應：以 class 切換取代 el.style 賦值，功能等價） ── */
+.li-u-hidden { display: none !important; }
+.li-u-invisible { visibility: hidden !important; }
+.li-audio-clip { display: block; margin-top: 4px; max-width: 100%; }
+.li-collation-sec-cell { font-weight: bold; background: var(--background-modifier-form-field); }
+
+/* ------------------------------------------------ 移動端軟鍵盤：去官方白塊（候選）
+   官方鍵盤彈出時疊在鍵盤上方的三件白底 UI（asar app.css 實錘）：
+   · .mobile-toolbar         position:absolute; top:calc(100vh - kh - h); background:primary
+   · .mobile-toolbar-spacer  background:primary（插在 app-container 佔位）
+   · .mobile-navbar          position:fixed; bottom:0; background:primary（官方僅在
+                             native 旗標 mobileSoftKeyboardVisible 置位時才不 show——
+                             部分 IME／inset 模式旗標缺失＝白塊常駐）
+   側欄 drawer 是 position:fixed，不在 app-container 的 kh 縮放鏈內（官方
+   drawer-inner padding-bottom:calc(max(safe)-kh) 在 kh>safe 時為負＝零讓位）——
+   drawer 內的面板用 --keyboard-height 自讓位。代價聲明：鍵盤開啟期間官方輸入
+   輔助列（格式快選）被藏；kh 歸零全部恢復。 */
+/* 官方輔助列隱藏已撤除（用戶裁定：移動端編輯態官方輔助編輯列應顯示）。
+   該組規則是白塊 v4 時代的雙保險（當時白塊真兇未明）；白塊真兇其後實錘為
+   root view-content 雙重讓位（padding-bottom 清零修復），本組隱藏已無必要——
+   kh 歸零自動恢復的語義也不再有「被藏」對象。 */
+
+
+/* 自算高度接管：li-kb-fit 掛上時面板收縮到 computeKbFitHeight 的 px 值
+   （訊號 max(kh, vv差值)＋80px 最小鍵盤／160px 最小面板兩道底線保護）。
+   主區 view-content 與 drawer 場景統一接管——drawer 是 position:fixed 不在
+   官方 kh 縮放鏈內（官方讓位鏈盲區實錘），自算高度是唯一可靠讓位路徑。 */
+/* 特異性對抗官方 .workspace-tabs .workspace-leaf .view-content { height:100% }
+   （(0,4,0) 高於單類選擇器——桌面 CDP 實錘 computed height 不縮），須鏡像官方選擇
+   路徑＋!important。 */
+.workspace-tabs .workspace-leaf .view-content.li-root.li-kb-fit,
+.workspace-drawer-active-tab-content .view-content.li-root.li-kb-fit,
+.li-root.li-kb-fit {
+  height: var(--li-kb-fit-height, 100%) !important;
+}
+
+/* drawer 內面板：鍵盤開啟時底部讓位（自算高度接管前的兜底；官方讓位鏈不覆蓋 drawer） */
+.li-root.li-in-drawer.li-kb-open .li-body {
+  padding-bottom: var(--keyboard-height, 0px);
+}
+
+/* 發音宿主按鈕：純三角形，無背景框（移動端詞條標題列直發音） */
+.li-root .li-mdx-play-btn {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  padding: 0 2px;
+  margin-left: 4px;
+  color: var(--text-muted);
+  font-size: 0.85em;
+  line-height: 1;
+  cursor: pointer;
+  min-width: unset;
+  min-height: unset;
+}
+.li-root .li-mdx-play-btn:hover { background: transparent; color: var(--text-normal); }

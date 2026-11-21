@@ -1,0 +1,49 @@
+combiningsigns	ayogavaha	𑲶
+combiningsigns	ayogavaha	𑲵
+consonants	main	𑱲
+consonants	main	𑱳
+consonants	main	𑱴
+consonants	main	𑱵
+consonants	main	𑲂
+consonants	main	𑲃
+consonants	main	𑲄
+consonants	main	𑱹
+consonants	main	𑱺
+consonants	main	𑱻
+consonants	main	𑱼
+consonants	main	𑱽
+consonants	main	𑱾
+consonants	main	𑱿
+consonants	main	𑲀
+consonants	main	𑲁
+consonants	main	𑲉
+consonants	main	𑲊
+consonants	main	𑲋
+consonants	main	𑲅
+consonants	main	𑲌
+consonants	main	𑲍
+consonants	main	𑲎
+consonants	persoarabic	𑲇
+numerals		༠
+numerals		༡
+numerals		༢
+numerals		༣
+numerals		༤
+numerals		༥
+numerals		༦
+numerals		༧
+numerals		༨
+numerals		༩
+others	symbols	𑱱
+others	symbols	𑱱𑱱
+vowels	main	𑲏
+vowelsigns	main	𑲰
+vowelsigns	main	𑲱
+vowelsigns	main	𑲱𑲰
+vowelsigns	main	𑲲
+vowelsigns	main	𑲲𑲰
+vowelsigns	main	𑲳
+vowelsigns	main	𑲳𑲰
+vowelsigns	main	𑲴
+vowelsigns	main	𑲰𑲴
+punctuation	headmark	𑱰

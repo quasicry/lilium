@@ -1,0 +1,39 @@
+test/build/
+node_modules/
+test/build/
+artifacts/
+*.log
+test/.*.bundle.mjs
+
+# 構建產物（可由 npm run build 再生；交付以 artifacts tar 為準）
+main.js
+/app.js
+/iife.js
+/err.log
+
+# 真值語料門禁語料——體積大或許可僅限本地測試（GRETIL CC BY-NC-SA、
+# Esukhia/Dakshina 下載包），不入庫；許可說明檔仍入庫。
+/corpus
+
+/spec/
+/docs/
+# 附錄（退役功能凍結源碼＋本地語料）全數隔離：門禁已改為「檔案不應回到 src/」反向守衛，不需附錄檔
+/附錄/
+/插件安裝包/
+/落地記錄/
+/落地記錄-*.md
+/報告/
+/交付成果/
+/lilium資料/
+main.js
+styles.css.backup*
+probe-num.*
+CHANGELOG-本次.md
+.probe/
+test/fixtures/*.azw3
+**/._*
+/_build-tibcheck.cjs
+__pycache__/
+
+# src/ 下 .js 均為 .ts 編譯產物（tsc/esbuild 再生，不入庫）
+src/**/*.js

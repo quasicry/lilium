@@ -1,0 +1,38 @@
+{
+  "source": "L2/13-071 §4.2 Table 8（Osman 2013，British Library OR.8212-75A/B 對照，依 Shogaito 1993 引文）＋正文實錘",
+  "note": "回鶻文 abjad 歧義語料：固化「寫本間系統性拼寫差異」事實，驗證引擎對歧義拼寫的行為（read 模式讀音歸一、mark 模式無損）。t/d 由同一字母 TAW 表記（t/d 混用＝寫本現象非引擎缺陷）；d 無專鍵輸入側透傳為設計聲明。",
+  "cases": [
+    {
+      "id": "yindam-textA",
+      "meaning": "唯（yindam，『nothing but』）",
+      "translit": "yyndm",
+      "native": "𐽶𐽶𐽺𐾀𐽹",
+      "expect_read": "īntm",
+      "note": "Text A（OR.8212-75A）恆用 yynd m；TAW 兼表 t/d，引擎 read 模式統一出 t"
+    },
+    {
+      "id": "yintam-textB",
+      "meaning": "唯（yintam）",
+      "translit": "yyntm",
+      "native": "𐽶𐽶𐽺𐾀𐽹",
+      "expect_read": "īntm",
+      "note": "Text B（OR.8212-75B）恆用 yynt m（n→t 對立）；同一 native 序列，讀音歸一實錘『兩寫本同碼位、歧義在轉寫層不可分辨』"
+    },
+    {
+      "id": "mn",
+      "meaning": "私（mn/man『I』，Text A 用法）",
+      "translit": "mn",
+      "native": "𐽹𐽺",
+      "expect_read": "mn",
+      "note": "無 aleph 短形；表8 案3：Text A 2 次 mn、Text B 4 次 mn（系統性差異不明顯）"
+    },
+    {
+      "id": "man",
+      "meaning": "私（man，Text B 常用形）",
+      "translit": "man",
+      "native": "𐽹𐽰𐽺",
+      "expect_read": "man",
+      "note": "帶 aleph；aleph 兼輔音 ʾ 與元音載體 a（matres lectionis）"
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "groups": [
+    [],
+    [],
+    [
+      "test/editor-vertical-advance-browser.mjs",
+      "test/dict-panel-css.mjs",
+      "test/settings-controls.mjs"
+    ],
+    [
+      "test/native-typo-vars-browser.mjs",
+      "test/clreq-em-browser.mjs",
+      "test/clreq-unbreakable-browser.mjs",
+      "test/translit-vertical-browser.mjs"
+    ]
+  ]
+}

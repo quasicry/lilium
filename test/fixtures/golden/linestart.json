@@ -1,0 +1,699 @@
+{
+  "_meta": {
+    "generatedAt": "2026-10-03T13:52:19.416Z",
+    "chrome": "/home/agentuser/.cache/ms-playwright/chromium-1243/chrome-linux64/chrome",
+    "supportsTextSpacingTrim": true,
+    "method": "直排段落行首字元盒 getBoundingClientRect（Range rect）+ canvas 同碼位字形量測",
+    "fonts": {
+      "zh-Hans": "Noto Serif CJK SC",
+      "zh-Hant": "Noto Serif CJK TC",
+      "ja": "Noto Serif CJK JP",
+      "ko": "Noto Serif CJK KR"
+    },
+    "note": "W3 驗證基建快照；二次執行除 _meta.generatedAt 外 diff=0",
+    "units": "em（font-size=100px）"
+  },
+  "lstart": [
+    {
+      "region": "zh-Hans",
+      "cp": "U+3002",
+      "char": "。",
+      "trim": "normal",
+      "spanTopEm": 0,
+      "spanSizeEm": 1
+    },
+    {
+      "region": "zh-Hans",
+      "cp": "U+3002",
+      "char": "。",
+      "trim": "space-all",
+      "spanTopEm": 0,
+      "spanSizeEm": 1
+    },
+    {
+      "region": "zh-Hans",
+      "cp": "U+3001",
+      "char": "、",
+      "trim": "normal",
+      "spanTopEm": 0,
+      "spanSizeEm": 1
+    },
+    {
+      "region": "zh-Hans",
+      "cp": "U+3001",
+      "char": "、",
+      "trim": "space-all",
+      "spanTopEm": 0,
+      "spanSizeEm": 1
+    },
+    {
+      "region": "zh-Hans",
+      "cp": "U+FF0C",
+      "char": "，",
+      "trim": "normal",
+      "spanTopEm": 0,
+      "spanSizeEm": 1
+    },
+    {
+      "region": "zh-Hans",
+      "cp": "U+FF0C",
+      "char": "，",
+      "trim": "space-all",
+      "spanTopEm": 0,
+      "spanSizeEm": 1
+    },
+    {
+      "region": "zh-Hant",
+      "cp": "U+3002",
+      "char": "。",
+      "trim": "normal",
+      "spanTopEm": 0,
+      "spanSizeEm": 1
+    },
+    {
+      "region": "zh-Hant",
+      "cp": "U+3002",
+      "char": "。",
+      "trim": "space-all",
+      "spanTopEm": 0,
+      "spanSizeEm": 1
+    },
+    {
+      "region": "zh-Hant",
+      "cp": "U+3001",
+      "char": "、",
+      "trim": "normal",
+      "spanTopEm": 0,
+      "spanSizeEm": 1
+    },
+    {
+      "region": "zh-Hant",
+      "cp": "U+3001",
+      "char": "、",
+      "trim": "space-all",
+      "spanTopEm": 0,
+      "spanSizeEm": 1
+    },
+    {
+      "region": "zh-Hant",
+      "cp": "U+FF0C",
+      "char": "，",
+      "trim": "normal",
+      "spanTopEm": 0,
+      "spanSizeEm": 1
+    },
+    {
+      "region": "zh-Hant",
+      "cp": "U+FF0C",
+      "char": "，",
+      "trim": "space-all",
+      "spanTopEm": 0,
+      "spanSizeEm": 1
+    },
+    {
+      "region": "ja",
+      "cp": "U+3002",
+      "char": "。",
+      "trim": "normal",
+      "spanTopEm": 0,
+      "spanSizeEm": 1
+    },
+    {
+      "region": "ja",
+      "cp": "U+3002",
+      "char": "。",
+      "trim": "space-all",
+      "spanTopEm": 0,
+      "spanSizeEm": 1
+    },
+    {
+      "region": "ja",
+      "cp": "U+3001",
+      "char": "、",
+      "trim": "normal",
+      "spanTopEm": 0,
+      "spanSizeEm": 1
+    },
+    {
+      "region": "ja",
+      "cp": "U+3001",
+      "char": "、",
+      "trim": "space-all",
+      "spanTopEm": 0,
+      "spanSizeEm": 1
+    },
+    {
+      "region": "ja",
+      "cp": "U+FF0C",
+      "char": "，",
+      "trim": "normal",
+      "spanTopEm": 0,
+      "spanSizeEm": 1
+    },
+    {
+      "region": "ja",
+      "cp": "U+FF0C",
+      "char": "，",
+      "trim": "space-all",
+      "spanTopEm": 0,
+      "spanSizeEm": 1
+    },
+    {
+      "region": "ko",
+      "cp": "U+3002",
+      "char": "。",
+      "trim": "normal",
+      "spanTopEm": 0,
+      "spanSizeEm": 1
+    },
+    {
+      "region": "ko",
+      "cp": "U+3002",
+      "char": "。",
+      "trim": "space-all",
+      "spanTopEm": 0,
+      "spanSizeEm": 1
+    },
+    {
+      "region": "ko",
+      "cp": "U+3001",
+      "char": "、",
+      "trim": "normal",
+      "spanTopEm": 0,
+      "spanSizeEm": 1
+    },
+    {
+      "region": "ko",
+      "cp": "U+3001",
+      "char": "、",
+      "trim": "space-all",
+      "spanTopEm": 0,
+      "spanSizeEm": 1
+    },
+    {
+      "region": "ko",
+      "cp": "U+FF0C",
+      "char": "，",
+      "trim": "normal",
+      "spanTopEm": 0,
+      "spanSizeEm": 1
+    },
+    {
+      "region": "ko",
+      "cp": "U+FF0C",
+      "char": "，",
+      "trim": "space-all",
+      "spanTopEm": 0,
+      "spanSizeEm": 1
+    }
+  ],
+  "glyph": [
+    {
+      "region": "zh-Hans",
+      "cp": "U+3002",
+      "char": "。",
+      "advanceEm": 1,
+      "inkCenterEm": {
+        "x": -0.3222,
+        "y": 0.3183
+      },
+      "inkBoxEm": {
+        "w": 0.28,
+        "h": 0.28
+      }
+    },
+    {
+      "region": "zh-Hans",
+      "cp": "U+3001",
+      "char": "、",
+      "advanceEm": 1,
+      "inkCenterEm": {
+        "x": -0.3158,
+        "y": 0.3316
+      },
+      "inkBoxEm": {
+        "w": 0.24,
+        "h": 0.24
+      }
+    },
+    {
+      "region": "zh-Hans",
+      "cp": "U+FF0C",
+      "char": "，",
+      "advanceEm": 1,
+      "inkCenterEm": {
+        "x": -0.3439,
+        "y": 0.3873
+      },
+      "inkBoxEm": {
+        "w": 0.15,
+        "h": 0.31
+      }
+    },
+    {
+      "region": "zh-Hant",
+      "cp": "U+3002",
+      "char": "。",
+      "advanceEm": 1,
+      "inkCenterEm": {
+        "x": -0.0041,
+        "y": -0.0021
+      },
+      "inkBoxEm": {
+        "w": 0.28,
+        "h": 0.28
+      }
+    },
+    {
+      "region": "zh-Hant",
+      "cp": "U+3001",
+      "char": "、",
+      "advanceEm": 1,
+      "inkCenterEm": {
+        "x": -0.0133,
+        "y": 0.0063
+      },
+      "inkBoxEm": {
+        "w": 0.23,
+        "h": 0.23
+      }
+    },
+    {
+      "region": "zh-Hant",
+      "cp": "U+FF0C",
+      "char": "，",
+      "advanceEm": 1,
+      "inkCenterEm": {
+        "x": -0.0093,
+        "y": -0.0456
+      },
+      "inkBoxEm": {
+        "w": 0.16,
+        "h": 0.27
+      }
+    },
+    {
+      "region": "ja",
+      "cp": "U+3002",
+      "char": "。",
+      "advanceEm": 1,
+      "inkCenterEm": {
+        "x": -0.3222,
+        "y": 0.3183
+      },
+      "inkBoxEm": {
+        "w": 0.28,
+        "h": 0.28
+      }
+    },
+    {
+      "region": "ja",
+      "cp": "U+3001",
+      "char": "、",
+      "advanceEm": 1,
+      "inkCenterEm": {
+        "x": -0.3158,
+        "y": 0.3316
+      },
+      "inkBoxEm": {
+        "w": 0.24,
+        "h": 0.24
+      }
+    },
+    {
+      "region": "ja",
+      "cp": "U+FF0C",
+      "char": "，",
+      "advanceEm": 1,
+      "inkCenterEm": {
+        "x": -0.3439,
+        "y": 0.3873
+      },
+      "inkBoxEm": {
+        "w": 0.15,
+        "h": 0.31
+      }
+    },
+    {
+      "region": "ko",
+      "cp": "U+3002",
+      "char": "。",
+      "advanceEm": 1,
+      "inkCenterEm": {
+        "x": -0.3222,
+        "y": 0.3183
+      },
+      "inkBoxEm": {
+        "w": 0.28,
+        "h": 0.28
+      }
+    },
+    {
+      "region": "ko",
+      "cp": "U+3001",
+      "char": "、",
+      "advanceEm": 1,
+      "inkCenterEm": {
+        "x": -0.3158,
+        "y": 0.3316
+      },
+      "inkBoxEm": {
+        "w": 0.24,
+        "h": 0.24
+      }
+    },
+    {
+      "region": "ko",
+      "cp": "U+FF0C",
+      "char": "，",
+      "advanceEm": 1,
+      "inkCenterEm": {
+        "x": -0.3439,
+        "y": 0.3873
+      },
+      "inkBoxEm": {
+        "w": 0.15,
+        "h": 0.31
+      }
+    }
+  ],
+  "controls": [
+    {
+      "id": "openLstart(「国)",
+      "trim": "normal",
+      "char": "「",
+      "spanTopEm": 0,
+      "spanSizeEm": 1
+    },
+    {
+      "id": "openLstart(「国)",
+      "trim": "space-all",
+      "char": "「",
+      "spanTopEm": 0,
+      "spanSizeEm": 1
+    },
+    {
+      "id": "openLstart(「国)",
+      "trim": "trim-start",
+      "char": "「",
+      "spanTopEm": 0,
+      "spanSizeEm": 0.5
+    },
+    {
+      "id": "closeMid(国。、国)",
+      "trim": "normal",
+      "advancesEm": [
+        1,
+        0.5,
+        1,
+        1
+      ]
+    },
+    {
+      "id": "closeMid(国。、国)",
+      "trim": "space-all",
+      "advancesEm": [
+        1,
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "id": "closeMid(国。、国)",
+      "trim": "trim-start",
+      "advancesEm": [
+        1,
+        0.5,
+        1,
+        1
+      ]
+    },
+    {
+      "id": "closeMidOff(国。、国。国)",
+      "trim": "normal",
+      "advancesEm": [
+        1,
+        0.5,
+        1,
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "id": "closeMidOff(国。、国。国)",
+      "trim": "space-all",
+      "advancesEm": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "id": "closeMidOff(国。、国。国)",
+      "trim": "trim-start",
+      "advancesEm": [
+        1,
+        0.5,
+        1,
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "id": "haltFont:dotLstart(。国)",
+      "trim": "normal",
+      "spanSizeEm": 1
+    },
+    {
+      "id": "haltFont:openLstart(「国)",
+      "trim": "normal",
+      "spanSizeEm": 1
+    },
+    {
+      "id": "haltFont:dotMid(国。」国)",
+      "trim": "normal",
+      "advancesEm": [
+        1,
+        0.5,
+        1,
+        1
+      ]
+    },
+    {
+      "id": "haltFont:dotLstart(。国)",
+      "trim": "space-all",
+      "spanSizeEm": 1
+    },
+    {
+      "id": "haltFont:openLstart(「国)",
+      "trim": "space-all",
+      "spanSizeEm": 1
+    },
+    {
+      "id": "haltFont:dotMid(国。」国)",
+      "trim": "space-all",
+      "advancesEm": [
+        1,
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "id": "haltFont:dotLstart(。国)",
+      "trim": "trim-start",
+      "spanSizeEm": 1
+    },
+    {
+      "id": "haltFont:openLstart(「国)",
+      "trim": "trim-start",
+      "spanSizeEm": 0.5
+    },
+    {
+      "id": "haltFont:dotMid(国。」国)",
+      "trim": "trim-start",
+      "advancesEm": [
+        1,
+        0.5,
+        1,
+        1
+      ]
+    }
+  ],
+  "lineStartGeom": [
+    {
+      "region": "zh-Hans",
+      "cp": "U+3002",
+      "char": "。",
+      "trim": "off",
+      "dotOffsetEm": 0
+    },
+    {
+      "region": "zh-Hans",
+      "cp": "U+3002",
+      "char": "。",
+      "trim": "geom-on",
+      "dotOffsetEm": -0.5
+    },
+    {
+      "region": "zh-Hans",
+      "cp": "U+3001",
+      "char": "、",
+      "trim": "off",
+      "dotOffsetEm": 0
+    },
+    {
+      "region": "zh-Hans",
+      "cp": "U+3001",
+      "char": "、",
+      "trim": "geom-on",
+      "dotOffsetEm": -0.5
+    },
+    {
+      "region": "zh-Hans",
+      "cp": "U+FF0C",
+      "char": "，",
+      "trim": "off",
+      "dotOffsetEm": 0
+    },
+    {
+      "region": "zh-Hans",
+      "cp": "U+FF0C",
+      "char": "，",
+      "trim": "geom-on",
+      "dotOffsetEm": -0.5
+    },
+    {
+      "region": "zh-Hant",
+      "cp": "U+3002",
+      "char": "。",
+      "trim": "off",
+      "dotOffsetEm": 0
+    },
+    {
+      "region": "zh-Hant",
+      "cp": "U+3002",
+      "char": "。",
+      "trim": "geom-on",
+      "dotOffsetEm": -0.5
+    },
+    {
+      "region": "zh-Hant",
+      "cp": "U+3001",
+      "char": "、",
+      "trim": "off",
+      "dotOffsetEm": 0
+    },
+    {
+      "region": "zh-Hant",
+      "cp": "U+3001",
+      "char": "、",
+      "trim": "geom-on",
+      "dotOffsetEm": -0.5
+    },
+    {
+      "region": "zh-Hant",
+      "cp": "U+FF0C",
+      "char": "，",
+      "trim": "off",
+      "dotOffsetEm": 0
+    },
+    {
+      "region": "zh-Hant",
+      "cp": "U+FF0C",
+      "char": "，",
+      "trim": "geom-on",
+      "dotOffsetEm": -0.5
+    },
+    {
+      "region": "ja",
+      "cp": "U+3002",
+      "char": "。",
+      "trim": "off",
+      "dotOffsetEm": 0
+    },
+    {
+      "region": "ja",
+      "cp": "U+3002",
+      "char": "。",
+      "trim": "geom-on",
+      "dotOffsetEm": -0.5
+    },
+    {
+      "region": "ja",
+      "cp": "U+3001",
+      "char": "、",
+      "trim": "off",
+      "dotOffsetEm": 0
+    },
+    {
+      "region": "ja",
+      "cp": "U+3001",
+      "char": "、",
+      "trim": "geom-on",
+      "dotOffsetEm": -0.5
+    },
+    {
+      "region": "ja",
+      "cp": "U+FF0C",
+      "char": "，",
+      "trim": "off",
+      "dotOffsetEm": 0
+    },
+    {
+      "region": "ja",
+      "cp": "U+FF0C",
+      "char": "，",
+      "trim": "geom-on",
+      "dotOffsetEm": -0.5
+    },
+    {
+      "region": "ko",
+      "cp": "U+3002",
+      "char": "。",
+      "trim": "off",
+      "dotOffsetEm": 0
+    },
+    {
+      "region": "ko",
+      "cp": "U+3002",
+      "char": "。",
+      "trim": "geom-on",
+      "dotOffsetEm": -0.5
+    },
+    {
+      "region": "ko",
+      "cp": "U+3001",
+      "char": "、",
+      "trim": "off",
+      "dotOffsetEm": 0
+    },
+    {
+      "region": "ko",
+      "cp": "U+3001",
+      "char": "、",
+      "trim": "geom-on",
+      "dotOffsetEm": -0.5
+    },
+    {
+      "region": "ko",
+      "cp": "U+FF0C",
+      "char": "，",
+      "trim": "off",
+      "dotOffsetEm": 0
+    },
+    {
+      "region": "ko",
+      "cp": "U+FF0C",
+      "char": "，",
+      "trim": "geom-on",
+      "dotOffsetEm": -0.5
+    }
+  ]
+}

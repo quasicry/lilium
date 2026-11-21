@@ -1,0 +1,43 @@
+{
+ "meta": {
+  "description": "Ashokan Prakrit IAST paragraph samples for full-paragraph round-trip stress testing (Brahmi romanization engine brahmi-iast)",
+  "sources": [
+   "UD Prakrit-DIPI treebank (Universal Dependencies, 'Digitising Imperial Prakrit Inscriptions'), dev branch - https://github.com/UniversalDependencies/UD_Prakrit-DIPI (dev)",
+   "Raw text: The Ashoka Project, Bibliotheca Polyglotta, University of Oslo - https://www2.hf.uio.no/polyglotta/index.php?page=library&bid=14 (per UD_Prakrit-DIPI README; treebank GPLv3)",
+   "NOT OCR-derived; NOT verbatim Hultzsch 1925 print - spelling follows the Polyglotta/DIPI printed IAST, which generally follows Hultzsch's conventions (dhaṃma, devānaṃpiya, etc.)"
+  ],
+  "license": "GPLv3 (UD_Prakrit-DIPI / Bibliotheca Polyglotta)"
+ },
+ "samples": [
+  {
+   "edict": "Girnar-RE1",
+   "iast": "iyaṃ dhaṃma-lipī Devānaṃpriyena Priyadasinā rāña lekhāpitā idha na kiṃci jīvaṃ ārabhitpā prajūhitavyaṃ na ca samājo katavyo bahukaṃ hi dosaṃ samājamhi pasati Devānaṃpriyo Priyadasi rājā asti pi tu ekacā samājā sādhu-matā Devānaṃpriyasa Priyadasino rāño pura mahānasamhi Devānaṃpriyasa Priyadasino rāño anudivasaṃ bahūni prāṇa-sata-sahasrāni ārabhisu sūpāthāya se aja yadā ayaṃ dhaṃma-lipī likhitā tī eva prāṇā ārabhare sūpāthāya dvo morā eko mago so pi mago na dhruvo ete pi tri prāṇā pachā na ārabhisare",
+   "note": "Girnar 第一摩崖詔（Hultzsch RE1 Girnar 版）"
+  },
+  {
+   "edict": "Girnar-RE2",
+   "iast": "sarvata vijitamhi Devānaṃpriyasa Piyadasino rāño evamapi pracaṃtesu yathā Coḍa Pāḍā Satiyaputo Ketalaputo ā Taṃbapaṃṇī Aṃtiyako Yona-rājā ye va pi tasa Aṃtiyakasa sāmīpaṃ rājāno sarvatra Devānaṃpriyasa Priyadasino rāño dve cikīcha katā manusa-cīkichā ca pasu-cikīchā ca osuḍhāni ca yāni manusopagāni ca pasopagāni ca yata yata nāsti sarvatrā hārāpitāni ca ropāpitāni ca mūlāni ca phalāni ca yata yatra nāsti sarvata hārāpitāni ca ropāpitāni ca paṃthesū kūpā ca khānāpitā vrachā ca ropāpitā paribhogāya pasumanusānaṃ",
+   "note": "Girnar 第二摩崖詔"
+  },
+  {
+   "edict": "Girnar-RE5",
+   "iast": "Devānaṃpriyo Piyadasi rājā evaṃ āha kalāṇaṃ dukaraṃ yo ādikaro kalāṇasa so dukaraṃ karoti ta mayā bahu kalāṇaṃ kataṃ ta mama putā ca potā ca paraṃ ca tena ya me apacaṃ āva saṃvaṭa-kapā anuvatisare tathā so sukataṃ kāsati yo tu eta desaṃ pi hāpesati so dukataṃ kāsati sukaraṃ hi pāpaṃ atikataṃ aṃtaraṃ na bhūta-pruvaṃ dhaṃma-mahāmātā nāma ta mayā traidasavāsābhisitena dhaṃmamahāmātā katā te sava-pāsaṃḍesu vyāpatā dhāmadhisṭānāya ... dhaṃma-yutasa ca Yoṇa-Kaṃboja-Gaṃdhārānaṃ Risṭika-Peteṇikānaṃ ye vā pi aṃñe āparātā bhata mayesu vā ... sukhāya dhaṃma-yutānaṃ aparigodhāya vyāpatā te baṃdhana-badhasa paṭividhānāya ... prajā katābhākāresu vā thairesu vā vyāpatā te Pāṭalipute ca bāhirasu ca ... ye vā pi me añe ñātikā sarvata vyāpatā te yo ayaṃ dhaṃmanisrito ti va ... te dhaṃma-mahāmātā etāya athāya ayaṃ dhaṃma-lipī likhitā ...",
+   "note": "Girnar 第五摩崖詔"
+  },
+  {
+   "edict": "Kalsi-RE1",
+   "iast": "iyaṃ dhaṃma-lipi Devānaṃpiyena Piyadasinā lekhitā hidā no kichi jive ālabhitu pajohitaviye no pi ca samāje kaṭaviye bahukā hi dosā samājasā Devānaṃpiye Piyadasī lājā dakhati athi pi cā ekatiyā samājā sādhu-matā Devānaṃpiyasā Piyadasisā lājine pule mahānasasi Devānaṃpiyasā Piyadasisā lājine anudivasaṃ bahuni pāta-sahasāni alaṃbhiyisu supaṭhāye se idāni yadā iyaṃ dhaṃma-lipi lekhitā tadā tiṃni yevā pānāni alabhiyaṃti duve majūlā eke mige se pi cū mige no dhruve etāni pi cu tini pānāni no alābhiyisaṃti",
+   "note": "Kalsi 第一摩崖詔"
+  },
+  {
+   "edict": "Shahbazgarhi-RE1",
+   "iast": "aya dhrama-dipi Devanapriasa raño likhapitu hida no kici jive arabhitu prayuhotave no pi ca samaja kaṭava bahuka hi dośa samayaspi Devaṇapriye Priadraśi raya dakhati asti pi cu ekatia samaye sasu-mate Devanapiasa Priadraśisa raño pura mahanasasi Devanapriasa Priadraśisa raño anudivaso bahuni praṇa-sata-sahasani arabhiyisu supaṭhaye so idani yada aya dhrama-dipi likhita tada trayo vo praṇa haṃñaṃti majura duvi mrugo so pi mrugo no dhruvaṃ eta pi praṇa trayo paca na arabhiśaṃti",
+   "note": "Shahbazgarhi 第一摩崖詔（Kharosthi 區西北方言，dhrama/dipi 拼法）"
+  },
+  {
+   "edict": "Jaugada-RE1",
+   "iast": "iyaṃ dhaṃma-lipi Khepiṃgalasi pavatasi Devānaṃpiyena Piyadasinā lājinā likhāpitā hida no kichi jāvaṃ ālabhitu pajohitaviye no pi ca samaje kaṭaviye bahukaṃ hi dosaṃ samājasa drakhati Devānaṃpiye Piyadasī lājā athi pi cu ekatiyā samājā sādhu-matā Devānaṃpiyasa Piyadrasine lājine puluvaṃ mahānasasi Devānaṃpiyasa Piyadasine lājine anudivasaṃ bahūni pana-sata-sahasāni ālabhiyisu sūpaṭhāye se aja adā iyaṃ dhaṃma-lipī likhitā tiṃni yeva pānāni ālaṃbhiyaṃti duve majūlā eke mige se pi cu mige no dhuvaṃ etāni pi cu tiṃni pānāni pachā no ālabhiyisamti",
+   "note": "Jaugada 第一摩崖詔"
+  }
+ ]
+}
