@@ -221,9 +221,17 @@ export function looksLikePhagsPaUnicode(text: string): boolean {
  * 純 ASCII 字母的普通文本不再放行；帶特徵字符的單詞級轉寫仍判拉丁。
  */
 export function looksLikePhagsPaRoman(text: string): boolean {
-  if (!/[a-z]/i.test(text) && !/[ŋγśẖʼʷʸʳr\u030Aṃṭḍṇḥṣṅý]/.test(text)) return false;
-  return /[ŋγśẖʼʷʸʳr\u030Aṃṭḍṇḥṣṅý]/.test(text) ||
-    /^[a-zŋγśẖʼʷʸʳr\u030Aṃṭḍṇḥṣṅý'’<>{}|/:\s.,\u0301\u0303\u0304\u0306\u0307\u0308\u030C\u0323\u0331-]+$/i.test(text);
+  // 轉寫特徵/允許碼位表（含組合 ring above U+030A 與尾組合符）；逐碼位檢查，
+  // 避免字元類中組合字符與裸基字並排的歧義（官方審核 no-misleading-character-class）
+  const FEATS = new Set(["\u014B", "\u03B3", "\u015B", "\u1E96", "\u02BC", "\u02B7", "\u02B8", "\u02B3",
+    "\u030A", "\u1E43", "\u1E6D", "\u1E0D", "\u1E47", "\u1E25", "\u1E63", "\u1E45", "\u00FD",
+    "\u0301", "\u0303", "\u0304", "\u0306", "\u0307", "\u0308", "\u030C", "\u0323", "\u0331"]);
+  const BASE = /[a-z'\u2019<>{}|/:\s.,-]/i;
+  const cps = [...text];
+  const hasFeat = cps.some((c) => FEATS.has(c));
+  const hasLetter = cps.some((c) => /[a-z]/i.test(c));
+  if (!hasLetter && !hasFeat) return false;
+  return hasFeat || cps.every((c) => FEATS.has(c) || BASE.test(c));
 }
 
 /* ---------------- romanToNative ---------------- */

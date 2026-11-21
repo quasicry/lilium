@@ -199,7 +199,7 @@ export function wrapTibetanRuns(root: HTMLElement): void {
       const [s, e] = ranges[k];
       if (e < node.data.length) node.splitText(e);
       const runNode = s > 0 ? node.splitText(s) : node;
-      const span = document.createElement("span");
+      const span = createSpan();
       span.className = "li-tib-run";
       runNode.parentNode?.insertBefore(span, runNode);
       span.appendChild(runNode);

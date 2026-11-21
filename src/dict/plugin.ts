@@ -866,7 +866,7 @@ export class DictFeature {
     for (const entry of byFolder.values()) {
       if (!entry.hasDict) continue;
       const prefix = `${entry.folder.path}/`;
-      const bucket = byPrefix.get(prefix) ?? { child: [], resSub: new Map(), subs: new Set<string>() };
+      const bucket = byPrefix.get(prefix) ?? { child: [] as TFile[], resSub: new Map<string, TFile[]>(), subs: new Set<string>() };
       // 一層資源子夾內的檔案，視為配套收進
       for (const files of bucket.resSub.values()) for (const x of files) {
         const lower = x.name.toLowerCase();
