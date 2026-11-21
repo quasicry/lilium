@@ -1121,7 +1121,16 @@ async function exportMd(plugin: DictFeature, sel: { src: boolean; out: boolean }
     added++;
   }
   if (sel.out && out) {
-    lines.push('## ' + plugin.T('dict.translit.export.secOut'), '', '```', out, '```', '');
+    // 蘭朒體字形依賴內嵌 Nithya Ranjana DU，碼位與天城相同（U+0900–097F），
+    // 正文字體棧不含蘭朒族即回落天城字形。匯出 MD 用行內 HTML span 自帶
+    // font-family（note-builder 體例：inline style 是唯一雙視圖存活載體），
+    // 閱讀態與 Live Preview 編輯態都直接顯示蘭朒字形；其他文種維持 code fence。
+    if (used?.group === 'ranjana') {
+      const span = `<span style="font-family: 'Nithya Ranjana DU'">${out}</span>`;
+      lines.push('## ' + plugin.T('dict.translit.export.secOut'), '', span, '');
+    } else {
+      lines.push('## ' + plugin.T('dict.translit.export.secOut'), '', '```', out, '```', '');
+    }
     added++;
   }
   if (!added) { liNotice(plugin.T('dict.translit.export.empty')); return; }
