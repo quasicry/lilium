@@ -1823,6 +1823,8 @@ const sanskritItrans: TransliterationScheme = {
 
   // f2-A：\uXXXX esc 標註 token 掃描層原子化（\ 是詞界 trigger，逐詞掃描切碎標註實錘）
   escAnnotationToken: true,
+  // ITRANS 的 .h（visarga）/.a（avagraha）/.N 等 dot 標記是詞內音標，掃描層不作詞界
+  romanKeepChars: ".",
   label: { zh: "梵文 ITRANS（鍵盤輸入）", "zh-TW": "梵文 ITRANS（鍵盤輸入）", ja: "梵字 ITRANS（入力用）", ko: "범어 ITRANS(입력용)", en: "Sanskrit (ITRANS)", bo: "སང་སྐྲིད་(ITRANS)", ug: "سانسكرىت (ITRANS)", fr: "Sanskrit (ITRANS)", de: "Sanskrit (ITRANS)", },
   group: "sanskrit",
   primary: false,
@@ -1882,6 +1884,8 @@ interface AsciiSchemeMeta {
   hiddenFromPicker?: boolean;
   /** f2-A：全方案通用 esc 標註 token（\uXXXX）原子化（透傳到 TransliterationScheme） */
   escAnnotationToken?: boolean;
+  /** 方案 roman 專屬詞內標點（透傳到 TransliterationScheme，掃描層不作詞界） */
+  romanKeepChars?: string;
 }
 function makeAsciiScheme(def: AsciiSchemeDef, meta: AsciiSchemeMeta): TransliterationScheme {
   const consRev: Record<number, string> = {};
@@ -2039,6 +2043,7 @@ function makeAsciiScheme(def: AsciiSchemeDef, meta: AsciiSchemeMeta): Transliter
     label: meta.label,
     hiddenFromPicker: meta.hiddenFromPicker,
     escAnnotationToken: meta.escAnnotationToken,
+  romanKeepChars: meta.romanKeepChars,
     group: "sanskrit",
     primary: false,
     altOf: meta.altOf,
@@ -2085,6 +2090,8 @@ const VELTHUIS_DEF: AsciiSchemeDef = {
 };
 const sanskritVelthuis = makeAsciiScheme(VELTHUIS_DEF, {
   id: "sanskrit-velthuis",
+  // velthuis roman 的 dot 標記（.m/.n/.t 等）與雙撇號（quote-s）是詞內音標，掃描層不作詞界
+  romanKeepChars: '."',
 
   // f2-A：\uXXXX esc 標註 token 掃描層原子化（\ 是詞界 trigger，逐詞掃描切碎標註實錘）
   escAnnotationToken: true,

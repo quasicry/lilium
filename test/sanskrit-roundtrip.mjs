@@ -63,6 +63,9 @@ const VERSES = [
   "त्रयी वेदाश्चत्वारो मीमांसा न्यायश्च वैशेषिकम्",
   "अथातो ब्रह्मजिज्ञासा जन्माद्यस्य यतः",
   "यो मां पश्यति सर्वत्र सर्वं च मयि पश्यति तस्याहं न प्रणश्यामि स च मे न प्रणश्यति",
+  // 用戶實錘句：黏合叢集長句——引擎直呼全過而掃描層切詞破碎（LATIN_SHAPE 缺 ~/'''、
+  // velthuis .m/\\" 詞內音標被 TRIGGER_CHARS 切詞），修復後入語料防回歸
+  "अध्यात्मरूपसंज्ञी बहिर्धा रूपाणि पश्यति परीत्तानि सुवर्णदुर्वर्णानि तानि खलु रूपाण्यभिभूय जानात्यभिभूय पश्यति एवंसंज्ञि च भवति इदं प्रथममभिभ्वायतनं",
 ];
 
 /* ---- 大小寫探針（僅對大小寫即語義的方案） ---- */
@@ -207,9 +210,32 @@ for (const r of report) {
   }
 }
 
+// ---- 掃描層（transliterateLongText 逐詞路徑＝面板實際管線）雙向檢查 ----
+// 引擎直呼全過不等於面板逐詞掃描過：TRIGGER_CHARS 切詞會把方案專屬詞內標點
+// （velthuis .m、\"；ITRANS ~n）切開致整詞破碎（用戶實錘）。VERSES 全句走掃描層。
+let scanBugs = 0;
+for (const s of schemes) {
+  for (const v of VERSES) {
+    if (!representable(s, v)) continue;
+    const nr = lib.transliterateLongText(v, s, false);
+    const back = lib.transliterateLongText(nr.text, s, true);
+    if (back.text !== v) {
+      scanBugs++;
+      console.log(`\u2717 ${s.id} 掃描層 N-R-N 失敗：${JSON.stringify(nr.text.slice(0, 60))} -> ${JSON.stringify(back.text.slice(0, 60))}`);
+    }
+    const rn = lib.transliterateLongText(nr.text, s, true);
+    const back2 = lib.transliterateLongText(rn.text, s, false);
+    if (back2.text !== nr.text) {
+      scanBugs++;
+      console.log(`\u2717 ${s.id} 掃描層 R-N-R 失敗：${JSON.stringify(rn.text.slice(0, 60))} -> ${JSON.stringify(back2.text.slice(0, 60))}`);
+    }
+  }
+}
+if (scanBugs > 0) { totalBugs += scanBugs; anyFail = true; }
+
 if (anyFail) {
   console.log(`\n=== 發現 ${totalBugs} 處缺陷 ===`);
   process.exit(1);
 } else {
-  console.log("\n✅ 全部梵文轉寫方案：雙向無損往返 + 大小寫敏感性 全綠");
+  console.log("\n\u2705 全部梵文轉寫方案：雙向無損往返 + 大小寫敏感性 + 掃描層全綠");
 }

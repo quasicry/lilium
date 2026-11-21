@@ -107,6 +107,16 @@ export interface TransliterationScheme {
    */
   escAnnotationToken?: boolean;
   /**
+   * romanKeepChars: 方案羅馬字輸出中的「方案專屬標點」字符集（字面串）。
+   * 長文本掃描的詞界判定（TRIGGER_CHARS）把 . " ; 等視作句讀切詞，
+   * 但 Velthuis 的 .m/.n（鼻音化/virama 標記）與 "（ś）是詞內音標——
+   * 被切詞則整詞破碎（sa.mj~nii -> sa | mj~nii 各自轉錯）。聲明後，
+   * roman->native 方向掃描遇這些字符不作詞界、黏進詞緩衝整詞送引擎。
+   * 安全性：latin gate 的形狀判定＋「轉換結果與原詞相同則 skip」兜底，
+   * 一般西文正文不受影響（方案未聲明即行為零變化）。
+   */
+  romanKeepChars?: string;
+  /**
    * 跳過「自動生成命令」。用於已有等價手寫命令的文種（滿文 / 蒙古文
    * 的歷史命令 id 已沿用），僅為補齊檢字表而註冊，避免命令面板出現
    * 功能重複的兩條同名命令。

@@ -170,7 +170,7 @@ function safeLooks(
  *   + 數字 + 常見連接符（' ’ . _ -）
  * 漢字、假名、藏文、天城體等一律不在此集合內 → 不會被誤餵。
  */
-const LATIN_SHAPE = /^[\u0300-\u036FA-Za-z\u00C0-\u024F\u02B0-\u02FF\u1E00-\u1EFF\u2C60-\u2C7F0-9'\u2019._<>+\u200C-\u200D-]+$/;
+const LATIN_SHAPE = /^[\u0300-\u036FA-Za-z\u00C0-\u024F\u02B0-\u02FF\u1E00-\u1EFF\u2C60-\u2C7F0-9'\u2019._<>+~"\u200C-\u200D-]+$/;
 /** 至少要有一個拉丁字母，避免純標點 / 純數字 token 被當成詞送去轉 */
 const HAS_LATIN_LETTER = /[A-Za-z\u00C0-\u024F\u1E00-\u1EFF\u2C60-\u2C7F]/;
 
@@ -484,7 +484,9 @@ export function transliterateLongText(
         continue;
       }
     }
-    if (isTriggerChar(ch)) {
+    if (isTriggerChar(ch) && !(
+      native && scheme.romanKeepChars && scheme.romanKeepChars.includes(ch)
+    )) {
       flush();
       // 標點映射：羅馬→原生方向時，方案可提供 punctMap
       // （如維吾爾 , → ،、? → ？）把被詞界切開的標點一併轉換——
