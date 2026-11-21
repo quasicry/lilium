@@ -2121,3 +2121,19 @@ test("藏文 Wylie 彎引號正規化：mkha’/mtha’/’das 掃描層零透�
   const back = lib.transliterateLongText(r.text, s, false);
   assert.equal(back.text.replace(/\u2019/g, "'"), ascii, "R-N 往返無損");
 });
+
+/* ---------- 零寬字符/BOM 黏詞透傳修復（剪貼板複製常態） ----------
+ * 網頁/微信複製文本常帶 U+200B/C/D、U+FEFF 黏在句首詞前，形狀 gate 對
+ * "​de" 判否整詞 skipped（移動端實測句首 de 透傳實錘）。零寬字符須從詞緩衝
+ * 剝離：句首黏著時 flush 前段、零寬自身透傳，詞照常轉換。
+ */
+test("零寬字符/BOM 黏詞：句首 de 不再透傳", () => {
+  const s = lib.getScheme("tibetan-wylie");
+  for (const zw of ["\u200b", "\u200c", "\u200d", "\ufeff"]) {
+    const r = lib.transliterateLongText(zw + "de rnam pa thams cad du", s, true);
+    assert.ok(!/[a-zA-Z]{2}/.test(r.text.replace(/^[\u200b-\u200d\ufeff]/, "")), "零寬 " + JSON.stringify(zw) + " 後詞全轉: " + JSON.stringify(r.text));
+  }
+  // 無零寬行為不變
+  const plain = lib.transliterateLongText("de rnam pa", s, true);
+  assert.equal(plain.text, "དེ་རྣམ་པ", "無零寬對照不變");
+});

@@ -484,6 +484,17 @@ export function transliterateLongText(
         continue;
       }
     }
+    // 零寬字符（U+200B-U+200D 零寬空格/連接符、U+FEFF BOM）不是詞字符——
+    // 網頁/剪貼板複製常態黏在詞首（"\u200Bde" → 詞緩衝 "\u200Bde"、形狀 gate 判否
+    // 整詞 skipped，句首詞透傳實錘）。遇之即 flush 前段詞、字符自身原樣透傳。
+    const cpCh = ch.codePointAt(0) ?? 0;
+    if (cpCh === 0x200b || cpCh === 0x200c || cpCh === 0x200d || cpCh === 0xfeff) {
+      flush();
+      out += ch;
+      prevLetterTail = /[^\s.,;:!?]/.test(out.slice(-1));
+      i += 1;
+      continue;
+    }
     if (isTriggerChar(ch) && !(
       native && scheme.romanKeepChars && scheme.romanKeepChars.includes(ch)
     )) {
