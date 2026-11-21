@@ -188,7 +188,12 @@ const FRAME_SCRIPT_RANGES: Array<[number, number, string]> = [
   [0x0600, 0x06ff, "Noto Naskh Arabic"],
   [0x10c00, 0x10c4f, "Noto Serif Old Uyghur"],
   [0x11580, 0x115ff, "Noto Sans Siddham"], // Siddham U+11580–U+115FF
-  [0x11d40, 0x11d5f, "Nithya Ranjana DU"],
+  // 蘭朒體無標準 Unicode，插件文本走天城碼位 U+0900–U+097F（languages.ts ranjana.note
+  //   體例）——映射須對準實際碼位，否則 familiesForText 檢測不到蘭朒文本，
+  //   iframe 內聯 @font-face 與正文棧免尾都會漏掋 Nithya Ranjana DU（實鏈：字體
+  //   cmap 收 0900 區段、11D40 區塊反而無字形）。排序在 NOTO 組之後＝天城文
+  //   由 Noto Sans Devanagari 前位命中，蘭朒僅兜尾，天城減染零變化。
+  [0x0900, 0x097f, "Nithya Ranjana DU"],
   // Doulos SIL：IPA 擴展音標與拼音/轉寫用拉丁擴展（編輯器主棧已全量覆蓋，此處供詞條 iframe 按需內聯）
   [0x0250, 0x02af, "Doulos SIL"], // IPA Extensions
   [0x1d00, 0x1d7f, "Doulos SIL"], // Phonetic Extensions

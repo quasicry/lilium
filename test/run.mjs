@@ -2137,3 +2137,15 @@ test("零寬字符/BOM 黏詞：句首 de 不再透傳", () => {
   const plain = lib.transliterateLongText("de rnam pa", s, true);
   assert.equal(plain.text, "དེ་རྣམ་པ", "無零寬對照不變");
 });
+
+/* ---------- 蘭札字體映射對準實際碼位（0900 天城碼位承載） ----------
+ * 舊映射 0x11D40-0x11D5F（Unicode 16 Nithya Ranjana 區塊）對不上插件實際輸出的
+ * 天城碼位文本——familiesForText 檢測不到、iframe 內聯 @font-face 漏掛蘭札字體。
+ * 斷言：天城碼位文本的字體棧尾同時含 Noto Sans Devanagari（前位，天城零變化）
+ * 與 Nithya Ranjana DU（兜尾）。
+ */
+test("蘭札字體映射：天城碼位文本棧尾含 Nithya Ranjana DU 且排在 Devanagari 之後", () => {
+  const src = fs.readFileSync(path.join(ROOT, "src/bundled-fonts.ts"), "utf8");
+  assert.ok(!src.includes("0x11d40"), "舊 11D40 映射已移除");
+  assert.ok(src.includes('[0x0900, 0x097f, "Nithya Ranjana DU"]'), "映射對準天城碼位");
+});
