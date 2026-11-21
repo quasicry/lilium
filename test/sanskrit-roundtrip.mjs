@@ -229,6 +229,12 @@ for (const s of schemes) {
       scanBugs++;
       console.log(`\u2717 ${s.id} 掃描層 R-N-R 失敗：${JSON.stringify(rn.text.slice(0, 60))} -> ${JSON.stringify(back2.text.slice(0, 60))}`);
     }
+    // NFD 輸入（macOS 剪貼板/網頁複製常態）——tokenizeIast 須 NFC 規範化（實錘：a+U+0304 拆裂亂碼）
+    const nfdBack = lib.transliterateLongText(nr.text.normalize("NFD"), s, true);
+    if (nfdBack.text !== v) {
+      scanBugs++;
+      console.log(`\u2717 ${s.id} 掃描層 NFD R-N 失敗：${JSON.stringify(nfdBack.text.slice(0, 60))}`);
+    }
   }
 }
 if (scanBugs > 0) { totalBugs += scanBugs; anyFail = true; }

@@ -328,7 +328,11 @@ export function parseEscCp(rest: string): { cp: number; width: number } | null {
   return null;
 }
 
-function tokenizeIast(text: string, mode: IndicMode, pali: boolean): Unit[] {
+function tokenizeIast(input: string, mode: IndicMode, pali: boolean): Unit[] {
+  // NFD 輸入（macOS 剪貼板/網頁複製常態）的 a + U+0304 組合序列若不規範化，
+  // 'a' 命中後 U+0304 成孤兒透傳 → ā 拆裂產出「輔音上掛長音符」亂碼
+  //（實證：adhyātmarūpasaṃjñī NFD → अध्य̄त्मरु̄प…）。入口統一 NFC。
+  let text = input.normalize("NFC");
   // ISO 15919 正規把 ए/ओ 寫作 ē/ō（本版輸出採 IAST 風的 e/o，見文件頭）；
   // 爲與生態文本互通，輸入端把 ē/ō 視同 e/o。
   if (mode === "iso") text = text.replace(/ē/g, "e").replace(/ō/g, "o");
