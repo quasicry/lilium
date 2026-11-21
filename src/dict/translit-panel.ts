@@ -631,8 +631,25 @@ export function renderTranslitPanel(body: HTMLElement, _view: LiDictView, plugin
     // 顯示文字按同一切段座標從 text 對應取段（套用只替換 amb 覆蓋的碼位區間，
     // 區間外的碼位序列兩邊完全一致，可直接按段序對應）。複製/匯出仍取純文字。
     const pre = outBox.createEl('pre', { cls: 'li-col-translit-pre' });
+    // W 類（tibSpelling）是字串級替換（index 未填、非碼點座標），定位方式與
+    // applyStringAmbiguities 一致：在輸出中 indexOf(primary) 首現定位
+    // （同形同歧義一起改）。先算出 W 類的碼點位置，再統一走碼點座標切段。
+    const wSpans = new Map<TranslitAmbiguity, number>();
+    {
+      let searchFrom = 0;
+      for (const a of st.amb) {
+        if (a.kind !== 'tibSpelling') continue;
+        const at = text.indexOf(a.primary, searchFrom);
+        if (at < 0) continue;
+        wSpans.set(a, at);
+        searchFrom = at + a.primary.length;
+      }
+    }
     const ambSorted = st.amb.length
-      ? [...st.amb].sort((a, b) => a.index - b.index)
+      ? [...st.amb]
+          .map((a) => ({ a, idx: a.kind === 'tibSpelling' ? (wSpans.get(a) ?? -1) : a.index }))
+          .filter((e) => e.idx >= 0)
+          .sort((x, y) => x.idx - y.idx)
       : [];
     if (ambSorted.length) {
       const baseCps = Array.from(st.out);
@@ -642,9 +659,9 @@ export function renderTranslitPanel(body: HTMLElement, _view: LiDictView, plugin
       let baseOff = 0;   // baseCps 中已消費的碼位數
       let dispOff = 0;   // dispCps 中已消費的碼位數
       const segs: Array<{ dispStart: number; dispEnd: number; marked: boolean }> = [];
-      for (const a of ambSorted) {
-        // 歧義前的普通段：base [baseOff, a.index) → disp 對應同長度
-        const plainLen = a.index - baseOff;
+      for (const { a, idx } of ambSorted) {
+        // 歧義前的普通段：base [baseOff, idx) → disp 對應同長度
+        const plainLen = idx - baseOff;
         if (plainLen > 0) {
           segs.push({ dispStart: dispOff, dispEnd: dispOff + plainLen, marked: false });
           dispOff += plainLen;
@@ -654,7 +671,7 @@ export function renderTranslitPanel(body: HTMLElement, _view: LiDictView, plugin
         const markedLen = choice ? Array.from(a.alternative).length : 1;
         segs.push({ dispStart: dispOff, dispEnd: dispOff + markedLen, marked: true });
         dispOff += markedLen;
-        baseOff = a.index + 1;
+        baseOff = idx + (a.kind === 'tibSpelling' ? Array.from(a.primary).length : 1);
       }
       // 尾段
       if (baseOff < baseCps.length) {
