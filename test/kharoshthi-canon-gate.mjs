@@ -88,23 +88,23 @@ const fold = (s) => s.toLowerCase()
   .replace(/\u0331a/g, "a\u0331");      // ̱ 位置：詞典掛後 vs 插件掛後（同音節）
 const aliasLem = (p) => {
   let l = p.lem;
-  // R-COMB：組合字母（vha/kka/tttha）+virama 後接元音：詞典反拼拆寫 vha·V
-  // （固有意義：組合字母含固有 a，後接元音附標讀 vh-a-i 並存 vh·ai 兩種音節解析——
-  //  詞典以 ai 併寫、插件以 vha+i 展開，同寫本形雙讀，2+22 條）
-  l = l.replace(/avhi/g, "avhai").replace(/avhe/g, "avhae");
+  // G-K2 後 N2R 已出 17-012 attested 拼法（vhi/ttthi/vhri），fold 只處理顯式別名：
   // R-ALIAS：ṭ́h/ḱ 別名鍵 ↔ canonical 拼寫 tttha/kka（同碼位，v2.9.14 設計）。
   // 詞典鍵序為 ṭ+́+h；插件 canonical 鍵為 tttha（匹配時 t·ttha 先於 ṭh），故 tttha 反拼。
-  // 全部 105+4+… 條均同此規律；ṭ́ha→tttha 還需消費其固有 a：插件 tttha 鍵尾含 a，
-  // 詞典 ṭ́ha 之 a 為顯式固有元音——兩者 R2N 同為 10A33，fold 後 t·ttha≈tttha·a，
-  // 再歸一 a·tttha→tttha。
+  // ṭ́h 後接元音附標之詞（aṭ́hi 等）N2R 現直接出 ttthi（附標跟讀），fold 只需
+  // 歸一 tttha→ttth 前綴差（G-K2 剝固有 a），無需 vhi→vhai 反向歸一（已撤）。
   l = l.replace(/ṭ́h/g, "tttha").replace(/ḱ/g, "kka");
+  // G-K2 對稱：N2R 出 ttthi/kki（組合字母剝固有 a＋附標跟讀），fold 對稱歸一
+  // tttha·V→ttth·V（kki 同型；裸 tttha/kka 之 a 為顯式，仍由 (tttha)a 歸一）。
+  // 僅對 native 實含組合字母（10A32/10A33）的詞條生效——Itakkai 之 kk 為
+  // k+ka 真簇（native 無 10A32），不可誤傷。
+  if (p.native.includes("\u{10A32}") || p.native.includes("\u{10A33}")) {
+    l = l.replace(/tttha(?=[iueo])/g, "ttth").replace(/kka(?=[iueo])/g, "kk");
+  }
   l = l.replace(/(tttha)a/g, "$1");
-  // R-COMB-2：組合字母簇內（rvhri/vhry 等非 avhi 起首）：vh+V 序列詞典拆寫
-  // vh·r(i/y)（VHA 無元音+VIRAMA+RA），插件展開 vha·r（固有 a 回填）——同一
-  // 寫本形（VHA+VIRAMA+RA）在詞典為 vhri、插件為 vhari，fold 歸 vhari
-  l = l.replace(/vhri/g, "vhari").replace(/vhrya/g, "vharya");
-  // R-VHI-2：jivhi 等 vi 前型：vhi→vhai（同 avhi 家族，組合字母 VHA+I-sign 讀 vha·i/vh·ai）
-  l = l.replace(/vhi/g, "vhai");
+  // R-COMB-2：組合字母簇內（rvhri/vhry 等非 avhi 起首）：G-K2 後 N2R 直接出 vhri/vhrya
+  // （17-012 attested 拼法），詞典拼寫一致——此規則撤除（歷史：vha·r 拆寫歸一）。
+  // R-VHI-2：同上撤除（G-K2 後 N2R 出 vhi，詞典亦 vhi）。
   // R-LÝ：lýa 後接輔音時詞典補出 ý 尾音節（Kilýagi 詞典 ý·gi、插件 ý·gi 對齊——
   // 插件 LYA 連寫吞 ý 的固有 a，詞典顯式寫出：fold 歸一 ly·a→ly）
   l = l.replace(/lýa/g, "lý");

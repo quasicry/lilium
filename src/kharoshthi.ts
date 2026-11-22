@@ -4,7 +4,7 @@
  * 佉盧虱吒文（Kharoṣṭhī，Unicode U+10A00–U+10A5F）↔ 羅馬字轉寫器。
  *
  * 【歷史地位】佉盧文是犍陀羅語（Gāndhārī）的書寫文字，公元前 1 世紀大英圖書館
- *  桦樹皮佛教寫本即用此文；它是唯一**從右向左**書寫的婆羅米系文字（數字亦 RTL）。
+ *  樺樹皮佛教寫本即用此文；它是唯一**從右向左**書寫的婆羅米系文字（數字亦 RTL）。
  *
  * 【設計決策：abugida 固有元音模型，不做梵文合字引擎】
  *  與悉曇不同，佉盧文不能復用天城體引擎（碼位佈局差異大、犍陀羅正字法遠較寬鬆）。
@@ -72,10 +72,15 @@ const KHARO_CONSONANT: Record<string, number> = {
   kka: 0x10a32, tttha: 0x10a33, ttta: 0x10a34, vha: 0x10a35,
   // 詞典轉寫慣例（Baums & Glass, gandhari.org 965 條語料實測）：
   // ṭ́h（ṭ+́+h，t+ṭh 合音）→ TTTHA：aṭ́ha→𐨀𐨳、saṭ́ha→𐨯𐨳
+  // ṭ́（L2/17-012：Arapacana 全型實證 ṭ́ 與 ṭ 為兩個獨立字母）→ TTTA；
   // ḱ（=kk 合音）→ KKA：maḱa→𐨨𐨲、paḱaya→𐨤𐨲𐨩
   // vh（=v+h 合音，詞典 60/60 雙射實證）→ VHA：lavhi→𐨫𐨵𐨁、avhisaṃbudha→𐨀𐨵𐨁𐨯𐨎𐨦𐨂𐨢
   // lý（=l+y 連寫，詞典以 ZWJ 標 LYA 合字，56 條實證）→ 𐨫+ZWJ+𐨿+𐨩：Lýipe→𐨫‍𐨿𐨩𐨁𐨤𐨅
-  "ṭ́h": 0x10a33, "ḱ": 0x10a32, "vh": 0x10a35,
+  "ṭ́h": 0x10a33, "ṭ́": 0x10a34, "ḱ": 0x10a32, "vh": 0x10a35,
+  // G-K2 對稱短鍵：N2R 出 ttthi/kki（組合字母剝固有 a＋附標跟讀），R2N 須能
+  // 讀回同一碼位——ttth→TTTHA、kk→KKA（長鍵 tttha/kka 貪婪優先不受影響；
+  // 語料實證：字面 ttth 僅出現於 tttha、kk 僅 Itakkai 特例分支先於本鍵）。
+  "ttth": 0x10a33, "kk": 0x10a32,
 };
 
 // 獨立元音 LETTER（僅 a）
@@ -169,10 +174,14 @@ export function looksLikeKharoshthi(text: string): boolean {
   return false;
 }
 
-/** 是否像佉盧文羅馬字（含元音/符號鍵） */
+/** 是否像佉盧文羅馬字（含元音/符號鍵）。G-K3：補自有鍵字符 ï/ü/ḱ/組合尖音符
+ *  （ṭ́/ṭ́h 之 ́，U+0301）與 ½（FRACTION 鍵）——否則「aṭ́hi」「kalpa½」探測落空、
+ *  suggestFlow 兜底判 han/latin，掃描層不分流到本方案。組合尖音符（U+0301）以
+ *  codePointAt 判定（字符類內組合字元觸發 no-misleading-character-class 警告）。 */
 export function looksLikeKharoRoman(text: string): boolean {
   for (const ch of text) {
-    if (/[a-zāīūṛṝḷḹṅñṭḍṇśṣḥṃ]/.test(ch)) return true;
+    if (ch.codePointAt(0) === 0x301) return true;
+    if (/[a-zāīūṛṝḷḹṅñṭḍṇśṣḥṃḱïü½]/.test(ch)) return true;
   }
   return false;
 }
@@ -192,7 +201,7 @@ function matchAt(input: string, pos: number, keys: string[], map: Record<string,
  *    （佉盧文僅 a 有獨立字母，詞典對詞首 i/u/e/o 一律以 𐨀+附標標寫，71 例無例外）；
  *  - 大寫拉丁詞首（專名）歸一為小寫匹配；
  *  - 詞典轉寫特殊鍵：ḱ→KKA、ü/ï→𐨀+u/i 附標、V̄（上橫線）→ BAR ABOVE、
- *    ṭ́/ḍ́→TTTHA；
+ *    ṭ́→TTTA、ṭ́h→TTTHA（L2/17-012：ṭ́ 與 ṭ 為 Arapacana 兩個獨立字母）；
  *  - 組合字母（kka/tttha/ttta/vha）以最長鍵優先。
  * 未命中原樣保留。
  */
@@ -364,13 +373,22 @@ export function kharoNativeToRoman(input: string, _opts?: TransliterationOptions
       // ⟑（⟑ 僅非輔音後保留）。須在回填固有 a 之前，還原 'j̄a' 字序。
       if (codes[i] === 0x10a38) { out += "\u0304"; i += 1; }
       const nextCode = i < codes.length ? codes[i] : undefined;
+      // G-K2 修正（L2/17-012 attested forms）：組合字母（kka/tttha/ttta/vha）鍵尾含
+      // 固有 a，後接元音附標/VIRAMA 時剝除之——附標跟讀（𐨵𐨁→vhi、𐨳𐨁→ttthi、
+      // 𐨲𐨁→kki）、VIRAMA 簇拆寫（𐨵𐨿𐨪→vhra）；裸字母保留含 a 讀法（𐨵→vha、𐨲→kka）。
+      // 單輔音鍵（1-2 字元）不含固有 a，不受影響（𐨐𐨁→ki）。
+      const isCombo = cons.length > 2;
+      if (isCombo && (nextCode === 0x10a3f ||
+          (nextCode !== undefined && REV_VOWEL_SIGN.has(nextCode)))) {
+        out = out.slice(0, -1); // 鍵尾固有 a
+      }
       // VIRAMA：輔音無固有元音，消費之且不回填 'a'（詞典正字法：𐨒𐨿𐨪→"gra" 而非 "gaˌra"）
       if (nextCode === 0x10a3f) { i += 1; continue; }
       const sign = nextCode !== undefined ? REV_VOWEL_SIGN.get(nextCode) : undefined;
       if (sign !== undefined) { out += sign; i += 1; }
-      // 固有元音回填：組合字母（kka/tttha/ttta/vha）鍵本身已含尾音 a，不再回填，
+      // 固有元音回填：組合字母鍵已含尾音 a（上分支已按需剝除），不再回填，
       // 否則 'ttta'+'a'='tttaa' 會讀成「tt·t·ā」——錯音。
-      else if (!cons.endsWith("a")) out += "a";
+      else if (sign === undefined && cons.length <= 2) out += "a";
       // 輔音（含固有 a）後的 CAUDA = 詞典下劃線標記 ̱（Las̱a→l+a+̱…）
       if (codes[i] === 0x10a39 && !cons.endsWith("a")) { out += "\u0331"; i += 1; }
       continue;
@@ -423,10 +441,11 @@ function buildKharoCharTable(): CharTableEntry[] {
   // 引擎鍵不動），僅於 canonical 列的 note 註明別名拼法。
   const KHARO_ALIAS_NOTE: Record<string, string> = {
     "tttha": "別名鍵 ṭ́h＝同碼位（10A33），正向鍵入亦收；反查歸 tttha",
+    "ttta": "別名鍵 ṭ́＝同碼位（10A34），正向鍵入亦收；反查歸 ttta",
     "kka": "別名鍵 ḱ＝同碼位（10A32），正向鍵入亦收；反查歸 kka",
     "vha": "別名鍵 vh＝同碼位（10A35），正向鍵入亦收；反查歸 vha",
   };
-  const KHARO_ALIAS_KEYS = new Set(["ṭ́h", "ḱ", "vh"]);
+  const KHARO_ALIAS_KEYS = new Set(["ṭ́h", "ṭ́", "ḱ", "vh"]);
   for (const [r, c] of Object.entries(KHARO_VOWEL_INDEP)) push(r, c, "獨立元音");
   for (const [r, c] of Object.entries(KHARO_CONSONANT)) {
     if (KHARO_ALIAS_KEYS.has(r)) continue; // 別名鍵不入檢字表（引擎鍵保留）

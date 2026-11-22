@@ -2239,3 +2239,49 @@ test("婆羅米 11003 JIHVAMULIYA＋11039 Bhattiprolu AA（U18 名表對齊）",
     assert.equal(s.nativeToRoman(n3, {}), w, w + " 既有零變化");
   }
 });
+
+test("kharoshthi G-K2/G-K3：組合字母附標跟讀＋ṭ́ 鍵＋探測補齊（L2/17-012）", () => {
+  const s = lib.listSchemes().find((x) => x.id === "gandhari-iast");
+  const cp = (...a) => a.map((c) => String.fromCodePoint(c)).join("");
+  // G-K2：組合字母＋元音附標＝剝固有 a、附標跟讀（17-012 attested forms）
+  assert.equal(s.nativeToRoman(cp(0x10a35, 0x10a01), {}), "vhi", "𐨵𐨁→vhi");
+  assert.equal(s.nativeToRoman(cp(0x10a35, 0x10a02), {}), "vhu", "𐨵𐨂→vhu");
+  assert.equal(s.nativeToRoman(cp(0x10a33, 0x10a01), {}), "ttthi", "𐨳𐨁→ttthi");
+  assert.equal(s.nativeToRoman(cp(0x10a32, 0x10a01), {}), "kki", "𐨲𐨁→kki");
+  assert.equal(s.nativeToRoman(cp(0x10a34, 0x10a01), {}), "ttti", "𐨴𐨁→ttti");
+  // 裸字母讀法零變化
+  assert.equal(s.nativeToRoman(String.fromCodePoint(0x10a35), {}), "vha", "裸𐨵→vha");
+  assert.equal(s.nativeToRoman(String.fromCodePoint(0x10a32), {}), "kka", "裸𐨲→kka");
+  // VIRAMA 簇拆寫
+  assert.equal(s.nativeToRoman(cp(0x10a35, 0x10a3f, 0x10a2a), {}), "vhra", "𐨵𐨿𐨪→vhra");
+  assert.equal(s.nativeToRoman(cp(0x10a35, 0x10a3f, 0x10a2a, 0x10a01), {}), "vhri", "𐨵𐨿𐨪𐨁→vhri");
+  // 單輔音不受影響
+  assert.equal(s.nativeToRoman(cp(0x10a10, 0x10a01), {}), "ki", "𐨐𐨁→ki 零變化");
+  // G-K2 對稱：R2N 短鍵閉環
+  assert.equal(lib.kharoRomanToNative("ttthi"), cp(0x10a33, 0x10a01), "ttthi 入向");
+  assert.equal(lib.kharoRomanToNative("kkai").endsWith("\u{10a05}\u{10a0c}"), true, "kkai 二合分支不變");
+  assert.equal(lib.kharoRomanToNative("vhi"), cp(0x10a35, 0x10a01), "vhi 入向零變化");
+  // 長鍵貪婪不受短鍵影響
+  assert.equal(lib.kharoRomanToNative("tttha"), "\u{10a33}", "tttha 長鍵貪婪");
+  assert.equal(lib.kharoRomanToNative("kka"), "\u{10a32}", "kka 長鍵貪婪");
+  // G-K2 語料往返抽樣（aṭ́hi 之 native 讀法走 canonical 拼寫 ttthi——別名 ṭ́h
+  // 僅供正向鍵入，N2R 反查歸 canonical，同 ṭ́h/kka/vha 先例）
+  for (const [lem, nat, n2r] of [
+    ["aṭ́hi", "\u{10a00}\u{10a33}\u{10a01}", "attthi"],
+    ["aṭhavaṣaavhisita", "\u{10a00}\u{10a1b}\u{10a2c}\u{10a2e}\u{10a00}\u{10a35}\u{10a01}\u{10a2f}\u{10a01}\u{10a1f}", "aṭhavaṣaavhisita"],
+    ["Iṃdravhriya", "\u{10a00}\u{10a01}\u{10a0e}\u{10a21}\u{10a3f}\u{10a2a}\u{10a35}\u{10a3f}\u{10a2a}\u{10a01}\u{10a29}", "ïṃdravhriya"],
+    ["Kaḱuca", "\u{10a10}\u{10a32}\u{10a02}\u{10a15}", "kakkuca"],
+  ]) {
+    const n = lib.transliterateLongText(lem, s, true).text;
+    assert.equal(n, nat, lem + " 入向逐碼位");
+    assert.equal(s.nativeToRoman(nat, {}), n2r, lem + " 出向讀法");
+  }
+  // G-K2：ṭ́ 鍵（L2/17-012 TTTA）
+  assert.equal(lib.kharoRomanToNative("ṭ́"), "\u{10a34}", "ṭ́→TTTA");
+  assert.equal(s.nativeToRoman("\u{10a34}", {}), "ttta", "𐨴 裸→ttta");
+  // G-K3：探測補齊
+  assert.equal(s.looksLikeRoman("aṭ́hi"), true, "ṭ́ 探測");
+  assert.equal(s.looksLikeRoman("½"), true, "½ 探測");
+  assert.equal(s.looksLikeRoman("kalpa½"), true, "½ 混排探測");
+  assert.equal(s.looksLikeRoman("maḱa"), true, "ḱ 探測");
+});
