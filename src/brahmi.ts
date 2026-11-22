@@ -149,10 +149,16 @@ const BRAHMI_NUM_JOINER = 0x1107f;
 
 // upadhmaniya（後接同部位清塞音成簇連字，字母性質不經 virama）
 const BRAHMI_UPADHMANIYA = 0x11004;
+// jihvamuliya（U+11003，後接同部位清塞音成簇連字，字母性質同 upadhmaniya；
+// Unicode 18.0 名表：11003=JIHVAMULIYA——舊草案 L2/07-342 曾派 11003=avagraha，
+// 最終標準改派 JIHVAMULIYA 且婆羅米區塊 avagraha 不存在，舊 '.a' 鍵移除）
+const BRAHMI_JIHVAMULIYA = 0x11003;
 // Old Tamil virama / 原子元音 / 專有輔音
 const BRAHMI_OT_VIRAMA = 0x11070;
 const BRAHMI_OT_VOWELS: Record<string, number> = {
   "ĕ": 0x11071, "ŏ": 0x11072, ".e": 0x11073, ".o": 0x11074,
+  // Bhattiprolu 長 a 變體附標（U+11039，U18 chart）；鍵體對稱 .e/.o
+  ".ā": 0x11039,
 };
 const BRAHMI_OT_EXTRA: Record<string, number> = {
   "ḻ": 0x11075,
@@ -393,8 +399,9 @@ export function brahmiRomanToNative(input: string, _opts?: TransliterationOption
       lastWasConsonant = false;
       continue;
     }
-    // ".a" avagraha（11003）入向
-    if (src.startsWith(".a", i)) { if (lastWasConsonant) out += cp(BRAHMI_VIRAMA); out += cp(0x11003); i += 2; lastWasConsonant = false; continue; }
+    // jihvamuliya "~j"（U+11003，與 ~h 同款分支；字母性質、不經 virama 簇邏輯——
+    // 同 upadhmaniya 既有基線）。舊 ".a" avagraha 鍵移除：Unicode 婆羅米區塊無 avagraha。
+    if (src.startsWith("~j", i)) { out += cp(BRAHMI_JIHVAMULIYA); i += 2; lastWasConsonant = false; continue; }
     // 未命中原樣保留；輸出前若上一是死輔音（詞尾裸輔音如 arhat 的 t）補 virama：
     // 此處的「下一字元非輔音/元音」即詞尾死輔音情境
     if (lastWasConsonant) out += cp(BRAHMI_VIRAMA);
@@ -491,8 +498,10 @@ export function brahmiNativeToRoman(input: string, _opts?: TransliterationOption
       if (codes[i] === BRAHMI_NUM_JOINER && (n === 0x11064 || n === 0x11065)) continue; // <jm> 由 joiner 分支輸出
       continue;
     }
-    // 11003 avagraha → ".a"（IAST 連聲慣例；入向 ".a"↔11003 對稱）
-    if (n === 0x11003) { out += ".a"; i += 1; continue; }
+    // jihvamuliya（11003）→ "~j"（與 "~h" 對稱；入向 "~j"↔11003）
+    if (n === BRAHMI_JIHVAMULIYA) { out += "~j"; i += 1; continue; }
+    // Bhattiprolu aa 附標（11039）→ ".ā"（與 OT 原子短元音 .e/.o 鍵體對稱）
+    if (n === 0x11039) { out += ".ā"; i += 1; continue; }
     // 其餘未收錄碼位（11039 Bhattiprolu aa、孤立 11046 virama、11070 OT virama
     // 等舊「透傳」位）→ \uXXXX 顯式標註（全拉丁化；入向 esc 對稱還原）。
     // 鐵律：esc 出向僅限方案法定區段（11000-1107F）——區段外（如 25CC
@@ -555,6 +564,8 @@ function buildBrahmiCharTable(): CharTableEntry[] {
   for (const [r, c] of Object.entries(BRAHMI_OT_VOWELS)) push(r, cp(c), "獨立元音", "Old Tamil 原子短元音");
   for (const [r, c] of Object.entries(BRAHMI_OT_EXTRA)) push(r, cp(c), "輔音", "Old Tamil 專有字母");
   push("~h", cp(BRAHMI_UPADHMANIYA), "符號", "upadhmaniya（後接同部位清塞音）");
+  push("~j", cp(0x11003), "符號", "jihvamuliya（後接同部位清塞音；舊草案誤派 avagraha、U18 名表正為 JIHVAMULIYA）");
+  push(".ā", cp(0x11039), "元音符號", "Bhattiprolu 長 a 變體附標（U+11039）");
   return rows;
 }
 
@@ -588,7 +599,7 @@ const brahmiIast: TransliterationScheme = {
   // 檢字表審計擴集：;/<jm> 之外，天城直引「ळa」、danda「।॥」、Old Tamil
   // puḷḷi「_.」/原子短元音「.e .o」、upadhmaniya「~h」、加法系「;-」皆含詞界
   // trigger 字符（; _ . ~ ळ），逐詞掃描會拆散透傳——併入原子 token。
-  romanTokenRe: /^(?:⟨U\+[0-9A-Fa-f]{4,8}⟩|\\u[0-9A-Fa-f]{4,6}|;[.;:*()*0-9]{1,6}(?:<jm>;[.;:*()*0-9]{1,6})*|<jm>|ळa|।|॥|;-|_\.|\.a|\.e|\.o|~h)$/,
+  romanTokenRe: /^(?:⟨U\+[0-9A-Fa-f]{4,8}⟩|\\u[0-9A-Fa-f]{4,6}|;[.;:*()*0-9]{1,6}(?:<jm>;[.;:*()*0-9]{1,6})*|<jm>|ळa|।|॥|;-|_\.|\.e|\.o|\.ā|~h|~j)$/,
   // B2/r156：⟨U+XXXX⟩ 註記＋舊 \uXXXX esc 體例原子化（escAnnotationToken 同款）——
   // ⟨ 與 \ 皆會被長文掃描切詞拆散成逐鍵碎片（11045→<jm>… 實錘），整體送轉換器。
 };
