@@ -2175,3 +2175,37 @@ test("ITRANS 官方多拼鍵：c C S chh shh ksh 不再透傳且出向統一形�
   assert.equal(lib.transliterateLongText("Sh", s, true).text, "ष", "Sh 零變化");
   assert.equal(lib.transliterateLongText("kSh", s, true).text, "क्ष", "kSh 零變化");
 });
+
+/* ---------- 僧伽羅語專有字母（n2737 SLS 1134 §3.1/3.2 全收） ----------
+ * æ 元音 ඇ/ඈ（ae/aee）＋matra ැ/ෑ、prenasalized ඟ/ඦ/ඬ/ඥ（nng/ndj/nnd/jnya）、
+ * ඁ candrabindu、෴ kundaliya、ෟ/ෳ vocalic l/ll matra。
+ * ඳ/ඹ 不收（nd/mb 與巴利序列 sandi/ambaya 爭 token，收錄破壞既有往返）。
+ * 出向 n2737 官方記法；往返回官方記法閉合。
+ */
+test("僧伽羅專有字母（n2737）：ae/aee 系＋prenasalized＋candrabindu＋kundaliya", () => {
+  const s = lib.listSchemes().find((x) => x.id === "sinhala-pali");
+  // 出向官方記法
+  const cases = [
+    ["ඇ", "ae"], ["ඈ", "aee"], ["ැ", "ae"], ["ෑ", "aee"],
+    ["ඟ", "nnga"], ["ඦ", "ndja"], ["ඬ", "nnda"], ["ඥ", "jnyaa"],
+    ["ඁ", "\u02ee"], ["෴", "."], ["ෟ", "\u1e39"], ["ෳ", "\u1e39\u0304"],
+  ];
+  for (const [ch, exp] of cases) assert.equal(s.nativeToRoman(ch, {}), exp, ch + " 出向");
+  // 入向官方記法＋往返閉合
+  const rt = [["kae", "කැ"], ["kaee", "කෑ"], ["kaaee", "කඈ"], ["mae", "මැ"]];
+  for (const [w, exp] of rt) {
+    const n = lib.transliterateLongText(w, s, true).text;
+    assert.equal(n, exp, w + " 入向 " + JSON.stringify(n));
+    assert.equal(s.nativeToRoman(n, {}), w, w + " 往返");
+  }
+  // nng 單鍵入向
+  assert.equal(lib.transliterateLongText("nnga", s, true).text, "ඟ", "nnga 入向 ඟ");
+  // 巴利既有往返零變化
+  for (const w of ["sandi", "canda", "ambaya", "kya", "rka"]) {
+    const n = lib.transliterateLongText(w, s, true).text;
+    assert.equal(s.nativeToRoman(n, {}), w, w + " 既有零變化");
+  }
+  // ISO 15919 備選方案繼承
+  const iso = lib.listSchemes().find((x) => x.id === "sinhala-iso15919");
+  assert.equal(iso.nativeToRoman("ඇ", {}), "ae", "ISO 繼承 ඇ");
+});

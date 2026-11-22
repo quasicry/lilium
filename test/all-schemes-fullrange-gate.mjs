@@ -135,7 +135,8 @@ const NUKTA_CPS = new Set([0x958, 0x959, 0x95A, 0x95B, 0x95C, 0x95D, 0x95E, 0x95
 const EXEMPT_SCHEMES_RESIDUE = new Set(["sanskrit-velthuis", "sanskrit-wx", "sanskrit-kolkata", "sanskrit-slp1", "sanskrit-itrans", "sanskrit-hk", "sanskrit-iast", "sanskrit-iso15919", "pali-iast", "pali-iso15919", "ranjana-iast"]);
 const PALI_EXCLUDED = new Set([0x90C, 0x961, 0x963]); // pali ḷ/ḹ 排除＋ऌ 借音
 // sinhala 孤立母音符號/virama 單碼位往返得獨立元音或恆等拉丁（無上下文；逐筆同款既有）
-const SINHALA_ORPHAN = new Set([0xD8F,0xDCA,0xDCF,0xDD2,0xDD3,0xDD4,0xDD6,0xDD8,0xDD9,0xDDA,0xDDB,0xDDC,0xDDD,0xDDE,0xDF2]);
+const SINHALA_ORPHAN = new Set([0xD8F,0xDCA,0xDCF,0xDD2,0xDD3,0xDD4,0xDD6,0xDD8,0xDD9,0xDDA,0xDDB,0xDDC,0xDDD,0xDDE,0xDD0,0xDD1,0xDDF,0xDF2,0xDF3]);
+// n2737 收錄（ae/aee/nng 系）：孤立 matra ැ/ෑ/ෟ 往返得獨立元音——同上既有政策
 // IME 方案（hiddenFromPicker）非全拉丁轉寫：出向為字形升級後蒙文碼位＝設計（description 聲明）
 const IME_SCHEMES = new Set(["mongolian-ime"]);
 const EXEMPT_RT_LEGACY = new Set([

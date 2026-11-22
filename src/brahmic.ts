@@ -692,6 +692,28 @@ const SINHALA: BrahmicChar[] = [
   { ch: "ං", roman: "ṃ", cat: "anusvara" },
   // 止聲（visarga ḥ；U+0D83 SINHALA SIGN VISARGAYA）——梵文 bhuvaḥ / svaḥ / naḥ 等
   { ch: "ඃ", roman: "ḥ", cat: "visarga" },
+  // 僧伽羅語專有字母（n2737 SLS 1134 §3.1/3.2：出向官方記法）——
+  // · æ 元音 ඇ/ඈ（ae/aee）及其 matra ැ/ෑ：僧語獨有短/長 ae 音。
+  //   出向 n2737 官方記法 ae/aee；語義安全：abugida 詞內元音全由 matra 表達，
+  //   羅馬 ae/aee 直串不承載其他語義。
+  // · 五個 prenasalized stops 中 ඟ/ඦ/ඬ/ඥ 收錄（nng/ndj/nnd/jnya）；
+  //   ඳ/ඹ（nd/mb）不收——nd/mb 與巴利常用序列（sandi/canda/ambaya
+  //   實證 nda→න්ද）爭同一輸入 token，收錄必破壞既有往返；
+  //   序列形由 n්+g 等自動組合轉，單字母輸入走 \uXXXX esc 標註。
+  // · ඁ candrabindu（U18 chart 新收錄，n2737 表無）、෴ kundaliya（§4.2）。
+  // · ෟ/ෳ vocalic l/ll matra（獨立母音 ඏ/ඐ 已收，補齊對應 matra）。
+  { ch: "ඇ", roman: "ae", cat: "ivowel" },
+  { ch: "ඈ", roman: "aee", cat: "ivowel" },
+  { ch: "ැ", roman: "ae", cat: "vowel" },
+  { ch: "ෑ", roman: "aee", cat: "vowel" },
+  { ch: "ඟ", roman: "nng", cat: "consonant" },
+  { ch: "ඦ", roman: "ndj", cat: "consonant" },
+  { ch: "ඬ", roman: "nnd", cat: "consonant" },
+  { ch: "ඥ", roman: "jnya", cat: "consonant" },
+  { ch: "ඁ", roman: "\u02ee", cat: "mark" },
+  { ch: "෴", roman: ".", cat: "mark" },
+  { ch: "ෟ", roman: "ḹ", cat: "vowel" },
+  { ch: "ෳ", roman: "ḹ\u0304", cat: "vowel" },
   // 數字
   ...digitRows(DIGITS_SIN),
 ];
