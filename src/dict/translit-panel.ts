@@ -1134,7 +1134,14 @@ async function exportMd(plugin: DictFeature, sel: { src: boolean; out: boolean }
   // 勾選決定段落——原文（粘貼框）與轉寫輸出可分可合（預設全選）。
   let added = 0;
   if (sel.src && st.src.trim()) {
-    lines.push('## ' + plugin.T('dict.translit.export.secSrc'), '', '```', st.src.trim(), '```', '');
+    // 蘭札方案的原文（粘貼框）同為天城碼位——正文字體棧不含蘭札族即回落天城字形；
+    // 與輸出段同款行內 span 自帶 font-family（雙視圖存活載體），其他文種維持 code fence。
+    if (used?.group === 'ranjana') {
+      const span = `<span style="font-family: 'Nithya Ranjana DU'">${st.src.trim()}</span>`;
+      lines.push('## ' + plugin.T('dict.translit.export.secSrc'), '', span, '');
+    } else {
+      lines.push('## ' + plugin.T('dict.translit.export.secSrc'), '', '```', st.src.trim(), '```', '');
+    }
     added++;
   }
   if (sel.out && out) {
