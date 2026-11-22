@@ -92,8 +92,8 @@ const SIGN_CP: Record<string, number> = { "ṃ": 0x11cb5, "m̐": 0x11cb6 };
 const SIGN_REV: Record<number, string> = {};
 for (const [k, v] of Object.entries(SIGN_CP)) SIGN_REV[v] = k;
 
-/** 數字：Marchen 無獨立數字系統，文獻沿用藏文數字 U+0F20–U+0F29
- *  （官方 Aksharamukha marchen 方案同此映射）。roman 端 ↔ ASCII 0–9
+/** 數字：Marchen 無獨立數字系統，文獻沿用藏文數字 U+0F20–U+0F29。
+ *  roman 端 ↔ ASCII 0–9
  *  （比照藏文擴展方案 tibetan-wylie 的數字慣例：TIB_DIGIT_TO_ASCII）。 */
 const DIGIT_CP: Record<string, number> = {};
 for (let d = 0; d <= 9; d++) DIGIT_CP[String(d)] = 0x0f20 + d;
@@ -127,7 +127,7 @@ const ZWSP = "\u200b";
  * 換行原樣。未知 token 透傳（罕見字符策略：不丟失、不亂碼）。
  */
 export function marchenRomanToNative(input: string, _opts?: TransliterationOptions): string {
-  // 建最長匹配詞典：輔音（含 'a）＋元音＋鼻音＋標點
+  // 建最長匹配辭典：輔音（含 'a）＋元音＋鼻音＋標點
   const TOKENS: Array<[string, string]> = [];
   for (const [k, v] of Object.entries(BASE_CP)) TOKENS.push([k, cp(v)]);
   for (const [k, v] of Object.entries(VOWEL_CP)) TOKENS.push([k, cp(v)]);
@@ -270,7 +270,7 @@ function buildMarchenCharTable(): CharTableEntry[] {
   rows.push({
     native: "—",
     roman: "（空格）",
-    note: "音節邊界：roman 端空格 ↔ native 端 U+200B ZWSP（N4491 官方建議）。Marchen 無 tshek（音節分隔符）——與藏文的核心差異（Unicode 18 §14.5）",
+    note: "音節邊界：roman 端空格 ↔ native 端 U+200B ZWSP（N4491 官方建議）。Marchen 無 tsheg（音節分隔符）——與藏文的核心差異（Unicode 18 §14.5）",
     section: "拼寫規則",
   });
   rows.push({
