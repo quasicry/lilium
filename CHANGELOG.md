@@ -1,3 +1,16 @@
+## 0.3.2
+
+### 新增
+- 僧伽羅專有字母全收（n2737 SLS 1134 官方記法）：æ 元音 ඇ/ඈ（ae/aee）與 matra ැ/ෑ；prenasalized ඟ/ඦ/ඬ/ඥ（nng/ndj/nnd/jnya）；ඁ candrabindu、෴ kundaliya、ෟ/ෳ vocalic l matra；ISO 15919 備選方案同步繼承。ඳ/ඹ 不收——nd/mb 與巴利常用序列（sandi/ambaya）爭同一輸入 token，收錄必破壞既有往返。
+- 婆羅米 Bhattiprolu 長 a 附標補收（U+11039，鍵 `.ā`，與 Old Tamil `.e`/`.o` 鍵體對稱）。
+- ITRANS 官方同碼位多拼鍵補收（5.30 編碼表）：c/C/S/chh/shh/ksh 入向收錄（舊表漏收致官方文檔拼寫透傳）；出向維持 ch/Ch/sh/Sh/kSh 統一形，既有鍵行為零變化。
+- 轉寫面板匯出 MD：蘭札方案輸出改行內 HTML span 自帶 font-family Nithya Ranjana DU，閱讀態與編輯態直顯蘭札字形（複製按鈕為純文字剪貼簿、無法攜樣式，帶樣式者為匯出 MD）。
+
+### 修復
+- 婆羅米 U+11003 正名 JIHVAMULIYA（新鍵 `~j`，與 `~h` 對稱）：原沿用 2007 舊草案 L2/07-342 誤派 avagraha（鍵 `.a`），Unicode 18.0 名表該碼位為 JIHVAMULIYA 且婆羅米區塊無 avagraha——糾錯，`.a` 鍵移除。
+- 蘭札字體映射對準實際碼位：0x11D40 改 0x0900-0x097F 天城碼位（字體 cmap 實證），檢字表內聯與兜尾不再漏掛 Nithya Ranjana DU；Noto 前位命中保天城渲染零變化。
+- 藏文拼式歧義（W 類）輸出高亮錯位：原全部高亮擠在輸出開頭，改為 indexOf 首現定位＋碼點座標切段，高亮落在實際歧義詞位置。
+
 ## 0.3.1
 
 ### 修復
