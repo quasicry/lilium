@@ -171,6 +171,14 @@ function hasTibetan(text: string): boolean {
 }
 
 function buildDecorations(view: EditorView): DecorationSet {
+  // 【G-T2b 停用（2026-11-23）】Noto Serif Tibetan 的 GSUB 已自帶「主字符＋
+  // subjoined 後續」上下文的變體替換（uni0F51→uni0F51.2/.3 實錘）——原始
+  // 序列單 span shaping 正確（CDP 實證：f54 f51 fa8=19.5px 規疊形、無
+  // dotted circle），補丁的 +0x50 改寫反而把疊基主形變體（པདྨ→པྡྨ 字形
+  // 等級差異）且字體棧問題另以 styles.css 字體規則解決。補丁保留但短路，
+  // 以便未來 fallback 字體場景（缺 GSUB 變體）需要時恢復。
+  return Decoration.none;
+
   const text = view.state.doc.toString();
   // 效能閘：textHasSubjoinScripts 的 SCRIPT_RANGES 只含 Zanabazar/Soyombo/
   // Marchen——不含藏文（0F00–0FFF），用它會讓藏文補丁永不觸發（實錘）。
