@@ -58,6 +58,28 @@ export function renderDictSections(
       }),
     );
 
+  // 冷啟動開關——詞典掃描是啟動期最重的工作
+  new Setting(containerEl)
+    .setName(dict.T('dict.set.autoScan'))
+    .setDesc(dict.T('dict.set.autoScanDesc'))
+    .addToggle((t) =>
+      t.setValue(dict.settings.autoScanOnStartup).onChange(async (v) => {
+        dict.settings.autoScanOnStartup = v;
+        // r59 ②：關閉啟動掃描時置位中止旗標——進行中的掃描迴圈下一輪退出。
+        if (!v) (dict as unknown as { scanAbort: boolean }).scanAbort = true;
+        await dict.saveSettings();
+      }),
+    );
+
+  new Setting(containerEl)
+    .setName(dict.T('dict.set.deferScan'))
+    .setDesc(dict.T('dict.set.deferScanDesc'))
+    .addToggle((t) =>
+      t.setValue(dict.settings.deferStartupScan).onChange(async (v) => {
+        dict.settings.deferStartupScan = v;
+        await dict.saveSettings();
+      }),
+    );
   // 模塊③：TEI Lex-0 開關 UI 已撤下——能力保留，
   // teiLexEnabled 默認 true（plugin.ts DEFAULTS）；舊 data.json 顯式 false 值仍被尊重
   // （向後相容：不自動覆寫用戶既有設置）。
@@ -255,28 +277,6 @@ export function renderDictSections(
       }),
     );
 
-  // 冷啟動開關——詞典掃描是啟動期最重的工作
-  new Setting(containerEl)
-    .setName(dict.T('dict.set.autoScan'))
-    .setDesc(dict.T('dict.set.autoScanDesc'))
-    .addToggle((t) =>
-      t.setValue(dict.settings.autoScanOnStartup).onChange(async (v) => {
-        dict.settings.autoScanOnStartup = v;
-        // r59 ②：關閉啟動掃描時置位中止旗標——進行中的掃描迴圈下一輪退出。
-        if (!v) (dict as unknown as { scanAbort: boolean }).scanAbort = true;
-        await dict.saveSettings();
-      }),
-    );
-
-  new Setting(containerEl)
-    .setName(dict.T('dict.set.deferScan'))
-    .setDesc(dict.T('dict.set.deferScanDesc'))
-    .addToggle((t) =>
-      t.setValue(dict.settings.deferStartupScan).onChange(async (v) => {
-        dict.settings.deferStartupScan = v;
-        await dict.saveSettings();
-      }),
-    );
 
   // groups management
   containerEl.createEl('h3', { text: dict.T('dict.set.groups') });
