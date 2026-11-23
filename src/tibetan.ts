@@ -849,9 +849,11 @@ const normalizeSeparator = (sep: string): string => {
   // 行尾不插 tsheg）。
   if (/^[ \t]+$/.test(sep)) return sep === " " ? cp(TSHEG) : sep;
   if (/^\s+$/.test(sep)) return sep;
-  // 混排段（顯式 tsheg/shad 與空白並存）：去空白、保留顯式分隔符——
-  // 空格對顯式 tsheg 是冗餘（"k-i ་la" 往返基線），shad 保留不吞。
-  return sep.replace(/[ \t]+/g, "");
+  // 混排段（顯式 tsheg/shad 與空白並存）：恰 1 個空格去空白（空格對顯式
+  // tsheg 是冗餘，"k-i ་la" 往返基線）；**≥2 連續空格原樣透傳**（排版
+  // 間距語義與純空白段一致，G-T1b）；shad 保留不吞。實現＝≥2 空格 run
+  // 以不可見碼位佔位保護，去完單空格後還原。
+  return sep.replace(/[ \t]+/g, (m) => (m.length >= 2 ? m : ""));
 };
 
 /**
