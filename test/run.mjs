@@ -1693,9 +1693,12 @@ test(`維吾爾輔音後 hamza：sün'iy 型隔音撇號往返無損`, () => {
     assert.equal(lib.soyomboRomanToNative("<jh>"), cp(0x11a84));
     assert.equal(lib.soyomboRomanToNative("<up>"), cp(0x11a85));
   });
-  // 標點：空格↔tsheg、shad、方向判定
+  // 標點：tshek 用 <ts> 顯式 token（G-T1c：空格透傳，比照 Zanabazar 先例）、shad、方向判定
   t("r45 Soyombo tshek／shad／方向判定", () => {
-    assert.equal(lib.soyomboRomanToNative("ka sa"), cp(0x11a5c, 0x11a9a, 0x11a81));
+    assert.equal(lib.soyomboRomanToNative("ka<ts>sa"), cp(0x11a5c, 0x11a9a, 0x11a81));
+    assert.equal(lib.soyomboRomanToNative("ka sa"), cp(0x11a5c, 0x20, 0x11a81));
+    assert.equal(lib.soyomboNativeToRoman(cp(0x11a5c, 0x11a9a, 0x11a81)), "ka<ts>sa");
+    assert.equal(lib.soyomboNativeToRoman(cp(0x11a5c, 0x20, 0x11a81)), "ka sa");
     assert.equal(lib.soyomboNativeToRoman(cp(0x11a9b)), "|");
     assert.ok(lib.looksLikeSoyombo(cp(0x11a9e)));
     assert.ok(lib.looksLikeSoyomboRoman("ma+sa"));

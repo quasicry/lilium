@@ -121,7 +121,9 @@ const INDEP_A_TOKENS: Map<number, [string, string]> = new Map(
 
 /** 標點：pluta＋head marks＋terminal marks＋tshek/shad */
 const PUNCT_CP: Record<string, number> = {
-  " ": 0x11a9a,        // tsheg（roman 端空格 ↔ tshek；Wylie 慣例）
+  "<ts>": 0x11a9a,     // tshek 顯式 token（r-e 比照 Zanabazar 先例：舊「空格↔tshek」
+                       // 與語料 0x20 分詞慣例互撞、且 Unicode 提案 N4142 定義 tshek
+                       // 僅標記藏文借詞音節尾，非通用分詞符——空格改透傳）
   "|": 0x11a9b, "||": 0x11a9c, // shad / double shad
   "<pluta>": 0x11a9d,  // 長音記號（pluta）
   "<head1>": 0x11a9e, "<head2>": 0x11a9f, "<head3>": 0x11aa0,
@@ -156,7 +158,7 @@ export function soyomboRomanToNative(input: string, _opts?: TransliterationOptio
   for (const [k, v] of Object.entries(FINAL_CP)) TOKENS.push([k, cp(v)]);
   for (const [k, v] of Object.entries(MARK_CP)) TOKENS.push([k, cp(v)]);
   for (const [k, v] of Object.entries(VEDIC_CP)) TOKENS.push([k, cp(v)]);
-  for (const [k, v] of Object.entries(PUNCT_CP)) if (k !== " ") TOKENS.push([k, cp(v)]);
+  for (const [k, v] of Object.entries(PUNCT_CP)) TOKENS.push([k, cp(v)]);
   for (const [tok, nat] of INDEP_A_TOKENS.values()) TOKENS.push([tok, nat]);
   // 最長鍵優先：<pluta>/<head1>/<term1>/<gm>/<ci-sh>/jha/gha/-ng/-'a/ue/ai… 先於單字母
   TOKENS.sort((a, b) => b[0].length - a[0].length);
@@ -166,7 +168,7 @@ export function soyomboRomanToNative(input: string, _opts?: TransliterationOptio
   let i = 0;
   while (i < input.length) {
     const ch = input[i];
-    if (ch === " ") { out += cp(0x11a9a); i++; continue; } // tsheg
+    if (ch === " ") { out += ch; i++; continue; } // 空格透傳（r-e：tshek 用 <ts> 顯式輸入）
     if (ch === "\n" || ch === "\t" || ch === "\r") { out += ch; i++; continue; }
     if (ch === "+") { out += cp(0x11a99); i++; continue; }
     // B2/r156：\uXXXX／⟨U+XXXX⟩ 標註還原（未收錄碼位的顯式標註，往返無損）——
@@ -187,7 +189,7 @@ export function soyomboRomanToNative(input: string, _opts?: TransliterationOptio
 
 /**
  * Soyombo Unicode → Wylie 擴展羅馬字。
- * 逐碼位映射；tsheg → 空格；shad → |；subjoiner → +；gemination → <gm>；
+ * 逐碼位映射；tshek → <ts>（顯式 token）；空格透傳；shad → |；subjoiner → +；gemination → <gm>；
  * final consonant signs → Wylie 同構鍵；區塊外透傳。
  */
 export function soyomboNativeToRoman(input: string, _opts?: TransliterationOptions): string {

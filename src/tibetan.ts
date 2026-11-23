@@ -875,6 +875,15 @@ export function wylieToTibetan(input: string): string {
   if (input.includes(NO_TSHEG)) {
     return input.split(NO_TSHEG).map((seg) => wylieToTibetan(seg)).join("");
   }
+  // <sp>（原生空格顯式 token，G-T1c）：前置切分——段間精確輸出 U+0020 真空格
+  // （可黏連在字母間 ka<sp>ga，故不能走段內 token 回映射；與 NO_TSHEG 前置
+  // 切分同模式）。各段遞歸解析，防止 <sp> 內字符被當分隔段/音節字符。
+  if (input.includes(NATIVE_SPACE)) {
+    return input
+      .split(NATIVE_SPACE)
+      .map((seg) => wylieToTibetan(seg))
+      .join(" ");
+  }
   const parts = input.split(TIB_SEP_RE);
   return parts
     .map((part) => {
@@ -993,6 +1002,13 @@ export function tibetanToWylie(input: string, pref: TibAmbigPref = "auto"): stri
       out.push(" ");
       continue;
     }
+    // 藏文原生真空格（U+0020）：出向輸出 <sp> 顯式 token——若輸出裸空格，
+    // 入向會被 G-T1 映射回 tsheg（真空格被誤轉，G-T1c）
+    if (c === 0x20) {
+      flush();
+      out.push(NATIVE_SPACE);
+      continue;
+    }
     // 只有輔音（含 a-chen / 下加字）與元音符號進入音節緩衝；
     // 標點、數字、符號一律切段後原樣保留，既不丟字也不會污染音節解析
     if (c === 0x0f84 || c === 0x0f00 || c === 0x0f39) {
@@ -1039,6 +1055,10 @@ const syllableKey = (s: string): string =>
  * 避免與 URL、路徑中的 `/` 或 Wylie 的 `-` 分詞符相撞。
  */
 const NO_TSHEG = "<->";
+/** 原生空格顯式 token：出向藏文真空格（U+0020，非 tsheg）→ "<sp>"，入向 "<sp>" → U+0020。
+ * 藏文語義：單空格在 Wylie 端是音節分隔（入向映射 tsheg），故「輸出真空格」
+ * 必須顯式標註才能往返——防止真空格被誤轉為 tsheg（G-T1c）。 */
+const NATIVE_SPACE = "<sp>";
 
 /**
  * 逐碼位貪吃切分：splitNoTsheg 的回溯在「最短自洽前綴的尾碼位是
