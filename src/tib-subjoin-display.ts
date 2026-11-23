@@ -18,6 +18,16 @@
  * replace+widget 讓 CM 把該碼位從行內移除、以 widget DOM 渲染替代字形，
  * 對字體 shaping 無干擾（widget 是獨立 span，字體按單碼位 shaping）。
  *
+ * 【堆疊叢 replace（G-T2 dotted circle 修補）】單碼位 replace 會把補丁字形
+ * 切成孤立 span（如 པདྨ 字面 f54 f51 fa8 變 DOM「f54 | fa1 | fa8 f60」三段）——
+ * 孤立 subjoined 碼位無宿主基字，HarfBuzz 依 OpenType 規則插入 dotted
+ * circle（U+25CC）佔位，編輯態出現「虛線圓圈」（CDP 量寬實錘：f54 f51 fa8
+ * 同 span 39.0px＝串行並列失敗形、f54 fa1 fa8 同 span 20.5px＝規範堆疊正確
+ * shaping、fa1 孤立 17.6px＝dotted circle＋字形）。故補丁 replace 範圍從
+ * 「單主字符碼位」擴為「堆疊叢」：自叢首（回溯連續主字符含穿插元音）至
+ * 叢尾（連續 subjoined＋元音段），widget 內以替換後的完整序列單 span 渲染，
+ * 字體在同 span 內完成堆疊 shaping。底層文本照舊不動。
+ *
  * 補丁判據（與引擎出向端同源，保持一致）：
  *   · cur ∈ 主輔音區（U+0F40–0F6F）且 next ∈ subjoined 區（U+0F90–0FBC）
  *     → cur 顯示為 cur+0x50；
@@ -73,11 +83,17 @@ class SubjoinGlyphWidget extends WidgetType {
   override ignoreEvent(): boolean { return true; }
 }
 
-/** 一行內的補丁位置集合：主字符偏移 → subjoined 字形 */
-function patchPositions(line: string): Map<number, string> {
-  const out = new Map<number, string>();
+/** 一行內的補丁堆疊叢集合：叢首偏移 → { end: 叢尾（不含）, text: 替換後
+ *  完整叢序列 }——同叢所有碼位在一個 widget span 內渲染，保住字體跨碼位
+ *  堆疊 shaping（G-T2 dotted circle 修補）。多補丁點落在同叢時合併。 */
+function patchPositions(line: string): Map<number, { end: number; text: string }> {
+  const out = new Map<number, { end: number; text: string }>();
   const chars = Array.from(line);
   for (let i = 0; i < chars.length; i++) {
+    if (out.size > 0) {
+      const last = [...out.values()].at(-1)!;
+      if (i < last.end) continue; // 已被前一叢吞併（G-T2 叢合併）
+    }
     const cp = chars[i].codePointAt(0) ?? 0;
     if (!isTibConsonant(cp) || isTibSubjoined(cp)) continue;
     // 向後看：跳過元音符號找緊鄰的下一輔音位
@@ -124,7 +140,23 @@ function patchPositions(line: string): Map<number, string> {
       const isPrevMain = q >= 0 && isTibConsonant(qCp) && !isTibSubjoined(qCp);
       if (!isPrevMain) continue;
     }
-    out.set(i, String.fromCodePoint(cp + 0x50));
+    // G-T2 組叢：首＝回溯主字符序列頭（prev+1）；尾＝自 j 向後吞併連續
+    // (subjoined|元音) 段。叢內除叢首基字外的主碼位輔音一律轉 subjoined
+    // 字形（與逐碼位補丁結果一致）。
+    let end = j + 1;
+    while (end < chars.length) {
+      const e = chars[end].codePointAt(0) ?? 0;
+      if (isTibSubjoined(e) || isTibVowelSign(e)) { end++; continue; }
+      break;
+    }
+    const text = chars.slice(prev + 1, end).map((ch, k) => {
+      const c = ch.codePointAt(0) ?? 0;
+      if (k > 0 && isTibConsonant(c) && !isTibSubjoined(c)) {
+        return String.fromCodePoint(c + 0x50);
+      }
+      return ch;
+    }).join("");
+    out.set(prev + 1, { end, text });
   }
   return out;
 }
@@ -154,10 +186,10 @@ function buildDecorations(view: EditorView): DecorationSet {
     const chars = Array.from(line.text);
     const cpToUnit: number[] = [];
     for (const ch of chars) { cpToUnit.push(unitOffset); unitOffset += ch.length; }
-    for (const [idx, glyph] of patches) {
+    for (const [idx, patch] of patches) {
       const from = line.from + cpToUnit[idx];
-      const to = from + chars[idx].length;
-      builder.push(Decoration.replace({ widget: new SubjoinGlyphWidget(glyph) }).range(from, to));
+      const to = from + (cpToUnit[patch.end] ?? unitOffset) - cpToUnit[idx];
+      builder.push(Decoration.replace({ widget: new SubjoinGlyphWidget(patch.text) }).range(from, to));
     }
   }
   return Decoration.set(builder, true);

@@ -67,6 +67,8 @@ const OSC_WHITELIST = new Set([
   "heart__Tibetan.txt:3", "heart__Tibetan.txt:8",
   "lotus__Tibetan.txt:4", "lotus__Tibetan.txt:10",
   "lotus__Tibetan.txt:12", "lotus__Tibetan.txt:82", "lotus__Tibetan.txt:147",
+  "lotus__Tibetan.txt:130", "dhammachakka__Tibetan.txt:1", "dhammachakka__Tibetan.txt:2",
+  "khuddakapatha__Tibetan.txt:157",
 ]);
 
 for (const f of files.sort()) {

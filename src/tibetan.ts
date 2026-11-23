@@ -261,6 +261,9 @@ interface Parsed {
   root: string | null;
   /** 下加字（1~2 個）：與 native 方向 subN ≤ 2 對稱 */
   subs: string[];
+  /** `+` 顯式下疊標註：用戶明示的堆疊結構，字形一律 subjoined（不受
+   *  subs[0] 主碼位規則影響——顯式標註優先於拼式規範化） */
+  subForced: boolean;
   vowel: string | null;
   /** 第二元音（疊元音）：梵咒音節會同時帶兩個元音符號，如 hūṃ ཧཱུྂ = ha + AA + U + bindu、
    *  hrīḥ = ha + ra + II + visarga。舊版只存一個元音，導致 U 被靜默丟棄（真實佛經丟字）。 */
@@ -373,26 +376,57 @@ function parseWylieSyllable(syl: string): Parsed | null {
     return null;
   }
 
-  // 固有 a 消歧（梵咒堆疊 padme / karko 型）：
+  // 固有 a 消歧（梵咒堆疊 padme / karko / padma 型）：
   // 當基字帶 ≥2 個下加字、且元音落在最末時，Wylie 會把基字的固有 a 寫在基字之後、
   // 下加字之前（པདྨེ → padme、ཀརྐོ → karko）。此處須先跳過該 a 再取下加字，
   // 否則 a 之後的輔音被誤當後加字，整段解析失敗（romanToNative 原樣吐回拉丁串）。
-  // 判據：a 之後恰好還有 ≥2 個輔音記號，且整段以元音符號收尾。
+  // 判據：a 之後恰好還有 ≥2 個輔音記號，且整段以元音符號收尾——
+  // G-T2 對稱擴充：無元音收尾（純堆疊 padma/karma/kalpa/karka）也放行——
+  // 出向 G-T2 對 firstStackIsBase 堆疊寫 padma 型拼式，入向須能吃回（舊判據
+  // 只認元音收尾，padma 解析失敗整段透傳；pdma 錯誤拼式反而能解析）。
+  // 單下加 bla/sga 型（a 屬堆疊整體、寫在末尾）不受影響——n>=2 條件排除了
+  // 「a 只有一個後隨輔音」的真下加音節。
   const ma0 = matchToken(syl, i);
   if (ma0 && ma0.tok === "a") {
     let j = i + 1;
     let n = 0;
+    const rest: string[] = [];
     for (;;) {
       // `+` 顯式下疊標註（p+ra 體例）穿透：不是輔音也不是元音，跳過不中斷統計
       if (syl[j] === "+") { j += 1; continue; }
       const t = matchToken(syl, j);
       if (!t || t.isVowel || t.tok === "a") break;
+      rest.push(t.tok);
       n++;
       j += t.tok.length;
       if (n >= 2) break;
     }
     const tail = matchToken(syl, j);
-    if (n >= 2 && tail && tail.isVowel) i += 1;
+    const tailIsVowelEnd = tail && tail.isVowel && j + tail.tok.length === syl.length;
+    // G-T2 對稱：a-chung 屬格收尾（padma'i/karma'i 型）也放行——a 後為
+    // 「' + 元音」且到串尾，即 a-chung 屬格結構（-'i/-'u/-'o/-'e）。
+    let tailIsAchungVowelEnd = false;
+    if (tail && tail.tok === "'") {
+      const v = matchToken(syl, j + 1);
+      tailIsAchungVowelEnd = !!v && v.isVowel && j + 1 + v.tok.length === syl.length;
+    }
+    // 拼式同構消歧（j 到串尾＝無元音收尾，padma / skabs 型）：a 之後的 2 個
+    // 輔音既可讀作「下加堆疊」（པདྨ padma、ཀརྨ karma——梵源詞規範拼式）
+    // 也可讀作「後加字 + 尾固有 a」（སྐབས skabs、སངས sangs——藏文詞規範拼式）。
+    // 區分判據＝藏文規範音節結構：第二後加字只有 s——「b s / g s / m s / d s」
+    // 是唯一合法雙後加收尾（skabs/sangs/rnams/thams 全屬此類），其餘組合
+    // （d m / r m / l p——第二個不是 s）雙後加不合法，只能是下加堆疊。
+    const achungTail = tailIsVowelEnd || tailIsAchungVowelEnd;
+    const secondIsS = rest.length === 2 && rest[1] === "s";
+    // root 可作前加字（g/d/b/m/'）且 rest[0] 可作根輔音：a 留作音節核、
+    // rest 走「前加重構 + 根 + 後加」讀法——basd＝བསད（prefix-b + sa + d，
+    // 語料三主碼位 0F56 0F66 0F51）、gand＝ga+na+da 連寫（0F42 0F53 0F51）。
+    // padma（p 非前加字）不受影響，仍跳 a 進堆疊。
+    const rootIsPrefixable = PREFIX.has(root ?? "");
+    const rest0IsRootable = rest.length > 0 &&
+      (WYLIE_TO_CP[rest[0]] !== undefined && !PREFIX.has(rest[0]));
+    if (n >= 2 && (achungTail || (!secondIsS && j === syl.length)) &&
+        !(rootIsPrefixable && rest0IsRootable && !achungTail)) i += 1;
   }
   // 下加字：1~2 個。
   // 舊版只取 1 個，與 native 方向（subN ≤ 2）不對稱，導致真實佛經 / 梵咒堆疊的
@@ -400,6 +434,7 @@ function parseWylieSyllable(syl: string): Parsed | null {
   //   ཀརྐ་ཊ krka Ta、ཀརྨ krma、ཀལྤ klpa、ཁྱིམ་ཕྱྭ phywa、ཀསྨིར ksmir
   // 這些都是 botok 31,060 條真實藏文詞表中的詞。
   const subs: string[] = [];
+  let subForced = false; // `+` 顯式標註曾出現（字形全 subjoined）
   let forceSub = false; // EWTS `+` 顯式下疊標註：p+ra 的 r 強制為下加字（並列連寫消歧）
 // `+` 顯式標註時下加上限放寬至 3（與 native 方向 krmsu 型 3 下加堆疊語料對稱；
 // 無 `+` 時維持 2——規範藏文與 botok 詞表語料上限）。
@@ -409,6 +444,7 @@ while (subs.length < subMax) {
     // 用於梵咒連寫的「並列 vs 堆疊」消歧：用戶/歧義面板以 `+` 自由指定堆疊結構。
     if (syl[i] === "+") {
       forceSub = true;
+      subForced = true;
       i += 1;
       continue;
     }
@@ -547,10 +583,116 @@ while (subs.length < subMax) {
         i = j + 1;
       }
     }
+    // G-T2 對稱：無顯式元音的純堆疊（padma/karma/kalpa/karka 型——root='pa'
+    // 已含固有 a，殘留「後加位輔音 + 尾 a」）：已收進後加字者與殘留輔音一併
+    // 改判下加字（d+m 全下加＝པདྨ 堆疊）。舊判據要求 vowel!==null，規範拼式
+    // padma 解析失敗整段透傳；錯誤拼式 pdma 反而能解析（往返不一致實錘）。
+    // 尾 a 是出向 G-T2 規則寫出的基字固有 a 連寫尾巴，解析吞掉、不寫碼位
+    // （與 chenAfterSuffix 同理）。
+    else if (vowel === null && vowel2 === null && !anus && !visar && subs.length === 0) {
+      const extra: string[] = [];
+      let j = i;
+      // root 後連寫固有 a（376 區消歧未跳、落到此處的 padma/karma 型）：
+      // 跳過該 a 繼續收其後的堆疊輔音。skabs 型不走此處——其輔音已進
+      // suffixes（subs.length===0 條件排除了雙後加讀法）。
+      if (j < syl.length && syl[j] === "a") j += 1;
+      while (extra.length < 2) {
+        const t = matchToken(syl, j);
+        // a-chung（'）不作下加字、不收進 extra——留給屬格收尾判定
+        if (!t || t.isVowel || t.tok === "a" || t.tok === "'") break;
+        extra.push(t.tok);
+        j += t.tok.length;
+      }
+      // root='pa' 連寫讀法（padma/karma 整段形態）：殘留輔音已進 suffixes、
+      // i 停在連寫固有 a 上——主迴圈 break 於 a。此時 tailA 為屬格 ' 或 null，
+      // 收尾形態由 i 位置判定（見下方第三分支）。
+      const tailA = j < syl.length ? matchToken(syl, j) : null;
+      // 收尾形態：純堆疊尾 a（padma）、a-chung 屬格收尾（padma'u 型），
+      // 或「尾 a + a-chung 屬格」雙寫（padma'i——root a 連寫＋堆疊尾 a＋屬格 'i）。
+      // 屬格尾「'+元音」不吞，留在解析流由主迴圈正常收（' 進 suffixes、元音進 vowel）。
+      let tailOk = false;
+      let tailEnd = -1;
+      let keepAchung = false;
+      let achungVowel: string | null = null;
+      if (extra.length === 0 && j > i && syl[i] === "a") {
+        // root='pa' 連寫固有 a 讀法：i 停在 a（d m 等已進 suffixes）、其後為
+        // 堆疊尾 a（padma，j===len 時尾型即此）、或「尾 a + ' + 元音」（padma'i）。
+        if (j >= syl.length) {
+          tailOk = true; tailEnd = i + 1;
+        } else {
+          const ta = matchToken(syl, j);
+          if (ta && ta.tok === "a") {
+            if (j + 1 === syl.length) { tailOk = true; tailEnd = j + 1; }
+            else {
+              const ap = matchToken(syl, j + 1);
+              if (ap && ap.tok === "'") {
+                const v = matchToken(syl, j + 2);
+                if (v && v.isVowel && j + 2 + v.tok.length === syl.length) {
+                  tailOk = true; tailEnd = j + 2 + v.tok.length; keepAchung = true; achungVowel = v.tok;
+                }
+              }
+            }
+          }
+          else if (ta && ta.tok === "'") {
+            const v = matchToken(syl, j + 1);
+            if (v && v.isVowel && j + 1 + v.tok.length === syl.length) {
+              tailOk = true; tailEnd = j + 1 + v.tok.length; keepAchung = true; achungVowel = v.tok;
+            }
+          }
+        }
+        if (tailOk) {
+          subs.push(...suffixes);
+          suffixes.length = 0;
+          if (keepAchung && achungVowel) {
+            suffixes.push("'");
+            vowelSuf = achungVowel;
+          }
+          i = tailEnd;
+          if (i < syl.length) return null;
+        }
+      } else if (tailA && tailA.tok === "a") {
+        if (j + 1 === syl.length) { tailOk = true; tailEnd = j + 1; }
+        else {
+          const ap = matchToken(syl, j + 1);
+          if (ap && ap.tok === "'") {
+            const v = matchToken(syl, j + 2);
+            if (v && v.isVowel && j + 2 + v.tok.length === syl.length) {
+              tailOk = true; tailEnd = j + 2 + v.tok.length; keepAchung = true; achungVowel = v.tok;
+            }
+          }
+        }
+      }
+      else if (tailA && tailA.tok === "'") {
+        const v = matchToken(syl, j + 1);
+        if (v && v.isVowel && j + 1 + v.tok.length === syl.length) {
+          tailOk = true; tailEnd = j + 1 + v.tok.length; keepAchung = true; achungVowel = v.tok;
+        }
+      }
+      // 判據收窄：僅「root token 自帶連寫固有 a（root='pa' 型）」的純堆疊才改判
+      // （padma/karma——root a 已寫，殘留輔音只能是下加）。root 不含 a 的音節
+      // （sngags/zhags/rnams——尾 a 是音節核固有 a 規範寫法）不觸發，g/s/m 維持後加。
+      // 收窄二：suffixes+extra **全部**都是合法後加字時不改判——gand（གནད
+      // ga+後加 n+後加 d）、hammA（ha+後加 m+ma）、sngags 型的後加讀法是
+      // 語料字形，堆疊改判會把後加字寫成下加（字形漂移）。僅當殘留輔音中
+      // 存在**非後加字**（padma 的 d——後加讀法非法，只能是下加）才改判。
+      const nonSuffixInResidue = [...suffixes, ...extra].some((t) => !SUFFIX.has(t));
+      if (tailOk && nonSuffixInResidue &&
+          suffixes.length + extra.length >= 2 && suffixes.length + extra.length <= 2) {
+        subs.push(...suffixes, ...extra);
+        suffixes.length = 0;
+        if (keepAchung && achungVowel) {
+          // 屬格尾「'+元音」就地收結構：a-chung 進 suffixes、元音存 vowelSuf
+          // （最末後加字自身的元音，寫在全部後加字之後＝padma'i 的 i）。
+          suffixes.push("'");
+          vowelSuf = achungVowel;
+        }
+        i = tailEnd;
+      }
+    }
     if (i < syl.length) return null; // 殘留未解析 → 非合法 Wylie 音節
   }
   return {
-    prefix, super: sup, root, subs, vowel, vowel2,
+    prefix, super: sup, root, subs, subForced, vowel, vowel2,
     anus, visar, anusAfterSuffix, suffixes, vowelInit, vowelSuf, vowelBeforeSubs,
     chenAfterSuffix, halanta, om, tsaphru, fixedR,
   };
@@ -639,7 +781,31 @@ function buildTibetan(p: Parsed): string {
       continue;
     }
     const base = WYLIE_TO_CP[sub];
+    // 堆疊中段（後面還有下加）的 r/l/s 寫**主碼位**（ཀརྨ＝0F40 0F62 0FA8、
+    // སརྦ＝0F66 0F62 0FA6、རཏྣ＝0F62 0F9F 0FA3 規範字形——上加字母組
+    // r/l/s 位於堆疊中間時規範用主碼位形）；subjoined 碼位（0FB2/0FB3）
+    // 用於堆疊最末位（badzra 末位 r＝0FB2）。中段用 subjoined 會使 N2R
+    // 走非規範讀法（krma/srba 型拼式），破壞兩 a 出向恆等。其餘輔音
+    // （hammA 語料 m＝sub 形）維持 subjoined——語料字形原樣恆等。
+    const hasLaterSub = p.subs.indexOf(sub, p.subs.indexOf(sub) + 1) >= 0;
+    const isLastSub = p.subs[p.subs.length - 1] === sub && p.subs.filter(x => x === sub).length === 1;
+    // 中段（非最末位）字形依語料主流定讞（tibetan-sanskrit-pairs 49,834 條
+    // 同音節三層堆疊統計）：la/ra/ba/da/kha/pha/a/sa 中段用**主碼位**（majority），
+    // dza/ka/pa/ma/dha/wa 中段用 subjoined（sub majority）——與真實佛經
+    // 語料字形逐碼位一致；單一下加（最末位）一律 subjoined。
+    // 中段（非最末位）字形依語料主流定讞：梵咒連寫語料實證——
+    // mangga＝0F58 0F44 0F92（nga 中段主碼位）、badzra＝0F56 0F5B 0FB2
+    // （dza 中段主碼位）、ཀརྨ＝0F40 0F62 0FA8（ra 中段主碼位）、
+    // སརྦ＝0F66 0F62 0FA6；規範藏文 རྒྱལ 型 ya 中段用 subjoined。
+    // 語料字形實證定讞：三層堆疊 subs[0]（第一下加）用主碼位、其餘下加
+    // 用 subjoined——badzra 0F5B（dz main）+0FB2、indra 0F53（n main）+
+    // 0FA1+0FB2、bazla 0F5F（za main）+0FB3、manta 0F53+0F9F、maNDa
+    // 0F4E+0F9C、padma 0F51+0FA8、karma/sarba/kalpa/karka 同構。
+    // 例外：ratna 語料 ta sub（0F9F）——ta 不適用，維持例外清單。
+    const isFirstSub = p.subs[0] === sub && !isLastSub;
+    const midSuper = isFirstSub && !SUB0_SUBSET.has(sub) && !p.subForced;
     const subCp =
+      midSuper ? base :
       sub === "y" ? 0x0fb1 :
       sub === "r" ? 0x0fb2 :
       sub === "l" ? 0x0fb3 :
@@ -687,6 +853,17 @@ const normalizeSeparator = (sep: string): string => {
   // 空格對顯式 tsheg 是冗餘（"k-i ་la" 往返基線），shad 保留不吞。
   return sep.replace(/[ \t]+/g, "");
 };
+
+/**
+ * 三層堆疊「中段」用主碼位的輔音集合（語料字形實證定讞）：
+ * la/ra/ba/da/kha/pha/a/sa（tibetan-sanskrit-pairs 同音節三層堆疊統計
+ * 主碼位為主流）＋nga/dza（梵咒連寫 mangga=0F44、badzra=0F5B 主碼位實證）。
+ * 不收 dza 以外的 ka/pa/ma/dha/wa（ka 2082:400、pa 1180:142、ma 472:23
+ * subjoined 為主流；hammA 語料 ma 中段＝subjoined 0FA8 實證）。
+ */
+const MID_MAIN_SUBS = new Set(["l", "r", "b", "d", "k", "kh", "ph", "a", "s", "sh", "g", "ng", "dz", "dh", "T", "D"]);
+/** subs[0] 例外：語料第一下加仍用 subjoined 的輔音（ratna ta＝0F9F 實證） */
+const SUB0_SUBSET = new Set(["t", "y", "w", "ny", "sh"]);
 
 /** Wylie → 藏文 Unicode */
 export function wylieToTibetan(input: string): string {
@@ -1119,6 +1296,12 @@ function unicodeSyllableToWylie(
           const isSuperPos = SUPER_CP.has(cur.cp);
           if (!isSuperPos) firstStackIsBase = true;
           else if (nextIsSub) {
+            // r/l/s 主碼位後接 sub 下加（ཀརྨ f62+fA8 型：上加 r 後接的
+            // 不是基字主碼位而是下加）＝梵咒「主碼位堆疊首」寫法，同 པདྨ
+            // f51 主碼位首堆疊——固有 a 寫兩個（karma 規範拼式）。
+            firstStackIsBase = true;
+          }
+          if (false) {
             // SUPER 主碼位（r/l/s）被當**下加**（bartsi：基 b + 下加 r + 下加 ts）
             // ——藏文規範無「下加 r/l/s 再疊下加」組合，此讀法非規範，降分。
             firstSubIsBaseForm = true;
@@ -1172,7 +1355,7 @@ function unicodeSyllableToWylie(
       //      པདྨེ = pa + 下加 d + 下加 m + 詞尾元音 e → padme（六字真言）
       //    只有 1 個下加字者元音符號直接取代固有 a，不可補寫，否則讀錯真實佛經：
       //      བློ blo → blo（非 blao）、སྐྱི kyi → kyi（非 kyai）、མཚོ mtsho → mtsho
-      let finalA = false; // 無顯式元音時，固有 a 寫在「下加字之後、後加字之前」
+      let finalA = false; // 無顯式元音時，固有 a 寫在下加字之後（bla/sga 型）
       // a-chung（འ U+0F60）作後加字時，其前音節固有 a 須寫出——
       // 標準 Wylie：པའི→pa'i、བའམ→ba'am、སོའི→so'i（-'i/-'u/-'o/-'e 屬格等
       // 高頻結構）。缺此規則引擎輸出 p'i（且回轉產生錯誤碼位 པྰི 0F71），
@@ -1182,10 +1365,13 @@ function unicodeSyllableToWylie(
       if (rootCp !== 0x0f68) {
         if (vowels.length === 0) {
           finalA = true;
-        } else if (subN >= 2 && trailingVowel && suffixItems.length === 0 && !useSuper) {
-          // 固有 a 補寫（padme 型）僅限無上加字場合——上加 s＋下加組合
+        } else if (subN >= 2 && trailingVowel &&
+                   (suffixItems.length === 0 || achungSuffix) && !useSuper) {
+          // 固有 a 補寫（padme/padma'i 型）僅限無上加字場合——上加 s＋下加組合
           // （སྤྲོ spro、སྤྱི spyi）的固有 a 被元音取代，補寫成 sapro/sapyi 是錯的；
-          // padme（པདྨེ）梵咒堆疊無上加字，不受影響。
+          // padme（པདྨེ）梵咒堆疊無上加字，不受影響。G-T2 對稱擴充：a-chung 屬格
+          // 後綴（པདྨའི padma'i、ཀརྨའི karma'i）同構補寫——基音節無顯式元音
+          // （元音落在 a-chung 之後＝vSuf），root a 緊跟基字、堆疊尾 a 照寫。
           w = w.slice(0, rootEnd) + "a" + w.slice(rootEnd);
         }
       }
@@ -1209,7 +1395,25 @@ function unicodeSyllableToWylie(
       const vSuf = vowelList.filter((v) => v.after > i).map((v) => v.w).join("");
       w += vAfterRoot;
       w += subStr;
-      if (finalA || achungA) w += "a";
+      // G-T2（往返一致）：無顯式元音時固有 a 的寫出位置——
+      //  · 主字符下加寫法（firstStackIsBase，梵咒文本 སྒ/བྲ 型之外的
+      //    པདྨ/ཀརྨ/ཀལྤ/ཀརྐ 寫法：首堆疊元素用主碼位）→ 規範拼式寫兩個 a：
+      //    基字固有 a 連寫（padma 的第一個 a，緊跟基字）＋最末下加字的固有 a
+      //    收尾（padma 的第二個 a，與 shAkya/berga 的「堆疊末尾固有 a」同源，
+      //    入向 526 段規則對稱）。舊版只寫一個 a 在下加之後（pdma 型）與
+      //    規範拼式不一致：pdma'i 回轉 པྡྨ（錯誤堆疊）、規範拼式 padma
+      //    解析失敗透傳。
+      //  · 真下加堆疊（首堆疊元素是 subjoined 形，sga/bra/bla）→ a 維持
+      //    寫在下加字之後（現行行為，bla/sga 規範）。
+            // firstSubIsBaseForm 不觸發兩 a：真下加堆疊（nta/bla 型）固有 a 規範
+      // 寫在末尾，舊版一 a 行為正確；兩 a 僅對主碼位首堆疊
+      // （firstStackIsBase，梵咒 པདྨ/ཀརྨ 寫法）。
+      if (finalA && firstStackIsBase) {
+        w = w.slice(0, rootEnd) + "a" + w.slice(rootEnd);
+        w += "a";
+      } else if (finalA || achungA) {
+        w += "a";
+      }
       w += vAfterSub;
       for (let si = 0; si < suffixItems.length; si++) {
         const sf = suffixItems[si];
@@ -1241,14 +1445,20 @@ function unicodeSyllableToWylie(
       cands.push({
         text: w,
         ok: selfCheckKey(w, syl) === target, // r59 批次乙：memo（原逐候選重算 wylieToTibetan+syllableKey）
-        // firstStackIsBase（主字符下加寫法，梵咒文本特有）是**非規範**讀法，
-        // 僅在規範堆疊讀法不存在時才應勝出——降 5 分，讓 སྤྱི 的規範 spyi
-        // （上加 s + 基 p + 下加 y）壓過同分數的 sapyi（基 s + 主字符堆疊 py）。
+        // firstStackIsBase（主字符下加寫法）非規範讀法降 5 分（spyi>sapyi）；
+        // 但出向兩 a 讀法（finalA && firstStackIsBase 寫雙 a：sarba/karma 型）
+        // 是恆等閉環唯一出向，且拼式含連寫 a，不降分。
         score: ((hasSub || rootWasSub) ? 4 : 0) - (usePrefix ? 1 : 0) - (useSuper ? 1 : 0) -
-          (firstStackIsBase ? 5 : 0) - (firstSubIsBaseForm ? 5 : 0) -
+          (firstStackIsBase ? (vowels.length === 0 && w.slice(rootEnd, rootEnd + 1) === "a" ? 0 : 5) : 0) -
+          (firstSubIsBaseForm ? 5 : 0) -
           // 3+ 下加堆疊（`+` 拼式）＝梵咒連寫非規範讀法，僅無 2 下加內
           // 讀法時勝出——規範藏文語料（subN≤2）行為完全不變。
-          (subN >= 3 ? 100 : 0),
+          (subN >= 3 ? 100 : 0) -
+          // G-T2 規範拼式偏好：無顯式元音的主字符下加堆疊，固有 a 應連寫在
+          // 基字內（padma/karma/kalpa/karka＝THL/EWTS 規範）；a 寫在下加之後
+          // 的 pdma 型拼式是非規範變體，降 1 分讓規範拼式同分勝出。
+          (firstStackIsBase && vowels.length === 0 && !achungSuffix &&
+           w.slice(rootEnd, rootEnd + 1) !== "a" ? 1 : 0),
       });
       if (collect) collect.push(cands[cands.length - 1]);
     }
