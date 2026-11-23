@@ -1957,6 +1957,9 @@ const tibetanWylie: TransliterationScheme = {
   // 或含換行→原樣透傳），punctMap 僅聲明單空格映射值（引擎 opt-in 判鍵存在）。
   // '\n'→原樣：換行是段落結構，行尾不插 tsheg。
   punctMap: { " ": "་", "\n": "\n" },
+  // G-T1c：出向原生真空格（U+0020）輸出 <sp> 顯式 token——真空格裸輸出會在
+  // 入向被 G-T1 恰 1 空格規則誤轉 tsheg（往返有損實錘）。
+  nativeSpaceToken: "<sp>",
   // 藏文疊字為隱式模型（語序推斷＋subjoined 專碼位 U+0F90–U+0FBC）——
   // 顯式聲明供引擎/未來方案（explicit-subjoiner：Zanabazar 11A47）對照，行為不變。
   stackModel: { mode: "implicit" },

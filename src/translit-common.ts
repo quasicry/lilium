@@ -82,6 +82,13 @@ export interface TransliterationScheme {
    */
   punctMap?: Record<string, string>;
   /**
+   * 原生→羅馬方向「原生真空格」顯式 token（G-T1c）：transliterateLongText
+   * 對方案聲明本欄位時，原生文字中的 U+0020 空格輸出為該 token（而非裸
+   * 空格）——裸空格在入向會被恰 1 空格→分隔符規則（G-T1）誤轉（往返有損）。
+   * 未聲明方案的空格維持透傳。
+   */
+  nativeSpaceToken?: string;
+  /**
    * 羅馬方向「原子 token」正則（r65）：transliterateLongText 的詞界掃描
    * 對命中本正則的整段**不分詞、整體送轉換器**，且 gate 直接放行。
    * 背景：檢字表列出的標註 token（藏文 `<.>`／`\uXXXX`、婆羅米 `;1`／
