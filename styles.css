@@ -2159,6 +2159,10 @@ body.li-editor-vertical-active .li-native-page .MJX-TEX {
    底層文本不動；widget 是獨立 span，字體按單碼位 shaping，無需特殊樣式，
    僅保基線對齊（vertical-align 避免行內高度抖動） ── */
 .cm-line .li-tib-subjoin-glyph { vertical-align: baseline; }
+/* widget span 字形字體：與 li-tib-run 同源——CM 主字體家族不含藏文
+   subjoined 變體字形（widget 計算字體棧 fallback 實錘），不指定時
+   編輯態堆疊叢字形與閱讀態不一致。 */
+.li-tib-subjoin-glyph { font-family: "Noto Serif Tibetan", serif; }
 
 /* ── 顯隱／樣式工具類（審核 no-static-styles-assignment 對應：以 class 切換取代 el.style 賦值，功能等價） ── */
 .li-u-hidden { display: none !important; }
