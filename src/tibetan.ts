@@ -261,7 +261,7 @@ interface Parsed {
   root: string | null;
   /** 下加字（1~2 個）：與 native 方向 subN ≤ 2 對稱 */
   subs: string[];
-  /** `+` 顯式下疊標註：用戶明示的堆疊結構，字形一律 subjoined（不受
+  /** `+` 顯式下疊標註：明示指定的堆疊結構，字形一律 subjoined（不受
    *  subs[0] 主碼位規則影響——顯式標註優先於拼式規範化） */
   subForced: boolean;
   vowel: string | null;
@@ -838,13 +838,13 @@ function buildTibetan(p: Parsed): string {
 /**
  * 音節分隔符正規化：Wylie 的空白 ↔ 藏文 tsheg（U+0F0B）。
  * 這是往返一致的關鍵：藏文以 tsheg 分界音節，Wylie 以空白分界，二者一一對應。
- * G-T1 規則（用戶裁定）：**恰 1 個空格**→tsheg；≥2 空格或含換行的空白段→
+ * G-T1 規則：**恰 1 個空格**→tsheg；≥2 空格或含換行的空白段→
  * 原樣透傳（換行是段落結構，非音節分隔；多空格是排版間距，非音節邊界）。
  */
 const TIB_SEP_RE = /([་།༎\s]+)/;
 const isSeparatorRun = (s: string): boolean => /^[་།༎\s]+$/.test(s);
 const normalizeSeparator = (sep: string): string => {
-  // G-T1 規則（用戶裁定）：純空白段——恰 1 個空格→tsheg；≥2 空格→原樣透傳
+  // G-T1 規則：純空白段——恰 1 個空格→tsheg；≥2 空格→原樣透傳
   // （多空格是排版間距，非音節邊界）；含換行→原樣透傳（換行是段落結構，
   // 行尾不插 tsheg）。
   if (/^[ \t]+$/.test(sep)) return sep === " " ? cp(TSHEG) : sep;

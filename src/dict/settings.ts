@@ -180,7 +180,7 @@ export function renderDictSections(
     );
 
   // 「辭典塊可折疊」預設開且設定頁撤除開關——
-  // collapsibleBlocks 欄位保留（向後相容舊 data.json 與運行期邏輯；用戶明示「功能保留」），
+  // collapsibleBlocks 欄位保留（向後相容舊 data.json 與運行期邏輯；功能保留），
   // UI 不再展示（與 buddhistMode 同式）。
 
   // 佛學模式開關已從設定頁撤除——模式默認常開（plugin.ts DEFAULT_SETTINGS
@@ -230,7 +230,7 @@ export function renderDictSections(
     );
 
   // 「記錄查詢歷史」預設開且設定頁撤除開關——
-  // rememberRecent 欄位保留（向後相容舊 data.json 與運行期邏輯；用戶明示「功能保留」），
+  // rememberRecent 欄位保留（向後相容舊 data.json 與運行期邏輯；功能保留），
   // loadSettings 遷移舊 false→true 防死角（與 buddhistMode/collapsibleBlocks 同式）。
 
   new Setting(containerEl)

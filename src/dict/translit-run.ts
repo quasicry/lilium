@@ -500,7 +500,7 @@ export function transliterateLongText(
     )) {
       flush();
       // G-T1：空白連續段整體判定（方案 punctMap 帶空格鍵時 opt-in，現僅藏文）——
-      // 用戶裁定規則：恰 1 個空格→tsheg；≥2 空格或含換行的空白段→原樣透傳
+      // 規則：恰 1 個空格→tsheg；≥2 空格或含換行的空白段→原樣透傳
       // （換行前不插 tsheg）。單 \t 等其他空白不入段判定，維持透傳。
       if (
         native &&
