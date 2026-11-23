@@ -499,6 +499,24 @@ export function transliterateLongText(
       native && scheme.romanKeepChars && scheme.romanKeepChars.includes(ch)
     )) {
       flush();
+      // G-T1：空白連續段整體判定（方案 punctMap 帶空格鍵時 opt-in，現僅藏文）——
+      // 用戶裁定規則：恰 1 個空格→tsheg；≥2 空格或含換行的空白段→原樣透傳
+      // （換行前不插 tsheg）。單 \t 等其他空白不入段判定，維持透傳。
+      if (
+        native &&
+        scheme.punctMap &&
+        scheme.punctMap[" "] !== undefined &&
+        (ch === " " || ch === "\n")
+      ) {
+        let j = i;
+        while (j < text.length && (text[j] === " " || text[j] === "\n")) j += 1;
+        const run = text.slice(i, j);
+        if (run === " ") out += scheme.punctMap[" "];
+        else out += run;
+        prevLetterTail = /[^\s.,;:!?]/.test(out.slice(-1));
+        i = j;
+        continue;
+      }
       // 標點映射：羅馬→原生方向時，方案可提供 punctMap
       // （如維吾爾 , → ،、? → ？）把被詞界切開的標點一併轉換——
       // 否則標點原樣透傳，UEY 輸出混入半形逗號/問號（真機實錘）。

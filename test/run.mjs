@@ -2285,3 +2285,33 @@ test("kharoshthi G-K2/G-K3：組合字母附標跟讀＋ṭ́ 鍵＋探測補齊
   assert.equal(s.looksLikeRoman("kalpa½"), true, "½ 混排探測");
   assert.equal(s.looksLikeRoman("maḱa"), true, "ḱ 探測");
 });
+
+test("G-T1：藏文空格→tsheg 規則（恰 1 空格映射；≥2 空格/換行原樣）", () => {
+  const s = lib.getScheme("tibetan-wylie");
+  const cp = (n) => String.fromCodePoint(n);
+  const TSHEG = cp(0x0f0b);
+  // 長文本路徑：恰 1 空格→tsheg
+  assert.equal(lib.transliterateLongText("ka kha", s, true).text, "ཀ" + TSHEG + "ཁ", "1 空格→tsheg");
+  // 長文本路徑：≥2 空格→原樣透傳（不插 tsheg）
+  assert.equal(lib.transliterateLongText("ka  kha", s, true).text, "ཀ  ཁ", "2 空格原樣");
+  assert.equal(lib.transliterateLongText("ka   kha", s, true).text, "ཀ   ཁ", "3 空格原樣");
+  // 長文本路徑：換行→原樣透傳（行尾不插 tsheg）
+  assert.equal(lib.transliterateLongText("ka\nkha", s, true).text, "ཀ\nཁ", "換行原樣");
+  assert.equal(lib.transliterateLongText("ka \n kha", s, true).text, "ཀ \n ཁ", "空格+換行混合原樣");
+  // 整串路徑：同規則
+  assert.equal(s.romanToNative("ka kha"), "ཀ" + TSHEG + "ཁ", "整串 1 空格→tsheg");
+  assert.equal(s.romanToNative("ka  kha"), "ཀ  ཁ", "整串 2 空格原樣");
+  assert.equal(s.romanToNative("ka\nkha"), "ཀ\nཁ", "整串 換行原樣");
+  // 混排段：空格對顯式 tsheg/shad 冗餘，去空白保留分隔符（T-1 往返基線）
+  assert.equal(s.romanToNative("k-i ་la"), "ཀ" + cp(0x0f80) + TSHEG + "ལ", "空格+tsheg 段去空白");
+  assert.equal(s.romanToNative("ka ། kha"), "ཀ" + cp(0x0f0d) + "ཁ", "空格+shad 段");
+  // 往返閉環
+  assert.equal(s.nativeToRoman(s.romanToNative("bod yig")), "bod yig", "單空格往返");
+  assert.equal(s.nativeToRoman(s.romanToNative("ma tri\nyis ge")), "ma tri\nyis ge", "多行往返");
+});
+
+// ── 終局紅綠：檔尾區（彙總列印後註冊的測試與 spawnSync 門禁）失敗也須 exit 1 ──
+if (failures.length) {
+  for (const f of failures) console.error(`FAIL(tail): ${f.name}\n${f.e.stack ?? f.e.message}`);
+  process.exit(1);
+}

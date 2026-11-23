@@ -672,10 +672,21 @@ function buildTibetan(p: Parsed): string {
 /**
  * 音節分隔符正規化：Wylie 的空白 ↔ 藏文 tsheg（U+0F0B）。
  * 這是往返一致的關鍵：藏文以 tsheg 分界音節，Wylie 以空白分界，二者一一對應。
+ * G-T1 規則（用戶裁定）：**恰 1 個空格**→tsheg；≥2 空格或含換行的空白段→
+ * 原樣透傳（換行是段落結構，非音節分隔；多空格是排版間距，非音節邊界）。
  */
 const TIB_SEP_RE = /([་།༎\s]+)/;
 const isSeparatorRun = (s: string): boolean => /^[་།༎\s]+$/.test(s);
-const normalizeSeparator = (sep: string): string => cp(TSHEG) + (/\n/.test(sep) ? "\n" : "");
+const normalizeSeparator = (sep: string): string => {
+  // G-T1 規則（用戶裁定）：純空白段——恰 1 個空格→tsheg；≥2 空格→原樣透傳
+  // （多空格是排版間距，非音節邊界）；含換行→原樣透傳（換行是段落結構，
+  // 行尾不插 tsheg）。
+  if (/^[ \t]+$/.test(sep)) return sep === " " ? cp(TSHEG) : sep;
+  if (/^\s+$/.test(sep)) return sep;
+  // 混排段（顯式 tsheg/shad 與空白並存）：去空白、保留顯式分隔符——
+  // 空格對顯式 tsheg 是冗餘（"k-i ་la" 往返基線），shad 保留不吞。
+  return sep.replace(/[ \t]+/g, "");
+};
 
 /** Wylie → 藏文 Unicode */
 export function wylieToTibetan(input: string): string {
@@ -1701,11 +1712,10 @@ const tibetanWylie: TransliterationScheme = {
   looksLikeRoman: looksLikeWylie,
   convert: (input: string, _opts?: TransliterationOptions) => convertTibetanExt(input),
   charTable: tibetanCharTable,
-  // 空格→tsheg：長文本路徑按詞界切割逐詞轉換後以原空格 join，
-  // 會把 Wylie 詞間分隔丟成拉丁空格（wylieToTibetan 的分隔符→tsheg 語義
-  // 只在整串輸入時生效）。punctMap 覆寫詞界空格，長文本與單詞路徑一致。
-  // '\n'→'་\n'：行尾音節按藏文正字法帶 tsheg，換行保留段落結構。
-  punctMap: { " ": "་", "\n": "་\n" },
+  // 空格→tsheg：G-T1 規則由引擎空白連續段判定實作（恰 1 空格→tsheg；≥2 空格
+  // 或含換行→原樣透傳），punctMap 僅聲明單空格映射值（引擎 opt-in 判鍵存在）。
+  // '\n'→原樣：換行是段落結構，行尾不插 tsheg。
+  punctMap: { " ": "་", "\n": "\n" },
   // 藏文疊字為隱式模型（語序推斷＋subjoined 專碼位 U+0F90–U+0FBC）——
   // 顯式聲明供引擎/未來方案（explicit-subjoiner：Zanabazar 11A47）對照，行為不變。
   stackModel: { mode: "implicit" },
