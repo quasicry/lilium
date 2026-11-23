@@ -37,16 +37,6 @@ export function renderDictSections(
         }),
     );
 
-  new Setting(containerEl)
-    .setName(dict.T('dict.set.scanCache'))
-    .setDesc(dict.T('dict.set.scanCacheDesc'))
-    .addToggle((t) =>
-      t.setValue(dict.settings.scanCache).onChange(async (v) => {
-        dict.settings.scanCache = v;
-        if (!v) void dict.clearScanCache();
-        await dict.saveSettings();
-      }),
-    );
 
   new Setting(containerEl)
     .setName(dict.T('dict.set.scan'))
@@ -58,6 +48,16 @@ export function renderDictSections(
       }),
     );
 
+  new Setting(containerEl)
+    .setName(dict.T('dict.set.scanCache'))
+    .setDesc(dict.T('dict.set.scanCacheDesc'))
+    .addToggle((t) =>
+      t.setValue(dict.settings.scanCache).onChange(async (v) => {
+        dict.settings.scanCache = v;
+        if (!v) void dict.clearScanCache();
+        await dict.saveSettings();
+      }),
+    );
   // 冷啟動開關——詞典掃描是啟動期最重的工作
   new Setting(containerEl)
     .setName(dict.T('dict.set.autoScan'))
