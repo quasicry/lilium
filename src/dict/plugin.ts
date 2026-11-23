@@ -243,6 +243,9 @@ export class DictFeature {
   /** r59 ②：掃描中止旗標——settings 關閉掃描/插件卸載時置位，掃描迴圈每輪檢查。
    *  無 UI 按鈕；僅由生命週期事件驅動，新掃描啟動時先重置。 */
   private scanAbort = false;
+  // 卸載終態旗標：unload 後任何排程中的 idle/setTimeout 回調不得再啟動掃描
+  // （scanAbort 會被 guarded 開頭清除作為「新掃描啟動」語義，不能兼作終態）。
+  private disposed = false;
   private scanCacheMap: Map<string, { dict: LiDict; sig: string }> = new Map();
   /** dict id → 磁盤緩存檔路徑（刪除辭典時清理用） */
   private scanCacheFiles: Map<string, string> = new Map();
@@ -562,6 +565,7 @@ export class DictFeature {
   unload(): void {
     // r59 ②：卸載即置位掃描中止旗標——進行中的掃描迴圈下一輪退出，
     // 不再對已析構元件發 Notice / add dict。
+    this.disposed = true;
     this.scanAbort = true;
     // 快取沖刷為異步：卸載時不阻塞，但必須捕獲異常，避免 unhandled rejection
     // r54 排查修復：先 cancel 排程中的 debounce——卸載前 1.5s 內剛有髒標記時，
@@ -1065,6 +1069,7 @@ export class DictFeature {
 
   /** 掃描辭典並載入（同一時間只跑一次；重複呼叫合併到同一次掃描，idempotent） */
   async rescanAndLoadGuarded(notify = false): Promise<void> {
+    if (this.disposed) return; // 卸載後排程回調不得復活掃描（移動端後台競態實錘）
     if (this.scanInFlight) return this.scanInFlight;
     this.scanInFlight = (async () => {
       try {

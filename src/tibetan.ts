@@ -882,6 +882,15 @@ export function wylieToTibetan(input: string): string {
       if (!syl) return part;
       // EWTS 專用 token 回映射（與 tibetanToWylie 出向對稱）
       if (syl === "?") return cp(0x0f84);
+      // 「?」前綴剝離：出向對孤立元音段可能產生「?<v-*>…」連寫（halanta
+      // 與孤立標註同段出在 sep-run 內），入向先剝離段首連續「?」還原為 0F84
+      // 串，剩段重入 wylieToTibetan（剩段無 sep 干擾，與整段解析同語義）——
+      // 否則整段送 parseWylieSyllable 失敗透傳，往返丟還原（fuzz 實錘）。
+      if (syl.startsWith("?") && syl.length > 1) {
+        const n = syl.length - syl.replace(/^\?+/, "").length;
+        const rest = wylieToTibetan(syl.slice(n));
+        return cp(0x0f84).repeat(n) + rest;
+      }
       if (syl === "oM") return cp(0x0f00);
       if (syl === "^") return cp(0x0f39);
       // A1：oM 連寫切分——「oMoM / oM^」中的每個 oM 各自是 SYLLABLE OM 獨立

@@ -85,9 +85,12 @@ export function loadPaliSanskritMap(): Record<string, string> {
 
 // ---- 蘭札體（ranjana.lazy）----
 export function loadRanjanaMap(): Record<string, RanjanaEntry> {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports -- 延遲加載（啟動性能/打包切割），非 CJS 遺留——審計批次三。
-  const mod = require("./data/ranjana.lazy") as { loadRanjanaMap: () => Record<string, RanjanaEntry> };
-  return guarded("ranjana", () => mod.loadRanjanaMap(), {});
+  return guarded("ranjana", () => {
+    // require 在 guarded 內：模組被刪除時求值拋錯同樣受容錯層保護（robust 測試實錘穿透）。
+    // eslint-disable-next-line @typescript-eslint/no-require-imports -- 延遲加載（啟動性能/打包切割），非 CJS 遺留——審計批次三。
+    const mod = require("./data/ranjana.lazy") as { loadRanjanaMap: () => Record<string, RanjanaEntry> };
+    return mod.loadRanjanaMap();
+  }, {});
 }
 
 /**

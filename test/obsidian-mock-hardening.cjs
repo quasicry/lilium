@@ -120,7 +120,14 @@ function arrayBufferToBase64(buf) {
   return typeof btoa === "function" ? btoa(bin) : Buffer.from(bin, "binary").toString("base64");
 }
 
-function debounce(fn) { return (...args) => fn(...args); }
+function debounce(fn) {
+  // Debouncer 介面：obsidian 真 API 提供 cancel/run（插件 unload 依賴 cancel）
+  let timer = null;
+  const d = (...args) => { if (timer) clearTimeout(timer); timer = setTimeout(() => { timer = null; fn(...args); }, 0); return d; };
+  d.cancel = () => { if (timer) { clearTimeout(timer); timer = null; } };
+  d.run = (...args) => { d.cancel(); fn(...args); };
+  return d;
+}
 
 async function requestUrl(opts) {
   throw new Error("requestUrl 在 headless 测试中不可用（需联网下载字体）"); }

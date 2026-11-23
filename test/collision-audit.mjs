@@ -103,8 +103,14 @@ if (!cssFile) {
 } else if (!cssFile.text.includes(DICT_CSS_BANNER)) {
   fail("styles.css 缺少辭典面板區塊（C2 的樣式是否整段掉了？）");
 } else {
-  const dictCss = cssFile.text
-    .slice(cssFile.text.indexOf(DICT_CSS_BANNER))
+  // dict 區結束邊界：疊字行距適配段（L2052 起）為筆記正文區樣式
+  // （編輯器 .cm-line／閱讀器段落級，li- 前綴／屬性選擇器，不屬辭典面板），
+  // 不在「dict 樣式不得外溢」審計範圍——先切尾再剝註釋。
+  const BODY_CSS_BANNER = "── 疊字行距適配（正文版：編輯器 .cm-line";
+  const cssFromBanner = cssFile.text.slice(cssFile.text.indexOf(DICT_CSS_BANNER));
+  const bodyStart = cssFromBanner.indexOf(BODY_CSS_BANNER);
+  const dictCss = cssFromBanner
+    .slice(0, bodyStart === -1 ? undefined : bodyStart)
     .replace(/\/\*[\s\S]*?\*\//g, "");
   // 這幾個是「刻意裸奔」的：詞典視圖之外的元素（編輯器內建議、懸浮視窗），
   // 沒有 .li-root 祖先，且命名上不會與核心撞（核心沒有 li-inline-* / li-hover-*）。
