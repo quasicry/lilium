@@ -884,6 +884,14 @@ export function wylieToTibetan(input: string): string {
       .map((seg) => wylieToTibetan(seg))
       .join(" ");
   }
+  // <ts>（tsheg 顯式 token，G-T1d）：前置切分——段間精確輸出 0F0B tsheg
+  //（可黏連字母/標點之間，走段內回映射會被音節解析吞掉；與 <sp> 同模式）。
+  if (input.includes(TSHEG_TOKEN)) {
+    return input
+      .split(TSHEG_TOKEN)
+      .map((seg) => wylieToTibetan(seg))
+      .join(cp(TSHEG));
+  }
   const parts = input.split(TIB_SEP_RE);
   return parts
     .map((part) => {
@@ -994,12 +1002,17 @@ export function tibetanToWylie(input: string, pref: TibAmbigPref = "auto"): stri
     out.push(split0 ?? w);
     buf = "";
   };
-  for (const ch of input) {
+  const chars = Array.from(input);
+  for (let ci = 0; ci < chars.length; ci++) {
+    const ch = chars[ci];
     const c = ch.codePointAt(0) ?? 0;
-    // tsheg 是音節邊界：必須在此切段，否則相鄰音節會被誤併成一個音節而丟字
+    // tsheg 是音節邊界：必須在此切段，否則相鄰音節會被誤併成一個音節而丟字。
+    // G-T1d：後緊跟標點（PUNCT_CP_TO_TOKEN 碼位）時輸出 <ts> 顯式 token——
+    // 裸空格入向會被混排段規則吃掉（tsheg 永久丟失，語料 26,085 處實錘）。
     if (c === TSHEG) {
       flush();
-      out.push(" ");
+      const next = ci + 1 < chars.length ? chars[ci + 1].codePointAt(0) ?? 0 : 0;
+      out.push(PUNCT_CP_TO_TOKEN.has(next) ? TSHEG_TOKEN : " ");
       continue;
     }
     // 藏文原生真空格（U+0020）：出向輸出 <sp> 顯式 token——若輸出裸空格，
@@ -1059,6 +1072,11 @@ const NO_TSHEG = "<->";
  * 藏文語義：單空格在 Wylie 端是音節分隔（入向映射 tsheg），故「輸出真空格」
  * 必須顯式標註才能往返——防止真空格被誤轉為 tsheg（G-T1c）。 */
 const NATIVE_SPACE = "<sp>";
+/** tsheg 顯式 token（G-T1d）：出向 tsheg 後緊跟標點（PUNCT_CP_TO_TOKEN 碼位）
+ * 時輸出 "<ts>"——裸空格會在入向混排段被「恰 1 空格去空白」吃掉，tsheg
+ * 永久丟失（語料實錘 26,085 處正字場景）。後跟字母/元音的 tsheg 仍輸出
+ * 空格（Wylie 正字慣例不變）。 */
+const TSHEG_TOKEN = "<ts>";
 
 /**
  * 逐碼位貪吃切分：splitNoTsheg 的回溯在「最短自洽前綴的尾碼位是
@@ -1724,6 +1742,7 @@ const PUNCT_TOKENS = TIB_PUNCT.map(([, t]) => t).sort((a, b) => b.length - a.len
  * 最長優先排序由正則交替的先後序保證（sort by length desc）。token 皆 ≤ 12 字符。 */
 const TIB_ATOM_TOKENS: string[] = [
   ...PUNCT_TOKENS,
+  TSHEG_TOKEN, // G-T1d：tsheg 顯式 token（出向 tsheg+標點場景），面板免切詞
   // 標註鍵全家——缺收時 romanTokenRe 最長前綴掃描會先命中短鍵
   //（"<v--i>" 被切出尾段 "-i" 命中分解序元音鍵，標註被切碎轉成乱碼實錘）
   ...Object.keys(ISOLATED_VOWEL_TOKEN_TO_SEQ),
@@ -1763,7 +1782,18 @@ export function tibetanExtToWylie(input: string, pref: TibAmbigPref = "auto"): s
     }
     const tok = PUNCT_CP_TO_TOKEN.get(c);
     if (tok !== undefined) {
-      flush();
+      // G-T1d：buf 尾是 tsheg（0F0B）時，主函數 lookahead 被 buf 切段截斷，
+      // tsheg 會裸輸出空格、入向被混排段規則吃掉——此處先 flush（tsheg 在
+      // buf 內被 tibetanToWylie 輸出為空格）後補 <ts> 顯式 token。順序：
+      // flush 先輸出 "ka "（tsheg→空格），再追加 <ts> 會多一個空格——故
+      // 先把 tsheg 從 buf 摘除、單獨輸出 <ts>，再 flush 剩餘音節。
+      if (buf.endsWith(cp(TSHEG))) {
+        buf = buf.slice(0, -1);
+        flush();
+        out += TSHEG_TOKEN;
+      } else {
+        flush();
+      }
       out += tok;
       continue;
     }
