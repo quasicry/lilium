@@ -45,6 +45,8 @@ export interface LoadResult {
   /** P0-2：TEI 磁盤緩存還原時回傳的來源檔簽名（mtime:size），供調用方與現檔比對 */
   srcSig?: string;
   bytes?: Uint8Array;
+  /** P0-3：容器形態（tar/zip/gunzip 後容器）完整位元組——資產抽取通路須吃容器而非內層 XML */
+  containerBytes?: Uint8Array;
 }
 
 export interface AssetWriter {
@@ -271,13 +273,18 @@ export function loadLex0(data: Uint8Array, fileName: string): LoadResult {
   
       bytes = gunzipSync(bytes);
     }
+    // P0-3：容器形態（tar/zip）在抽 XML 前保存解壓態容器——資產抽取通路
+    // （plugin 抽 img/audio/css 成員）須吃完整容器而非內層 XML。
+    let containerBytes: Uint8Array | null = null;
     // tar 包裝——ustar 魔數在偏移 257，抽最大 .xml 成員
     if (bytes.length > 262 && String.fromCharCode(...bytes.subarray(257, 262)) === 'ustar') {
+      containerBytes = bytes;
       const inner = extractLargestXmlFromTar(bytes);
       if (inner) bytes = inner;
     }
     // zip 包裝（DILA 三典實際分發格式）——PK 魔數，抽最大 .xml 成員
-    if (bytes.length > 4 && bytes[0] === 0x50 && bytes[1] === 0x4b && (bytes[2] === 3 || bytes[2] === 5 || bytes[2] === 7)) {
+    if (!containerBytes && bytes.length > 4 && bytes[0] === 0x50 && bytes[1] === 0x4b && (bytes[2] === 3 || bytes[2] === 5 || bytes[2] === 7)) {
+      containerBytes = bytes;
       const inner = extractLargestXmlFromZip(bytes);
       if (inner) bytes = inner;
     }
@@ -287,7 +294,10 @@ export function loadLex0(data: Uint8Array, fileName: string): LoadResult {
       return { ok: false, error: 'No <entry> elements found — not a TEI Lex-0 dictionary?', name: fileName, format: 'tei-lex0' };
     }
     const dict = new Lex0Dict(reader, fileName);
-    return { ok: true, dict, name: dict.meta.name, format: 'tei-lex0', bytes }; // B4：回傳解壓態 bytes
+    // B4：回傳解壓態 bytes；P0-3：容器形態額外回傳完整容器（資產抽取通路）
+    return containerBytes
+      ? { ok: true, dict, name: dict.meta.name, format: 'tei-lex0', bytes, containerBytes }
+      : { ok: true, dict, name: dict.meta.name, format: 'tei-lex0', bytes };
   } catch (e) {
     return { ok: false, error: describeError(e), name: fileName, format: 'tei-lex0' };
   }

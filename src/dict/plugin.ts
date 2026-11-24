@@ -1234,7 +1234,10 @@ export class DictFeature {
            * extractTeiTarAssetMembers 免再 gunzip 一次（冷路徑雙重解壓消除）。 */
           if (this.settings.extractMddAssets) {
             try {
-              const src = result.bytes || data;
+              /* P0-3：容器形態（tar/zip）須抽容器成員——舊碼 `result.bytes || data`
+                 在 loadLex0 抽最大 XML 後 bytes＝內層 XML，extractTei*AssetMembers
+                 恆 0 成員（63dcbc5 B4 引入回歸，真實丁福保 zip 155 資產→0 實錘）。 */
+              const src = result.containerBytes || result.bytes || data;
               const isZip = src.length > 4 && src[0] === 0x50 && src[1] === 0x4b;
               const assetMembers = isZip ? extractTeiZipAssetMembers(src) : extractTeiTarAssetMembers(src);
               const assets = (result.dict.meta.assets ||= []);
