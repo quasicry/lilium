@@ -318,5 +318,64 @@ await test("C3：hom 內 sense 編號繼承 hom 序號（1.1 型父鏈）", () =
   assert.match(a.html, /li-lex0-sense-no[^>]*>2\.3</, "sense 編號應繼承 hom 序號 2.3: " + a.html);
 });
 
-console.log(`\\n${pass} passed, ${fail} failed`);
+// ---- charDecl glyph＋多 mapping（TEI 6.5 節 CBETA 缺字標準範例：缺字標即 <glyph> 型）
+const gaiji = fs.readFileSync(path.join(ROOT, "test", "fixtures", "lex0-gaiji.xml"), "utf-8");
+
+await test("charDecl glyph＋多 mapping：glyph 塊入表（此前只收 <char> 全漏）", () => {
+  const r = new Lex0Reader(gaiji);
+  for (const id of ["id003", "id004", "id005", "char001"]) {
+    assert.ok(r.charDecl.get(id), id + " 應入 charDecl 表");
+  }
+});
+
+await test("charDecl glyph＋多 mapping：<g> 渲染用 standard 主文本（視覺輸出零變化）", () => {
+  const r = new Lex0Reader(gaiji);
+  const a = r.lookupAll("測")[0];
+  assert.match(a.html, /<span class="li-lex0-g" data-gref="id003" data-galt="僞\|瑱\|C0147-08">偽<\/span>/);
+});
+
+await test("charDecl glyph＋多 mapping：altTexts 收齊（按序，排除 standard 重複）", () => {
+  const r = new Lex0Reader(gaiji);
+  assert.deepEqual(r.charDecl.get("id003").altTexts, ["僞", "瑱", "C0147-08"]);
+  assert.equal(r.charDecl.get("id005").altTexts, undefined, "standard 重複值不收");
+  assert.deepEqual(r.charDecl.get("char001").altTexts, ["𠀾"], "char 塊多 mapping 同式收錄");
+});
+
+await test("charDecl glyph＋多 mapping：html 導出 data-galt 供上層 UI", () => {
+  const r = new Lex0Reader(gaiji);
+  const a = r.lookupAll("測")[0];
+  assert.match(a.html, /data-galt="僞\|瑱\|C0147-08"/);
+  // 無 altTexts 的引用不產生該屬性（既有輸出零變化）
+  const c = r.lookupAll("重")[0];
+  assert.ok(!c.html.includes("data-galt"), "id005 無 altTexts 應無 data-galt: " + c.html);
+});
+
+await test("charDecl glyph＋多 mapping：graphic 退化——無 standard 時 <img>", () => {
+  const r = new Lex0Reader(gaiji);
+  const a = r.lookupAll("圖")[0];
+  assert.match(a.html, /<img class="li-lex0-g-img" src="gaiji\/id004.png"/);
+  assert.ok(r.charDecl.get("id004").graphic === "gaiji/id004.png");
+  assert.deepEqual(r.charDecl.get("id004").altTexts, ["𨑨"]);
+});
+
+await test("charDecl glyph＋多 mapping：serialize/restore 保 altTexts（向後相容）", () => {
+  const r = new Lex0Reader(gaiji);
+  const r2 = Lex0Reader.deserialize(r.serialize());
+  assert.deepEqual(r2.charDecl.get("id003"), r.charDecl.get("id003"));
+  // 舊快取（無 altTexts 欄位）讀入不炸
+  const legacy = JSON.parse(r.serialize());
+  delete legacy.charDecl.find(([k]) => k === "id003")[1].altTexts;
+  const r3 = Lex0Reader.deserialize(JSON.stringify(legacy));
+  assert.equal(r3.charDecl.get("id003").text, "偽");
+  assert.equal(r3.charDecl.get("id003").altTexts, undefined);
+});
+
+await test("charDecl glyph＋多 mapping：既有 char/standard 行為不變（回歸）", () => {
+  const r = new Lex0Reader(gaiji);
+  const c = r.lookupAll("例")[0];
+  assert.match(c.html, /<span class="li-lex0-g" data-gref="char001" data-galt="𠀾">例<\/span>/);
+  assert.equal(r.charDecl.get("char001").graphic, "gaiji/char001.png");
+});
+
+console.log(`\n${pass} passed, ${fail} failed`);
 process.exit(fail ? 1 : 0);

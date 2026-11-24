@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 最小 TEI 樣例：charDecl 缺字機制——glyph 塊＋多 mapping type（比照魯伯納《TEI 使用指南》6.5 節 CBETA 缺字標準範例） -->
+<TEI xmlns="http://www.tei-c.org/ns/1.0" type="lex-0">
+  <teiHeader>
+    <fileDesc>
+      <titleStmt><title>Gaiji Test</title></titleStmt>
+      <publicationStmt><p>fixture</p></publicationStmt>
+    </fileDesc>
+  </teiHeader>
+  <standOff>
+    <charDecl>
+      <!-- char 塊（既有行為回歸）：standard 主文本＋cbeta 備選 -->
+      <char xml:id="char001">
+        <charProp><localName>standardized form</localName><mapping type="standard">例</mapping></charProp>
+        <mapping type="cbeta">𠀾</mapping>
+        <graphic url="gaiji/char001.png"/>
+      </char>
+      <!-- glyph 塊（CBETA 缺字標準範例型）：standard＋regular＋cbetaNo 多組 mapping，無 graphic -->
+      <glyph xml:id="id003">
+        <mapping type="standard">偽</mapping>
+        <mapping type="regular">僞</mapping>
+        <mapping type="cbeta">瑱</mapping>
+        <mapping type="cbetaNo">C0147-08</mapping>
+      </glyph>
+      <!-- glyph 塊：無 standard，僅 graphic——渲染應退化為 <img> -->
+      <glyph xml:id="id004">
+        <mapping type="cbeta">𨑨</mapping>
+        <graphic url="gaiji/id004.png"/>
+      </glyph>
+      <!-- glyph 塊：standard 與 cbeta 文本相同——altTexts 排除 standard 重複 -->
+      <glyph xml:id="id005">
+        <mapping type="standard">返</mapping>
+        <mapping type="cbeta">返</mapping>
+      </glyph>
+    </charDecl>
+  </standOff>
+  <text>
+    <body>
+      <entry xml:id="e1">
+        <form type="lemma"><orth>測</orth></form>
+        <sense><def>引 <g ref="#id003"/> 缺字標（standard 文本渲染＋data-galt）</def></sense>
+      </entry>
+      <entry xml:id="e2">
+        <form type="lemma"><orth>圖</orth></form>
+        <sense><def>無 <g ref="#id004"/> standard 的 glyph——img 退化</def></sense>
+      </entry>
+      <entry xml:id="e3">
+        <form type="lemma"><orth>重</orth></form>
+        <sense><def>altTexts 排除與 <g ref="#id005"/> standard 重複的值</def></sense>
+      </entry>
+      <entry xml:id="e4">
+        <form type="lemma"><orth>例</orth></form>
+        <sense><def>char 塊 <g ref="#char001"/> 既有行為不變</def></sense>
+      </entry>
+    </body>
+  </text>
+</TEI>

@@ -147,7 +147,7 @@ class EntryRenderer {
   /** 當前 entry 的 xml:id → 發音文本（pRef target 解析用，TEI 10.4）。 */
   pronById = new Map<string, string>();
 
-  constructor(private warnings: Lex0Warnings, private charDecl?: Map<string, { text?: string; graphic?: string }>) {}
+  constructor(private warnings: Lex0Warnings, private charDecl?: Map<string, CharDeclInfo>) {}
 
   result(): string {
     return this.parts.join('\n');
@@ -239,8 +239,10 @@ class EntryRenderer {
         if (tag === 'g') {
           const refId = (openTag.match(/\bref="#?([^"\s>]+)"/)?.[1] || '').replace(/^#/, '');
           const info = this.charDecl?.get(refId);
-          if (info?.text) this.parts.push(`<span class="li-lex0-g" data-gref="${esc(refId)}">${esc(info.text)}</span>`);
-          else if (info?.graphic) this.parts.push(`<img class="li-lex0-g-img" src="${esc(info.graphic)}" alt="${esc(refId)}">`);
+          // altTexts（非 standard mapping 備選文本）導出 data-galt 供上層 UI——不改變現有視覺輸出
+          const galt = info?.altTexts?.length ? ` data-galt="${esc(info.altTexts.join('|'))}"` : '';
+          if (info?.text) this.parts.push(`<span class="li-lex0-g" data-gref="${esc(refId)}"${galt}>${esc(info.text)}</span>`);
+          else if (info?.graphic) this.parts.push(`<img class="li-lex0-g-img" src="${esc(info.graphic)}" alt="${esc(refId)}"${galt}>`);
         }
         i = openEnd;
         continue;
@@ -406,8 +408,10 @@ class EntryRenderer {
         // charDecl standard mapping 文本優先；無文本有圖片則 <img>；皆無退化拍平
         const refId = (openTag.match(/\bref="#?([^"\s>]+)"/)?.[1] || '').replace(/^#/, '');
         const info = this.charDecl?.get(refId);
-        if (info?.text) this.parts.push(`<span class="li-lex0-g" data-gref="${esc(refId)}">${esc(info.text)}</span>`);
-        else if (info?.graphic) this.parts.push(`<img class="li-lex0-g-img" src="${esc(info.graphic)}" alt="${esc(refId)}">`);
+        // altTexts（非 standard mapping 備選文本）導出 data-galt 供上層 UI——不改變現有視覺輸出
+        const galt = info?.altTexts?.length ? ` data-galt="${esc(info.altTexts.join('|'))}"` : '';
+        if (info?.text) this.parts.push(`<span class="li-lex0-g" data-gref="${esc(refId)}"${galt}>${esc(info.text)}</span>`);
+        else if (info?.graphic) this.parts.push(`<img class="li-lex0-g-img" src="${esc(info.graphic)}" alt="${esc(refId)}"${galt}>`);
         else this.parts.push(`<span class="li-lex0-pc">${esc(textOf(inner))}</span>`);
         return;
       }
@@ -508,6 +512,9 @@ function findMatching(xml: string, from: number, tag: string): { start: number; 
 
 // --------------------------------------------------------------- Reader
 
+/** charDecl/glyphDecl 表值：standard mapping 主 text＋其他 type 備選 altTexts＋圖形 */
+type CharDeclInfo = { text?: string; graphic?: string; altTexts?: string[] };
+
 export class Lex0Reader {
   readonly meta: Lex0Meta;
   readonly articles: Lex0Article[] = [];
@@ -517,8 +524,8 @@ export class Lex0Reader {
   /** xml:id → 首鍵（xr 兩段式查詢期解析用；條目註冊時同步填） */
   readonly idToKey: Map<string, string> = new Map();
 
-  /** charDecl 表——xml:id → { text: standard mapping 文本, graphic: 圖片 url }（<g ref> 渲染用） */
-  readonly charDecl: Map<string, { text?: string; graphic?: string }> = new Map();
+  /** charDecl 表——xml:id → { text: standard mapping 文本, altTexts: 其他 mapping type 備選, graphic: 圖片 url }（<g ref> 渲染用） */
+  readonly charDecl: Map<string, CharDeclInfo> = new Map();
 
   constructor(xmlText: string) {
     this.meta = Lex0Reader.parseMeta(xmlText);
@@ -536,7 +543,7 @@ export class Lex0Reader {
     const rd = Object.create(Lex0Reader.prototype) as Lex0Reader;
     (rd as unknown as { meta: Lex0Meta }).meta = Lex0Reader.parseMeta(xmlText);
     (rd as unknown as { warnings: Lex0Warnings }).warnings = { unknownElements: new Map(), missingHeadword: 0, droppedEntries: 0 };
-    (rd as unknown as { charDecl: Map<string, { text?: string; graphic?: string }> }).charDecl = new Map();
+    (rd as unknown as { charDecl: Map<string, CharDeclInfo> }).charDecl = new Map();
     rd.parseCharDecl(xmlText);
     // parseEntries 內部 buildArticle 逐條同步；外層按已產出條數讓幀——
     // 拆法：逐 entry 調 buildArticle 太侵入，改為 parseEntries 一次性（內部無 yield 點）
@@ -605,7 +612,7 @@ export class Lex0Reader {
       v: number;
       meta: Lex0Meta;
       warnings: { missingHeadword: number; droppedEntries: number };
-      charDecl: Array<[string, { text?: string; graphic?: string }]>;
+      charDecl: Array<[string, CharDeclInfo]>;
       articles: Lex0Article[];
     };
     if (o.v !== 1) throw new Error(`lex0 cache version mismatch: ${o.v}`);
@@ -614,7 +621,7 @@ export class Lex0Reader {
     (rd as unknown as { warnings: Lex0Warnings }).warnings = {
       unknownElements: new Map(), missingHeadword: o.warnings.missingHeadword, droppedEntries: o.warnings.droppedEntries,
     };
-    (rd as unknown as { charDecl: Map<string, { text?: string; graphic?: string }> }).charDecl = new Map(o.charDecl);
+    (rd as unknown as { charDecl: Map<string, CharDeclInfo> }).charDecl = new Map(o.charDecl);
     (rd as unknown as { articles: Lex0Article[] }).articles = o.articles;
     (rd as unknown as { idToKey: Map<string, string> }).idToKey = new Map();
     (rd as unknown as { index: Map<string, number[]> }).index = new Map();
@@ -636,19 +643,33 @@ export class Lex0Reader {
     return meta;
   }
 
-  /** charDecl 收集（koktai PUA 異體字實錘）——無 DOM，正則逐 <char> 塊。 */
+/** charDecl 收集（koktai PUA 異體字實錘）——無 DOM，正則逐 <char>／<glyph> 塊。
+ *  TEI 規範（魯伯納《TEI 使用指南》6.5 節 CBETA 缺字標準範例）缺字標為
+ *  <glyph xml:id="…">，此前只收 <char> 全漏——現 char|glyph 同式收錄，
+ *  既有 char 塊行為零變化。mapping type="standard" 仍為主 text；
+ *  其他 type（cbeta/regular/cbetaNo 等）按序收進 altTexts（排除 standard 重複）。 */
   private parseCharDecl(xml: string): void {
-    const charRe = /<char\b[^>]*xml:id="([^"]*)"[^>]*>([\s\S]*?)<\/char>/g;
+    const charRe = /<(char|glyph)\b[^>]*xml:id="([^"]*)"[^>]*>([\s\S]*?)<\/\1>/g;
     let m: RegExpExecArray | null;
     while ((m = charRe.exec(xml))) {
-      const id = m[1];
-      const block = m[2];
-      const info: { text?: string; graphic?: string } = {};
+      const id = m[2];
+      const block = m[3];
+      const info: CharDeclInfo = {};
       const std = block.match(/<mapping\b[^>]*type="standard"[^>]*>([\s\S]*?)<\/mapping>/);
       if (std) info.text = textOf(std[1]);
       const fig = block.match(/<graphic\b[^>]*url="([^"]*)"/);
       if (fig) info.graphic = fig[1];
-      if (info.text || info.graphic) this.charDecl.set(id, info);
+      const altTexts: string[] = [];
+      const mapRe = /<mapping\b([^>]*)>([\s\S]*?)<\/mapping>/g;
+      let mm: RegExpExecArray | null;
+      while ((mm = mapRe.exec(block))) {
+        const attrs = mm[1];
+        if (/\btype="standard"/.test(attrs)) continue;
+        const t = textOf(mm[2]);
+        if (t && t !== info.text && !altTexts.includes(t)) altTexts.push(t);
+      }
+      if (altTexts.length) info.altTexts = altTexts;
+      if (info.text || info.graphic || info.altTexts) this.charDecl.set(id, info);
     }
   }
 
