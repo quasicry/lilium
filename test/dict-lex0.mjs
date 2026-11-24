@@ -569,5 +569,20 @@ await test("DILA 佛學辭典實錘：form 裸文本無 orth——鍵生成＋�
   assert.ok(!a2.html.includes("li-lex0-hw\">m<"), "結構性 form 不誤吞");
 });
 
+await test("CBETA 缺字慣例：charDecl 無 mapping 時退回 charProp 組字式", () => {
+  // KDR 正法華經詞典實錘：9 缺字僅 2 有 mapping type="normalized"，其餘僅 composition
+  const xml = `<?xml version="1.0"?><TEI xmlns="http://www.tei-c.org/ns/1.0"><teiHeader><fileDesc><titleStmt><title>t</title></titleStmt></fileDesc><encodingDesc><charDecl>
+<char xml:id="char01"><charProp><localName>CBETA</localName><value>CB00005</value></charProp><charProp><localName>composition</localName><value>[(牙*ㄉ)/里]</value></charProp><mapping type="normalized">劙</mapping></char>
+<char xml:id="char04"><charProp><localName>CBETA</localName><value>CB00145</value></charProp><charProp><localName>composition</localName><value>[少/兔]</value></charProp></char>
+</charDecl></encodingDesc></teiHeader><text><body>
+<entry><form>阿</form><sense><def>阿<g ref="#char01"/>與阿<g ref="#char04"/>二字。</def></sense></entry>
+</body></text></TEI>`;
+  const r = new Lex0Reader(xml);
+  assert.equal(r.charDecl.size, 2, "兩缺字均收錄");
+  const a = r.lookupAll("阿")[0];
+  assert.match(a.html, /<span class="li-lex0-g"[^>]*>劙</, "mapping normalized 文本渲染");
+  assert.match(a.html, /<span class="li-lex0-g"[^>]*>\[少\/兔\]</, "無 mapping 時組字式退回渲染");
+});
+
 console.log(`\n${pass} passed, ${fail} failed`);
 process.exit(fail ? 1 : 0);

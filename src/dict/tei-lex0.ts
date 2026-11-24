@@ -824,7 +824,24 @@ export class Lex0Reader {
         const t = textOf(mm[2]);
         if (t && t !== info.text && !altTexts.includes(t)) altTexts.push(t);
       }
+      // CBETA 缺字慣例（KDR 正法華經詞典實錘）：char 無 standard mapping 也無 graphic，
+      // 僅一個 mapping type="normalized"（CBETA 外字資料庫慣例＝正字推薦）——提升為顯示文本，
+      // 否則 <g> 完全不渲染（altTexts 只進 data-galt 屬性）。
+      if (!info.text && !info.graphic && altTexts.length === 1) {
+        info.text = altTexts[0];
+        altTexts.length = 0;
+      }
       if (altTexts.length) info.altTexts = altTexts;
+      // CBETA 缺字慣例（KDR 正法華經詞典實錘）：無 mapping 時退回 charProp 組字式
+      // （<localName>composition</localName><value>[(牙*ㄉ)/里]</value>）——組字式雖非
+      // 正字，但比完全空拍平保留更多可讀信息（CBETA 外字資料庫同款格式）。
+      if (!info.text && !info.graphic && !info.altTexts?.length) {
+        const comp = block.match(/<charProp>\s*<localName>composition<\/localName>\s*<value>([\s\S]*?)<\/value>/);
+        if (comp) {
+          const t = textOf(comp[1]);
+          if (t) info.text = t;
+        }
+      }
       if (info.text || info.graphic || info.altTexts) this.charDecl.set(id, info);
     }
   }
