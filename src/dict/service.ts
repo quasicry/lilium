@@ -304,7 +304,7 @@ export class DictService {
         this.lookupDepth--;
       }
     }
-    // r54：主路徑命中寫快取（lemma/變體回退路徑不寫——value 語義為精確命中）。
+    // 主路徑命中寫快取（lemma/變體回退路徑不寫——value 語義為精確命中）。
     if (hits.length && this.cache) {
       const toCache = hits.map(({ bookmarked: _bm, ...rest }) => rest);
       const scopeSig = this.scoped.map((d) => d.meta.id).sort().join(',');

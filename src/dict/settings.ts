@@ -137,7 +137,7 @@ export function renderDictSections(
       }),
     );
 
-  // r59 ⑥：行內建議觸發詞（寫死 → settings 注入）。
+  // 行內建議觸發詞（寫死 → settings 注入）。
   new Setting(containerEl)
     .setName(dict.T('dict.set.inlineTrigger'))
     .setDesc(dict.T('dict.set.inlineTriggerDesc'))

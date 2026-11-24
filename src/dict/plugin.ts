@@ -43,6 +43,7 @@ import {
   loadLex0,
   extractTeiTarAssetMembers,
   extractTeiZipAssetMembers,
+  isDictDisposed,
   AssetWriter,
   ASSET_FOLDER,
   LEGACY_ASSET_FOLDER,
@@ -1102,6 +1103,12 @@ export class DictFeature {
     this.migrateOverrideIds();
 
     this.service.clear();
+    /* P0-1：clear() 會 dispose 掉 scanCacheMap 共享實例的 reader——
+       sig 命中卻把已 dispose 的「屍體實例」add 回 service＝查詢恆空。
+       重掃入口先把已 dispose 的緩存項視為未命中剔除（P0-2 修復不相干，勿動其他邏輯）。 */
+    for (const [k, v] of this.scanCacheMap) {
+      if (isDictDisposed(v.dict)) this.scanCacheMap.delete(k);
+    }
     const loaded: string[] = [];
     const failed: Array<{ name: string; error: string }> = [];
 
@@ -1203,7 +1210,9 @@ export class DictFeature {
           try {
             const gzRaw = await this.plugin.app.vault.adapter.readBinary(lex0CachePath);
             const cachedResult = loadLex0FromCache(new Uint8Array(gzRaw), child.name);
-            if (cachedResult.ok && cachedResult.dict) {
+            /* P0-2：磁盤緩存無來源簽名校驗——同名覆蓋更新辭典後舊偏移配新 buf＝錯位亂碼。
+               緩存落盤時包裝 srcSig（mtime:size），讀回不符即棄用重解析。 */
+            if (cachedResult.ok && cachedResult.dict && (cachedResult as { srcSig?: string }).srcSig === teiSig) {
               this.applyStableId(cachedResult.dict, 'tei-lex0', dictBaseName(child.name), folder.path);
               this.service.add(cachedResult.dict);
               lex0Pending.set(child.name.replace(/\.(lex0\.xml|p5\.xml|xml|tar\.gz|tar\.xz|tgz|zip)$/i, ''), cachedResult.dict);
@@ -1243,7 +1252,9 @@ export class DictFeature {
             try {
               
               const readerJson = (result.dict as { reader?: { serialize?: () => string } }).reader?.serialize?.() ?? '';
+              /* P0-2：落盤時記錄來源檔簽名（mtime:size），還原時不符即棄用重解析 */
               const wrapped = JSON.stringify({
+                srcSig: teiSig,
                 reader: readerJson,
                 assets: (result.dict.meta as { assets?: Array<unknown> }).assets || [],
               });
@@ -1305,7 +1316,10 @@ export class DictFeature {
           try {
             const cachePath = `${ASSET_FOLDER}/.scan-cache/mdx-${folderKey}-${base}.json`;
             const raw = await this.plugin.app.vault.adapter.read(cachePath);
-            const saved = JSON.parse(raw) as { reader: string; mddEntryCount?: number; assets?: Array<unknown> };
+            const saved = JSON.parse(raw) as { reader: string; mddEntryCount?: number; assets?: Array<unknown>; srcSig?: string };
+            /* P0-2：磁盤緩存無來源簽名校驗——同名覆蓋更新辭典後舊偏移配新 buf＝錯位亂碼。
+               落盤時記錄 mdx 簽名，讀回不符即棄用走正常解析。 */
+            if (saved.srcSig !== sig) throw new Error('scan-cache sig mismatch');
             const res = await loadMdictFromCache(mdxData, files.mdx.name, saved.reader, {
               dictId: `mdx-${base}`,
               mddEntryCount: saved.mddEntryCount,
@@ -1373,7 +1387,7 @@ export class DictFeature {
                 this.scanCacheFiles.set(result.dict.meta.id, cacheFile);
                 await this.plugin.app.vault.adapter.write(
                   cacheFile,
-                  JSON.stringify({ reader: rd.serialize(), mddEntryCount: result.dict.meta.mddEntryCount, assets: result.dict.meta.assets || [] }),
+                  JSON.stringify({ srcSig: sig, reader: rd.serialize(), mddEntryCount: result.dict.meta.mddEntryCount, assets: result.dict.meta.assets || [] }),
                 );
               }
             } catch (e) { console.error('[lilium] scan-cache 落盤失敗（不阻塞）:', e); }

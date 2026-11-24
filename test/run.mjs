@@ -1347,7 +1347,7 @@ test(`藏文合併：tibetan-wylie 併入擴展引擎（數字/標點能力）�
 test(`藏文語料：翻譯名義大集 core 200 對匹配率 ≥88%、往返 ≥95%`, () => {
   const w = lib.getScheme("tibetan-wylie");
   const j = JSON.parse(fs.readFileSync(path.join(ROOT, "test/fixtures/tibetan-mingtsed/mingtsed-pairs.json"), "utf8"));
-  const norm = (s) => s.replace(/་+$/, "").replace(/་ /g, "་").trim();
+  const norm = (s) => s.replace(/<ts>/g, " ").replace(/་+$/, "").replace(/་ /g, "་").trim();
   let ok = 0, rt = 0;
   for (const p of j.core) {
     const g = norm(w.nativeToRoman(p.tib));
@@ -1452,7 +1452,7 @@ test(`蒙古文合併：convert 三態（ZCode 升級優先）＋IME 降隱`, ()
 test(`藏文語料：sample 295 對匹配率 ≥88%、往返 ≥93%`, () => {
   const w = lib.getScheme("tibetan-wylie");
   const j = JSON.parse(fs.readFileSync(path.join(ROOT, "test/fixtures/tibetan-mingtsed/mingtsed-pairs.json"), "utf8"));
-  const norm = (s) => s.replace(/་+$/, "").replace(/་ /g, "་").trim();
+  const norm = (s) => s.replace(/<ts>/g, " ").replace(/་+$/, "").replace(/་ /g, "་").trim();
   let ok = 0, rt = 0;
   for (const p of j.sample) {
     const g = norm(w.nativeToRoman(p.tib));

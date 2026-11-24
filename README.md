@@ -7,7 +7,7 @@
 ## Features
 
 ### Dictionary
-- **Formats**: MDict (`.mdx` / `.mdd`) and TEI Lex-0 (`.lex0.xml`) — detected by extension plus content sniffing
+- **Formats**: MDict (`.mdx` / `.mdd`) and TEI Lex-0 (`.lex0.xml` / `.p5.xml`) — detected by extension plus content sniffing
 - **Lookup**: hover word lookup while reading, full-text search across dictionaries, fuzzy and prefix matching (BK-tree)
 - **Styling**: dictionary CSS is isolated inside its own wrapper element — dictionaries can never restyle your notes
 - **Management**: drag-and-drop import with visible drop zone, bookmarks, lookup history, cross-entry links (`entry://`, `bword://`, TEI `xr` targets)

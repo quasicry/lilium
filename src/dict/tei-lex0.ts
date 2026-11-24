@@ -4,7 +4,7 @@
  * lilium 辭典 — TEI Lex-0 reader（模塊③ 辭典橋）。
  *
  * Lex-0 = TEI 官方辭典最小基線模型（bcdh/tei-lex-0；「0」＝零級最小起點）。
- * 本 reader 把 Lex-0 實例（<TEI> 文件，內含 <entry> 集）解析為 li 條目模型，
+ * 本 reader 把 Lex-0 實例（<TEI> 文件，內含 <entry> 集）解析為 lilium 條目模型，
  * 與 XDXF reader 同形：純字串/正則解析、不 import obsidian、Node 可直接測。
  *
  * 設計決策：

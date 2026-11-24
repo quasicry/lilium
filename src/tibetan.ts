@@ -1009,10 +1009,15 @@ export function tibetanToWylie(input: string, pref: TibAmbigPref = "auto"): stri
     // tsheg 是音節邊界：必須在此切段，否則相鄰音節會被誤併成一個音節而丟字。
     // G-T1d：後緊跟標點（PUNCT_CP_TO_TOKEN 碼位）時輸出 <ts> 顯式 token——
     // 裸空格入向會被混排段規則吃掉（tsheg 永久丟失，語料 26,085 處實錘）。
+    // G-T1e：雙 tsheg 與行尾/EOF tsheg 同樣輸出 <ts>——裸空格出向後入向
+    // 「恰 1 空格→tsheg」會把雙 tsheg 還原成空格或丟行尾 tsheg（往返不閉合，
+    // 校勘語料靜默資料損毀）；入向 <ts> 精確還原 0F0B，連續與行尾情境已驗證。
     if (c === TSHEG) {
       flush();
       const next = ci + 1 < chars.length ? chars[ci + 1].codePointAt(0) ?? 0 : 0;
-      out.push(PUNCT_CP_TO_TOKEN.has(next) ? TSHEG_TOKEN : " ");
+      const explicit =
+        PUNCT_CP_TO_TOKEN.has(next) || next === TSHEG || next === 0 || next === 0x0a || next === 0x0d;
+      out.push(explicit ? TSHEG_TOKEN : " ");
       continue;
     }
     // 藏文原生真空格（U+0020）：出向輸出 <sp> 顯式 token——若輸出裸空格，

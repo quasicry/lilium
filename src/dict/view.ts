@@ -1372,7 +1372,7 @@ export class LiDictView extends ItemView {
       return hit ? { vaultPath: hit } : null;
     };
     const toUrl = (vaultPath: string) => {
-      // r62：記錄 app:// URL → vaultPath 映射，供 inlineFrameAssets 宿主側讀檔
+      // 記錄 app:// URL → vaultPath 映射，供 inlineFrameAssets 宿主側讀檔
       // （requestUrl 不支持 app:// protocol——「ClientRequest only supports http: and
       // https:」，實機實錘；映射後走 adapter.readBinary 內聯，修詞條圖片空白）。
       const url = this.plugin.service.assetUrl(vaultPath);
@@ -1728,7 +1728,7 @@ export class LiDictView extends ItemView {
         if (cached) return cached;
         let buf: Uint8Array | null = null;
         let contentType = mime;
-        // r62：app:// 資源先查 URL→vaultPath 映射走 adapter.readBinary——
+        // app:// 資源先查 URL→vaultPath 映射走 adapter.readBinary——
         // requestUrl 不支持 app:// protocol（「ClientRequest only supports http: and
         // https:」實機實錘），B7 改造後所有 app:// 內聯全數靜默失敗＝詞條圖片空白真兇。
         const vaultPath = this.frameAssetPaths.get(url);
@@ -1774,7 +1774,7 @@ export class LiDictView extends ItemView {
       jobs.push((async () => {
         try {
           let css: string;
-          // r62b：app:// CSS 先查 URL→vaultPath 映射走 adapter.readBinary——
+          // app:// CSS 先查 URL→vaultPath 映射走 adapter.readBinary——
           // requestUrl 不支持 app://（同圖片資源根因，此前詞典配套 CSS 全部內聯失敗＝詞條樣式盡失）。
           const vp = this.frameAssetPaths.get(href);
           if (vp) {

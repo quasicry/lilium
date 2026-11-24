@@ -16,6 +16,20 @@ import {
 } from './service';
 import { ExtractedAsset, extractMddAssets, ASSET_KIND_RES } from './mdd-assets';
 
+/**
+ * P0-1：掃描緩存屍體實例檢查——實例曾被 service.clear()/remove() dispose 後，
+ * reader 內部資料已釋放（mdict buf 清空 / lex0 條目清空），查詢恆空。
+ * 以各 dict 實作暴露的可辨識狀態判定；無法判定時保守視為未 dispose。
+ */
+export function isDictDisposed(dict: LiDict): boolean {
+  const reader = (dict as unknown as { reader?: { disposed?: boolean; articles?: unknown[] } }).reader;
+  if (!reader) return false;
+  if (reader.disposed === true) return true; // MdictReader.dispose 標記
+  if (Array.isArray(reader.articles)) return reader.articles.length === 0; // Lex0Reader.dispose 清空條目
+  return false;
+}
+
+
 
 
 export interface LoadResult {
@@ -28,6 +42,8 @@ export interface LoadResult {
   assets?: ExtractedAsset[];
   skipped?: number;
   /** B4：冷路徑解壓後 bytes（gunzip/tar 抽取完成態）——資產抽取通路復用，免二次 gunzip */
+  /** P0-2：TEI 磁盤緩存還原時回傳的來源檔簽名（mtime:size），供調用方與現檔比對 */
+  srcSig?: string;
   bytes?: Uint8Array;
 }
 
@@ -223,11 +239,13 @@ export function loadLex0FromCache(gzData: Uint8Array, fileName: string): LoadRes
     // 舊緩存為裸 reader JSON（首字元 '{' 且無 "reader": 鍵）——兩態兼容。
     let readerJson = json;
     let assets: unknown;
+    let srcSig: string | undefined;
     try {
-      const outer = JSON.parse(json) as { reader?: string; assets?: unknown };
+      const outer = JSON.parse(json) as { reader?: string; assets?: unknown; srcSig?: string };
       if (typeof outer.reader === 'string') {
         readerJson = outer.reader;
         assets = outer.assets;
+        srcSig = outer.srcSig; // P0-2：來源檔簽名隨緩存還原，供調用方校驗
       }
     } catch { /* 非物件＝裸 JSON，走原路 */ }
     const reader = Lex0Reader.deserialize(readerJson);
@@ -238,7 +256,7 @@ export function loadLex0FromCache(gzData: Uint8Array, fileName: string): LoadRes
     if (Array.isArray(assets) && assets.length) {
       (dict.meta as { assets?: unknown }).assets = assets; // 還原路徑補掛資產清單（vault 檔案本身已落盤留存）
     }
-    return { ok: true, dict, name: dict.meta.name, format: 'tei-lex0' };
+    return { ok: true, dict, name: dict.meta.name, format: 'tei-lex0', srcSig };
   } catch (e) {
     return { ok: false, error: describeError(e), name: fileName, format: 'tei-lex0' };
   }

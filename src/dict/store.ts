@@ -109,7 +109,7 @@ export class DataStore {
     const bak = await this.adapter.readBackup();
     if (!bak || !(bak.bookmarks.length || bak.history.length || bak.groups.length
       || Object.keys(bak.dictOverrides).length)) return null;
-    // r59 批次乙：deepClone——原 Object.assign(d, bak) 直接引用 bak 的陣列/物件，
+    // deepClone——原 Object.assign(d, bak) 直接引用 bak 的陣列/物件，
     // this.data 與備份讀回值共享引用，後續對 bookmarks 等的原地變更會污染備份來源
     this.data = Object.assign(d, deepClone(bak));
     if (!this.data.dictIdIndex) this.data.dictIdIndex = {};
