@@ -1,3 +1,17 @@
+## 0.3.4
+
+### 新增
+- TEI Lex-0 詞典模組大幅擴展：`<re>` 相關條目（兩段式連結）、`<tr>`/`<trans>` 翻譯等價、`<choice>` 語義群（優取規範形，防校勘字並排錯誤文本）、`<oVar>`/`<pVar>` 例句內變體參照（斜體渲染）、charDecl 收錄 `<glyph>` 塊與多 mapping type 備選——雙語詞典與校勘型詞典核心元素不再拍平。
+- TEI 詞典匯入格式擴展：支持 `.p5.xml` 複合副檔名（TEI P5 分發慣例）、`.zip` 包裝（PK 魔數抽最大 xml 成員）；匯入面板新增「選擇資料夾」整批匯入（TEI 詞典常以資料夾分發：xml＋gaiji 圖片＋配套；行動端不支援時按鈕自動隱藏）；副檔名說明文案同步（七語）。
+- CBETA 缺字慣例兼容：charDecl 無 standard mapping 也無 graphic 時，唯一 `mapping type="normalized"` 提升為顯示文本，皆無時退回組字式（`[(牙*ㄉ)/里]` 型）渲染——實測 CBETA 淵源 DILA 詞典（正法華經詞典 3,356 條、比丘威儀法詞典等），缺字不再空拍平。
+- DILA 佛學詞典裸 form 格式兼容：`<form>` 帶裸文本無 `<orth>`（丁福保/Soothill/南山律學詞典實際格式）——詞頭列與索引鍵生成補頂層純文本 form 通路；三典 3 萬餘條全部可查。
+- 巴利文 GRETIL 語料門禁：2_pali pu 全 64 檔（三藏＋Milinda＋註釋，PTS/CC BY-SA 4.0）——6,073 句分層抽樣＋3,000 高頻詞；全量 20.6 萬行完整復核，真引擎 bug 0。
+- 蘭札方案轉寫複製按鈕改 HTML 格式：剪貼簿同放 text/html（span 自帶 font-family Nithya Ranjana DU）與 text/plain 雙 flavor，HTML 寫入失敗退純文字不劣化；其他方案複製行為不變。
+
+### 修復
+- 藏文 tsheg 後接標點往返閉合（G-T1d）：tsheg 緊跟標點碼位時輸出 `<ts>` 顯式 token（裸空格入向被混排段規則吃掉、tsheg 永久丟失，EPUB 語料 26,085 處正字場景實錘）；後跟字母的 tsheg 維持空格（Wylie 正字慣例不變）；Ext 路徑 buf 切段致 lookahead 失效處補 tsheg 摘除輸出；`<ts>` 納入面板原子 token。
+- TEI 詞典 quote 內 oVar/pVar 佔位符還原前剝除 C0 控制字元：原文含 U+0001–U+0008 時曾被誤還原為 span 破壞條目結構（質量復核實錘的注入面）。
+
 ## 0.3.3
 
 ### 新增
