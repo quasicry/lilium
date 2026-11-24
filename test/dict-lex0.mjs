@@ -530,5 +530,21 @@ await test("choice/oVar/pVar：既有 oRef/pRef 配對帶內文回歸（quote �
   assert.match(a.html, /<span class="li-lex0-oref" data-oref-type="cap">choiceword<\/span>/, "quote 外 oRef 佔位 span 既有渲染不變");
 });
 
+await test("choice/oVar/pVar：quote 內原文含 C0 控制字元不破壞 HTML（注入防禦回歸）", () => {
+  // 質量復核實錘：原文 \u0002\u0003 曾被佔位符還原步驟誤認而破壞結構——剝除後安全
+  const xml = `<?xml version="1.0"?><TEI xmlns="http://www.tei-c.org/ns/1.0"><teiHeader><fileDesc><titleStmt><title>t</title></titleStmt></fileDesc></teiHeader><text><body>
+<entry xml:id="e"><form type="lemma"><orth>foo</orth></form><cit type="example"><quote>a \u0002\u0003 evil b</quote></cit></entry>
+</body></text></TEI>`;
+  const r = new Lex0Reader(xml);
+  const a = r.lookupAll("foo")[0];
+  assert.ok(!a.html.includes('li-lex0-pvar" evil'), "私有區字元不得被誤還原為 span");
+  assert.match(a.html, /<div class="li-lex0-ex">a evil b<\/div>/, "控制字元剝除後文本正常");
+  // 正常 oVar 保護仍在（同函數回歸）
+  const xml2 = xml.replace("a \u0002\u0003 evil b", "took <oVar type=\"pt\">took2</oVar> us");
+  const r2 = new Lex0Reader(xml2);
+  const a2 = r2.lookupAll("foo")[0];
+  assert.ok(a2.html.includes("li-lex0-ovar"), "正常 oVar 佔位符保護仍在");
+});
+
 console.log(`\n${pass} passed, ${fail} failed`);
 process.exit(fail ? 1 : 0);
