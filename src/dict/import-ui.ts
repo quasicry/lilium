@@ -135,6 +135,25 @@ export function buildDictImportZone(
   });
   fileInput.addClass('li-u-hidden');
 
+  // 資料夾整批匯入（webkitdirectory）：TEI 辭典常以資料夾分發（xml＋gaiji 圖片＋配套），
+  // 整夾選取後檔案走同一 acceptFiles 通路——匯入落盤同夾、掃描靠同資料夾配套圖片通路命中。
+  // 行動端不支援 webkitdirectory 時按鈕隱藏（檔案選擇仍可用）。
+  const folderInput = drop.createEl('input', { type: 'file' });
+  folderInput.addClass('li-u-hidden');
+  folderInput.setAttribute('webkitdirectory', '');
+  folderInput.setAttribute('directory', '');
+  folderInput.setAttribute('multiple', '');
+  const browseFolderBtn = actionRow.createEl('button', { cls: 'li-mini-btn', text: T('dict.import.browseFolder') });
+  browseFolderBtn.addEventListener('click', () => folderInput.click());
+  if (typeof (folderInput as unknown as { webkitdirectory?: string }).webkitdirectory !== 'string') {
+    browseFolderBtn.addClass('li-u-hidden');
+  }
+  folderInput.addEventListener('change', () => {
+    const files = Array.from(folderInput.files ?? []);
+    if (files.length) acceptFiles(files);
+    folderInput.value = '';
+  });
+
   // ── 說明與狀態
   const hint = drop.createEl('p', { cls: 'setting-item-description li-dict-import-hint' });
   const status = drop.createDiv({ cls: 'li-dict-import-status' });

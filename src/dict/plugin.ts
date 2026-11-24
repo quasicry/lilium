@@ -1181,7 +1181,7 @@ export class DictFeature {
         if (lower.endsWith('.mdx')) entry.mdx = child;
         else entry.mdd = child;
         mdxFiles.set(base, entry);
-      } else if (this.settings.teiLexEnabled && (lower.endsWith('.lex0.xml') || lower.endsWith('.xml') || lower.endsWith('.tar.gz') || lower.endsWith('.tar.xz') || lower.endsWith('.tgz'))) {
+      } else if (this.settings.teiLexEnabled && (lower.endsWith('.lex0.xml') || lower.endsWith('.p5.xml') || lower.endsWith('.xml') || lower.endsWith('.tar.gz') || lower.endsWith('.tar.xz') || lower.endsWith('.tgz') || lower.endsWith('.zip'))) {
         // 模塊③：TEI Lex-0 掃描掛載——開關默認關；關閉時 .xml 完全忽略（原樣）。
         /* TEI 掃描緩存命中——檔案未變直接復用（stat 缺失＝跳過緩存判定） */
         let teiSig = '';
@@ -1190,7 +1190,7 @@ export class DictFeature {
         if (teiCached && teiCached.sig === teiSig) {
           this.applyStableId(teiCached.dict, 'tei-lex0', dictBaseName(child.name), folder.path);
           this.service.add(teiCached.dict);
-          lex0Pending.set(child.name.replace(/\.(lex0\.xml|xml|tar\.gz|tar\.xz|tgz)$/i, ''), teiCached.dict);
+          lex0Pending.set(child.name.replace(/\.(lex0\.xml|p5\.xml|xml|tar\.gz|tar\.xz|tgz|zip)$/i, ''), teiCached.dict);
           loaded.push(teiCached.dict.meta.name || child.name);
           continue;
         }
@@ -1206,7 +1206,7 @@ export class DictFeature {
             if (cachedResult.ok && cachedResult.dict) {
               this.applyStableId(cachedResult.dict, 'tei-lex0', dictBaseName(child.name), folder.path);
               this.service.add(cachedResult.dict);
-              lex0Pending.set(child.name.replace(/\.(lex0\.xml|xml|tar\.gz|tar\.xz|tgz)$/i, ''), cachedResult.dict);
+              lex0Pending.set(child.name.replace(/\.(lex0\.xml|p5\.xml|xml|tar\.gz|tar\.xz|tgz|zip)$/i, ''), cachedResult.dict);
               loaded.push(cachedResult.dict.meta.name || child.name);
               if (this.settings.scanCache && child.stat) {
                 this.scanCacheMap.set(`tei-lex0-${folderKey0}-${dictBaseName(child.name)}`, { dict: cachedResult.dict, sig: teiSig });
@@ -1255,7 +1255,7 @@ export class DictFeature {
           }
           // TEI 配套（css/js/字體＋圖片）延後到遍歷結束再 attach——companions 收集
           // 與檔案遍歷同步，先命中的 TEI 本體檔 attach 時可能還沒收到配套檔。
-          lex0Pending.set(child.name.replace(/\.(lex0\.xml|xml|tar\.gz|tar\.xz|tgz)$/i, ''), result.dict);
+          lex0Pending.set(child.name.replace(/\.(lex0\.xml|p5\.xml|xml|tar\.gz|tar\.xz|tgz|zip)$/i, ''), result.dict);
           loaded.push(result.name || child.name);
         } else {
           failed.push({ name: child.name, error: result.error || 'unknown error' });

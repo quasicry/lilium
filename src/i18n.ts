@@ -1748,6 +1748,15 @@ export const DICT: Record<string, Entry> = {
     "fr": "Déposez les fichiers ici, ou",
     "de": "Dateien hierher ziehen oder"
   },
+  "dict.import.browseFolder": {
+    "zh": "选择文件夹",
+    "zh-TW": "選擇資料夾",
+    "ja": "フォルダーを選択",
+    "ko": "폴더 선택",
+    "en": "Browse folder",
+    "fr": "Choisir un dossier",
+    "de": "Ordner wählen"
+  },
   "dict.import.browse": {
     "zh": "选择本地文件",
     "zh-TW": "選擇本機檔案",

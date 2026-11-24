@@ -70,15 +70,15 @@ export const DICT_IMPORT_SPECS: Record<DictFormat, DictFormatSpec> = {
     format: 'tei-lex0',
     labelKey: 'dict.import.fmt.teiLex0',
     hintKey: 'dict.import.hint.teiLex0',
-    accept: '.xml,.lex0.xml,.tar.gz,.tar.xz,.tgz,.zip',
-    requiredGroups: [['.lex0.xml', '.xml', '.tar.gz', '.tar.xz', '.tgz', '.zip']],
+    accept: '.xml,.lex0.xml,.p5.xml,.tar.gz,.tar.xz,.tgz,.zip',
+    requiredGroups: [['.lex0.xml', '.xml', '.p5.xml', '.tar.gz', '.tar.xz', '.tgz', '.zip']],
     optional: [],
     multi: false,
   },
 };
 
 /** 複合副檔名（最長匹配優先，避免 .gz 吃掉 .idx.gz）。 */
-const COMPOUND_EXTS: readonly string[] = ['.lex0.xml', '.tar.gz', '.tar.xz', '.tgz'];
+const COMPOUND_EXTS: readonly string[] = ['.lex0.xml', '.p5.xml', '.tar.gz', '.tar.xz', '.tgz'];
 
 /**
  * 逐字剔除控制字元（C0 + DEL）。
@@ -263,6 +263,7 @@ export function sniffFormat(ext: string, head: Uint8Array | null): SniffResult {
     case '.mdd':
       return sniffMdx(head);
     case '.lex0.xml':
+    case '.p5.xml':
     case '.xml':
       return sniffLex0(decodeUtf8(head));
     case '.tar.gz':
