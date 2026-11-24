@@ -81,7 +81,12 @@ interface BrahmicMaps {
  */
 const NIGGAHITA_ALIASES = ["ṃ", "ṁ"];
 
+/** E4 效能：模組級快取——data 爲模組級靜態資料（同參同果），按 data 陣列記憶化建構結果。 */
+const mapsCache = new WeakMap<BrahmicChar[], BrahmicMaps>();
+
 function buildMaps(data: BrahmicChar[]): BrahmicMaps {
+  const cached = mapsCache.get(data);
+  if (cached) return cached;
   const romanToCands = new Map<string, Cand[]>();
   const charToRoman = new Map<string, string>();
   const charToRomanAlt = new Map<string, string>();
@@ -114,7 +119,9 @@ function buildMaps(data: BrahmicChar[]): BrahmicMaps {
     charToCat.set(row.ch, row.cat);
     if (row.cat === "consonant") charToConsonantRoman.set(row.ch, row.roman);
   }
-  return { romanToCands, charToRoman, charToRomanAlt, charToCat, charToConsonantRoman };
+  const maps = { romanToCands, charToRoman, charToRomanAlt, charToCat, charToConsonantRoman };
+  mapsCache.set(data, maps);
+  return maps;
 }
 
 function allTokens(data: BrahmicChar[]): string[] {

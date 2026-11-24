@@ -1531,7 +1531,13 @@ function unicodeSyllableToWylie(
     // 拼式歧義面板偏好（r44c）：多候選同分/近分時依用戶選擇的拼式風格重排。
     // 特徵判定用候選回轉藏文的碼位（subjoined 主字符比、元音符號位置）與
     // Wylie 文本字面（長音緊湊 A / 分解 <v-A>）。
+    // E3 效能：prefScore 在 sort 的 comparator 內被 O(n log n) 次呼叫、
+    // 同一候選重複計算；改為逐候選計算一次後快取（memo），排序結果不變。
+    const prefScoreCache = new Map<string, number>();
     const prefScore = (t: string): number => {
+      const hit = prefScoreCache.get(t);
+      if (hit !== undefined) return hit;
+      const calc = (): number => {
       if (pref === "auto") return 0;
       const nat = wylieToTibetan(t);
       const cps = Array.from(nat).map((c) => c.codePointAt(0) ?? 0);
@@ -1547,6 +1553,10 @@ function unicodeSyllableToWylie(
         case "long-split": return t.includes("<v-") ? 100 : 0;
         default: return 0;
       }
+      };
+      const v = calc();
+      prefScoreCache.set(t, v);
+      return v;
     };
     if (pref !== "auto") {
       // 多音節層歧義（nirde/nairde 元音歸屬、rma 並列 vs ra<->ma）：整段候選

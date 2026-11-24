@@ -466,17 +466,9 @@ export class LiDictView extends ItemView {
     // W9-F：頂層在 dict 時，搜尋列取決於子分頁（查詢→搜尋框，管理→全文搜尋）。
     const leaf = this.activeTop() === 'dict' ? this.subTab : this.panel;
     if (leaf === 'lookup') {
-      // W8：面板沒換就沿用既有搜尋列，只同步動態部分（值與清除鈕）。
-      // 重建是「搜尋框位置會變動」的直接成因：DOM 換實體 → 焦點丟 → 30ms 後
-      // 補 focus() → 瀏覽器捲動 → 使用者看到框自己跳。復用後這整串都不發生。
-      const existing = h.querySelector('.li-search-row');
-      const exInput = existing?.querySelector('.li-search') as HTMLInputElement | null;
-      const exClear = existing?.querySelector('.li-clear') as HTMLElement | null;
-      if (existing && exInput && exClear) {
-        if (exInput.value !== this.query) exInput.value = this.query;
-        exClear.toggleClass('li-u-hidden', !(this.query));
-        return;
-      }
+      // V-F14：原 W8「面板沒換就沿用既有搜尋列」復用分支為死碼——上方已無條件
+      // remove 舊搜尋列，此處再 querySelector('.li-search-row') 必為 null，
+      // 復用分支永不成立，故移除（行為不變：每次都重建）。
       const searchRow = h.createDiv({ cls: 'li-search-row' });
       const searchWrap = searchRow.createDiv({ cls: 'li-search-wrap' });
       // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion -- 斷言為 CM6 動態型別窄化防護（批次一實錘 auto 刪除破壞型別），保留——審計批次四。
@@ -1640,7 +1632,9 @@ export class LiDictView extends ItemView {
                 audioEl.className = 'li-inline-audio';
                 audioEl.classList.add('li-audio-clip'); // iframe doc 元素無 Obsidian addClass 原型擴充，改原生 classList
                 a.insertAdjacentElement('afterend', audioEl);
-                void audioEl.play();
+                // V-F12：play() 可能被瀏覽器拒絕（自動播放政策、資源載入失敗等），
+                // fire-and-forget 下拒絕會成 unhandled rejection；發不出聲不該打斷閱讀，靜默吞掉即可。
+                void audioEl.play().catch(() => {});
               } catch (err) {
                 // 發音文件缺失——按要求 Notice 提示（不再靜默）；spx 解碼失敗一併提示
                 try {
