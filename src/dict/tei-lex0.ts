@@ -179,6 +179,19 @@ class EntryRenderer {
       if (bare) {
         const o = textOf(bare[1]);
         if (o) bits.push(`<span class="li-lex0-hw">${esc(o)}</span>`);
+      } else {
+        // DILA 佛學辭典實錘（dingfubao/soothill/nanshanlu）：<form> 帶裸文本無 orth
+        // ——頂層首個純文本 form 即詞頭（含 <g ref> 字形，esc 前先 textOf 保映射）
+        const top = stripNestedEntries(formsXml);
+        const raw = top.match(/<form\b[^>]*>([^<]*|[\s\S]*?)<\/form>/);
+        if (raw) {
+          const inner = raw[1];
+          // 只在 form 無嵌套元素（純文本＋可含 <g>）時視為詞頭，避免誤吞結構
+          if (!/<[a-zA-Z](?!g\b)/.test(inner.replace(/<g\b[^>]*\/?>(?:[\s\S]*?<\/g>)?/, ''))) {
+            const o = textOf(inner);
+            if (o) bits.push(`<span class="li-lex0-hw">${esc(o)}</span>`);
+          }
+        }
       }
     }
     while ((lm = lemmaRe.exec(formsXml))) {
@@ -1003,6 +1016,14 @@ export class Lex0Reader {
         if (!allOrths.length) {
           const sv = attr(orthOpen, 'value') || '';
           if (sv) allOrths.push(sv);
+        }
+        // DILA 佛學辭典實錘：form 裸文本無 orth——純文本 form 內容即鍵
+        if (!allOrths.length) {
+          const rawText = textOf(fm[2]);
+          // form 內含其他元素（非 <g>）時不取（避免誤吞結構文本）
+          if (rawText && !/<[a-zA-Z](?!g\b)/.test(fm[2].replace(/<g\b[^>]*\/?>(?:[\s\S]*?<\/g>)?/, ''))) {
+            allOrths.push(rawText);
+          }
         }
         for (const k of allOrths) {
           if (k && !keys.includes(k)) keys.push(k);

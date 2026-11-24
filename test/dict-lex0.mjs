@@ -546,5 +546,28 @@ await test("choice/oVar/pVar：quote 內原文含 C0 控制字元不破壞 HTML�
   assert.ok(a2.html.includes("li-lex0-ovar"), "正常 oVar 佔位符保護仍在");
 });
 
+await test("DILA 佛學辭典實錘：form 裸文本無 orth——鍵生成＋詞頭渲染", () => {
+  // dingfubao/soothill/nanshanlu 三典實際格式：<form>庫子</form>（無 <orth>）
+  const xml = `<?xml version="1.0"?><TEI xmlns="http://www.tei-c.org/ns/1.0"><teiHeader><fileDesc><titleStmt><title>t</title></titleStmt></fileDesc></teiHeader><text><body>
+<entry><form>庫子</form><sense><usg type="dom">職位</usg><def>禪家司會計等之行者也。</def></sense></entry>
+<entry><form>覽字</form><sense><def><g ref="#DF-87A9"/>Raṁ，一作濫字。</def></sense></entry>
+</body></text></TEI>`;
+  const r = new Lex0Reader(xml);
+  assert.ok(r.lookupAll("庫子").length === 1, "裸 form 文本作為索引鍵");
+  const a = r.lookupAll("覽字")[0];
+  assert.ok(a, "含 <g> 的裸 form 條目可查");
+  assert.match(a.html, /<span class="li-lex0-hw">覽字<\/span>/, "詞頭列渲染裸 form 文本");
+  // 無 charDecl 時 <g> 自閉合退化為空 span（既有行為）——引用不崩潰即可：
+  assert.ok(a.html.includes("li-lex0-def"), "定義體正常渲染");
+  // 結構性 form（含嵌套元素）不得誤吞為詞頭/鍵：
+  const xml2 = `<?xml version="1.0"?><TEI xmlns="http://www.tei-c.org/ns/1.0"><teiHeader><fileDesc><titleStmt><title>t</title></titleStmt></fileDesc></teiHeader><text><body>
+<entry><form type="lemma"><orth>real</orth></form><form><gramGrp><gram type="gen">m</gram></gramGrp></form></entry>
+</body></text></TEI>`;
+  const r2 = new Lex0Reader(xml2);
+  const a2 = r2.lookupAll("real")[0];
+  assert.ok(a2, "正常 orth 條目不受影響");
+  assert.ok(!a2.html.includes("li-lex0-hw\">m<"), "結構性 form 不誤吞");
+});
+
 console.log(`\n${pass} passed, ${fail} failed`);
 process.exit(fail ? 1 : 0);
