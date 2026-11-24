@@ -380,9 +380,11 @@ class EntryRenderer {
               // TEI 9.3.1.2：quote 內 oVar/pVar 為配對元素帶內文——textOf 會剝殼留內文
               // （不丟文本），但為了保住斜體語義，先以私有佔位符包住內文；
               // esc() 之後再把佔位符換回 span（私有區字元不經 esc，零 raw XML 直通）
-              // 安全（質量復核實錘）：原文若本身含 U+0001–U+0008 控制字元，
+              // 安全（質量復核實錘）：原文若本身含 U+0001–U0008 控制字元，
               // 會被下方還原步驟誤認為佔位符而破壞 HTML 結構——先剝除（C0 控制字元
-              // 在 HTML 語義中本就非法，textOf 拍平語義零損失）
+              // 在 HTML 語義中本就非法，textOf 拍平語義零損失）。
+              // 下行正則字元類是刻意的佔位符範圍（no-control-regex 豁免）：
+              // eslint-disable-next-line no-control-regex
               .replace(/[\u0001-\u0008]/g, '')
               .replace(/<oVar\b[^>]*>([\s\S]*?)<\/oVar>/g, (m: string, t: string) => {
                 const ty = attr(m, 'type') || '';
@@ -393,14 +395,23 @@ class EntryRenderer {
                 return `\u0003${ty ? `\u0005data-type\u0006${esc(ty)}\u0007` : ''}\u0008${t}\u0004`;
               });
             const q = textOf(qRaw);
+            // 佔位符還原（\u0001–\u0008 哨兵→span 屬性/括弧；no-control-regex 逐行豁免）：
             const qEsc = esc(q)
+              // eslint-disable-next-line no-control-regex
               .replace(/\u0001/g, '<span class="li-lex0-ovar"')
+              // eslint-disable-next-line no-control-regex
               .replace(/\u0002/g, '</span>')
+              // eslint-disable-next-line no-control-regex
               .replace(/\u0003/g, '<span class="li-lex0-pvar"')
+              // eslint-disable-next-line no-control-regex
               .replace(/\u0004/g, '</span>')
+              // eslint-disable-next-line no-control-regex
               .replace(/\u0005/g, ' ')
+              // eslint-disable-next-line no-control-regex
               .replace(/\u0006/g, '="')
+              // eslint-disable-next-line no-control-regex
               .replace(/\u0007/g, '"')
+              // eslint-disable-next-line no-control-regex
               .replace(/\u0008/g, '>');
             this.parts.push(`<div class="li-lex0-ex">${qEsc}</div>`);
           }

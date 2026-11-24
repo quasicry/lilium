@@ -787,7 +787,6 @@ function buildTibetan(p: Parsed): string {
     // 用於堆疊最末位（badzra 末位 r＝0FB2）。中段用 subjoined 會使 N2R
     // 走非規範讀法（krma/srba 型拼式），破壞兩 a 出向恆等。其餘輔音
     // （hammA 語料 m＝sub 形）維持 subjoined——語料字形原樣恆等。
-    const hasLaterSub = p.subs.indexOf(sub, p.subs.indexOf(sub) + 1) >= 0;
     const isLastSub = p.subs[p.subs.length - 1] === sub && p.subs.filter(x => x === sub).length === 1;
     // 中段（非最末位）字形依語料主流定讞（tibetan-sanskrit-pairs 49,834 條
     // 同音節三層堆疊統計）：la/ra/ba/da/kha/pha/a/sa 中段用**主碼位**（majority），
@@ -862,8 +861,9 @@ const normalizeSeparator = (sep: string): string => {
  * 主碼位為主流）＋nga/dza（梵咒連寫 mangga=0F44、badzra=0F5B 主碼位實證）。
  * 不收 dza 以外的 ka/pa/ma/dha/wa（ka 2082:400、pa 1180:142、ma 472:23
  * subjoined 為主流；hammA 語料 ma 中段＝subjoined 0FA8 實證）。
+ * 歷史：中段主碼位集合（l/r/b/d/k/kh/ph/a/s/sh/g/ng/dz/dh/T/D）曾以 MID_MAIN_SUBS
+ * 常數維護，現行讀法已內聯此判決，常數撤除。
  */
-const MID_MAIN_SUBS = new Set(["l", "r", "b", "d", "k", "kh", "ph", "a", "s", "sh", "g", "ng", "dz", "dh", "T", "D"]);
 /** subs[0] 例外：語料第一下加仍用 subjoined 的輔音（ratna ta＝0F9F 實證） */
 const SUB0_SUBSET = new Set(["t", "y", "w", "ny", "sh"]);
 
@@ -1350,11 +1350,8 @@ function unicodeSyllableToWylie(
             // f51 主碼位首堆疊——固有 a 寫兩個（karma 規範拼式）。
             firstStackIsBase = true;
           }
-          if (false) {
-            // SUPER 主碼位（r/l/s）被當**下加**（bartsi：基 b + 下加 r + 下加 ts）
-            // ——藏文規範無「下加 r/l/s 再疊下加」組合，此讀法非規範，降分。
-            firstSubIsBaseForm = true;
-          }
+          // 註：SUPER 主碼位（r/l/s）被當**下加**（bartsi 型）的讀法曾在此降分——
+          // 藏文規範無「下加 r/l/s 再疊下加」組合，此讀法非規範；分支現已移除（永不生效）。
         } else if (subN === 0 &&
                    (![0x0f5d, 0x0f61, 0x0f62, 0x0f63].includes(cur.cp) ||
                     (nextIsSub && [0x0f62, 0x0f63, 0x0f65].includes(cur.cp)))) {
