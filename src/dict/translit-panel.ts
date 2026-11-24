@@ -498,7 +498,7 @@ export function renderTranslitPanel(body: HTMLElement, _view: LiDictView, plugin
     const sid = st.schemeId || st.usedSchemeId;
     const grp = sid ? getScheme(sid)?.group : undefined;
     const isTib = grp === 'tibetan';
-    if (isTib && !ambigSel) {
+    if (isTib && !st.toNative && !ambigSel) {
       ambigField = ctl.createEl('label', { cls: 'li-col-translit-field' });
       ambigField.createSpan({ cls: 'li-col-translit-label', text: plugin.T('dict.translit.tibAmbigLabel') });
       // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion -- CM6 動態型別窄化防護（批次一實錘），審計批次四
@@ -517,7 +517,7 @@ export function renderTranslitPanel(body: HTMLElement, _view: LiDictView, plugin
       ambigSel.addEventListener('change', () => {
         st.tibAmbig = ambigSel!.value;
       });
-    } else if (!isTib && ambigField) {
+    } else if ((!isTib || st.toNative) && ambigField) {
       ambigField.remove();
       ambigField = null;
       ambigSel = null;
@@ -537,14 +537,14 @@ export function renderTranslitPanel(body: HTMLElement, _view: LiDictView, plugin
       agBackSel.addEventListener('change', () => {
         st.agBackForm = agBackSel!.value;
       });
-    } else if ((grp !== 'aligali' || st.toNative) && agBackField) {
+    } else if ((grp !== 'aligali' || !st.toNative) && agBackField) {
       agBackField.remove();
       agBackField = null;
       agBackSel = null;
     }
     // X-近似歧義 select（全套）：悉曇 oṃ 專用碼位 vs 拼出、sinhala 長式 ē/ō、
     // 缺項 esc 可逆 vs 近似拼出（不提供選項＝轉寫有問題）
-    if (sid && grp && X_APPROX_GROUPS.has(grp) && !xApproxSel) {
+    if (sid && grp && X_APPROX_GROUPS.has(grp) && !st.toNative && !xApproxSel) {
       xApproxField = ctl.createEl('label', { cls: 'li-col-translit-field' });
       xApproxField.createSpan({ cls: 'li-col-translit-label', text: plugin.T('dict.translit.xApproxLabel') });
       // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion -- CM6 動態型別窄化防護
@@ -560,7 +560,7 @@ export function renderTranslitPanel(body: HTMLElement, _view: LiDictView, plugin
       xApproxSel.addEventListener('change', () => {
         st.xApprox = xApproxSel!.value;
       });
-    } else if ((!sid || !grp || !X_APPROX_GROUPS.has(grp)) && xApproxField) {
+    } else if ((!sid || !grp || !X_APPROX_GROUPS.has(grp) || st.toNative) && xApproxField) {
       xApproxField.remove();
       xApproxField = null;
       xApproxSel = null;
