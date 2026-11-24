@@ -56,7 +56,7 @@ for (const doc of corpus.docs) {
     // elision 豁免族：省略撇號縮約（'si/'ti/'va 型，撇號標 iti/eva 等省略音節；
     // 入向還原為詞首 a-（'ti→ati）＝引擎正確補 a 規則，撇號本身無法保真。
     // 判準：含撇號縮約且雙側 elision 規範化（撇號摘除、補 a）後等值：
-    const stripApos = (s) => s.replace(/\s*'(?=[a-zāīūṅñṭḍṇḷṃ])/g, " a");
+    const stripApos = (s) => s.replace(/\s*'(?=[a-zāīūṅñṭḍṇḷṃ])/g, " a").replace(/'(?=[a-zāīūṅñṭḍṇḷṃ])/g, " a");
     if (/'[a-zāīūṅñṭḍṇḷṃ]/.test(line) && norm(stripApos(back)) === norm(stripApos(line))) {
       elision++;
       if (elisionSamples.length < 5) elisionSamples.push([doc.file, line.slice(0, 60)]);
