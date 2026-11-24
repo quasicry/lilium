@@ -1956,22 +1956,22 @@ export const DICT: Record<string, Entry> = {
     "de": ".mdx erforderlich; .mdd ist ein optionales Ressourcenpaket"
   },
   "dict.import.fmt.teiLex0": {
-    "zh": "TEI Lex-0（.lex0.xml）",
-    "zh-TW": "TEI Lex-0（.lex0.xml）",
-    "ja": "TEI Lex-0（.lex0.xml）",
-    "ko": "TEI Lex-0(.lex0.xml)",
-    "en": "TEI Lex-0 (.lex0.xml)",
-    "fr": "TEI Lex-0 (.lex0.xml)",
-    "de": "TEI Lex-0 (.lex0.xml)"
+    "zh": "TEI Lex-0（.lex0.xml / .p5.xml / .zip / tar 包）",
+    "zh-TW": "TEI Lex-0（.lex0.xml / .p5.xml / .zip / tar 包）",
+    "ja": "TEI Lex-0（.lex0.xml / .p5.xml / .zip / tar）",
+    "ko": "TEI Lex-0(.lex0.xml / .p5.xml / .zip / tar)",
+    "en": "TEI Lex-0 (.lex0.xml / .p5.xml / .zip / tar)",
+    "fr": "TEI Lex-0 (.lex0.xml / .p5.xml / .zip / tar)",
+    "de": "TEI Lex-0 (.lex0.xml / .p5.xml / .zip / tar)"
   },
   "dict.import.hint.teiLex0": {
-    "zh": "TEI Lex-0 辞典 XML（重命名为 .lex0.xml 后扫描自动挂载）",
-    "zh-TW": "TEI Lex-0 辭典 XML（重新命名為 .lex0.xml 後掃描自動掛載）",
-    "ja": "TEI Lex-0 辞書 XML（.lex0.xml にリネームするとスキャンで自動マウント）",
-    "ko": "TEI Lex-0 사전 XML(.lex0.xml로 이름 변경 후 자동 스캔)",
-    "en": "TEI Lex-0 dictionary XML (rename to .lex0.xml for auto-scan)",
-    "fr": "XML de dictionnaire TEI Lex-0 (renommer en .lex0.xml pour le scan auto)",
-    "de": "TEI Lex-0 Wörterbuch-XML (zu .lex0.xml umbenennen für Auto-Scan)"
+    "zh": "TEI Lex-0 辞典：.lex0.xml / .p5.xml（TEI P5）/ .zip / tar 包直接导入，gaiji 图片随包自动落盘",
+    "zh-TW": "TEI Lex-0 辭典：.lex0.xml / .p5.xml（TEI P5）/ .zip / tar 包直接匯入，gaiji 圖片隨包自動落盤",
+    "ja": "TEI Lex-0 辞書：.lex0.xml / .p5.xml（TEI P5）/ .zip / tar を直接取り込み、gaiji 画像は同梱で自動保存",
+    "ko": "TEI Lex-0 사전: .lex0.xml / .p5.xml(TEI P5) / .zip / tar 직접 가져오기, gaiji 이미지 자동 저장",
+    "en": "TEI Lex-0 dictionaries: import .lex0.xml / .p5.xml (TEI P5) / .zip / tar directly; gaiji images are extracted automatically",
+    "fr": "Dictionnaires TEI Lex-0 : importez directement .lex0.xml / .p5.xml (TEI P5) / .zip / tar ; les images gaiji sont extraites automatiquement",
+    "de": "TEI Lex-0 Wörterbücher: .lex0.xml / .p5.xml (TEI P5) / .zip / tar direkt importieren; Gaiji-Bilder werden automatisch extrahiert"
   },
   "dict.import.supplement": {
     "zh": "资料管理（补录）",
