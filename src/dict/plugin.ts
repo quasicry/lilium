@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Copyright (C) 2026 quasicry
-import { gzipSync } from 'fflate';
+import { gzip as gzipAsync } from 'fflate';
 import { resolveFontName } from '../font-name';
 import type VerticalWriterPlugin from "../main";
 import { t } from "../i18n";
@@ -259,8 +259,11 @@ export class DictFeature {
   cache: LookupCache = new LookupCache(undefined, () => this.flushCacheDebounced());
   inlineSuggest: InlineDictSuggest | null = null;
   lookupSequence: LookupSequence = new LookupSequence();
-  /** 查詢緩存變髒後延遲落盤，減少 plugin disable/reload 時的歷史丟失 */
-  private flushCacheDebounced = debounce(() => void this.flushCache(), 1500, true);
+  /** 查詢緩存變髒後延遲落盤，減少 plugin disable/reload 時的歷史丟失。
+   *  P1-4b：命中/寫入都會標髒（cache.ts 內），1.5s 視窗在連續查詞時仍會反覆
+   *  觸發全檔 saveData＋backup 雙寫——拉長為 10s 合併落盤；快取僅為加速用途，
+   *  崩潰丟失少量 LRU 順序可接受，卸載時 flushCache 兜底。 */
+  private flushCacheDebounced = debounce(() => void this.flushCache(), 10000, true);
   hoverController: HoverLookupController = new HoverLookupController({
     enabled: false,
     trigger: 'ctrl',
@@ -1261,8 +1264,12 @@ export class DictFeature {
                 reader: readerJson,
                 assets: (result.dict.meta as { assets?: Array<unknown> }).assets || [],
               });
-              const gz = gzipSync(new TextEncoder().encode(wrapped));
-              if (gz.length) await this.plugin.app.vault.adapter.writeBinary(lex0CachePath, gz.buffer);
+              /* P1-5：gzip 改 fflate 異步 API——gzipSync 在主執行緒同步跑，大辭典數百 ms 卡頓。
+                 本塊已是 fire-and-forget 異步上下文，await worker 壓縮不與掃描競爭。 */
+              const gz = await new Promise<Uint8Array>((res, rej) =>
+                gzipAsync(new TextEncoder().encode(wrapped), (err, out) => (err ? rej(err) : res(out))),
+              );
+              if (gz.length) await this.plugin.app.vault.adapter.writeBinary(lex0CachePath, gz.buffer as ArrayBuffer);
             } catch { /* 序列化失敗不阻載入 */ }
             const st = child.stat;
             this.scanCacheMap.set(`tei-lex0-${folderKey0}-${dictBaseName(child.name)}`, { dict: result.dict, sig: `${st.mtime}:${st.size}` });

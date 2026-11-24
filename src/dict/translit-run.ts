@@ -824,6 +824,16 @@ export function transliterateText(
   // 段尾音節缺 tsheg（用戶主訴：詞尾/段落尾空格不轉 tsheg）。頭部縮進不補：
   // 行首 tsheg 非藏文正字法。
   const trailingWs = text.slice(src.length).match(/\s+$/)?.[0] ?? "";
-  const stats = transliterateLongText(src + (toNative && trailingWs ? " " : trailingWs), scheme, toNative, { tibAmbig, xApprox, agBackForm });
-  return { ok: true, text: stats.text, stats, schemeId: usedId, ms: Date.now() - t0 };
+  // E5：羅馬→原生時單純補空格讓段尾音節補出 tsheg，但探針實測 'bod\n' 的尾隨
+  // 換行會被引擎吃成 tsheg（輸出 'བོད་' 丟 \n）。修法：入向仍補一個空格
+  // （維持段尾補 tsheg 設計不退回），出向後把尾隨空白中的「換行類字符」原樣
+  // 補回——純空格仍由引擎轉 tsheg，換行不該轉 tsheg 故逐字還原。
+  const trailingNewlines = toNative ? (trailingWs.match(/[\n\r]+/g)?.join("") ?? "") : "";
+  // E5/G-T1e 交互修正：入向文本尾已是 <ts> token（G-T1e 顯式 tsheg）時不再補空格——
+  // <ts> 已產生段尾 tsheg，再補空格會轉出第二個 tsheg（'bod<ts>\n' → 'བོད་་\n' 實錘）。
+  const padSpace = toNative && trailingWs && !/<ts>$/.test(src);
+  const stats = transliterateLongText(src + (padSpace ? " " : trailingWs), scheme, toNative, { tibAmbig, xApprox, agBackForm });
+  // padSpace=false 時引擎輸入已含尾空白（原樣透傳），再補 trailingNewlines 會重複——僅補空格路徑需還原換行
+  const outText = stats.text + (toNative && padSpace ? trailingNewlines : "");
+  return { ok: true, text: outText, stats, schemeId: usedId, ms: Date.now() - t0 };
 }

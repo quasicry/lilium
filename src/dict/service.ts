@@ -242,7 +242,13 @@ export class DictService {
       const scopeSig = this.scoped.map((d) => d.meta.id).sort().join(',');
       const cached = this.cache.get<Array<Omit<LookupHit & { dictOrder: number }, "bookmarked">>>("lookupAll", `${word}\u0000${scopeSig}`);
       if (cached) {
-        return cached.map((h) => ({ ...h, bookmarked: this.store?.isBookmarked(word) || false }));
+        // P1-4a：落盤快取不含 html（序列化時剝離）——html 缺失的快取值視為未命中，
+        // 落回正常查詢路徑重建，再用剝離後的值回寫快取。
+        if (cached.length && cached.some((h) => !h.html)) {
+          // 不 return：繼續走下方正常查詢
+        } else {
+          return cached.map((h) => ({ ...h, bookmarked: this.store?.isBookmarked(word) || false }));
+        }
       }
     }
     const hits: Array<LookupHit & { dictOrder: number }> = [];
@@ -305,8 +311,10 @@ export class DictService {
       }
     }
     // 主路徑命中寫快取（lemma/變體回退路徑不寫——value 語義為精確命中）。
+    // P1-4a：快取序列化剝離 html（整段詞條 HTML 不該持久化，data.json 曾因此極度膨脹）。
+    // 讀回時 html 為空的 hit 會在 lookupAll 快取讀取路徑被判為未命中，走正常查詢重建。
     if (hits.length && this.cache) {
-      const toCache = hits.map(({ bookmarked: _bm, ...rest }) => rest);
+      const toCache = hits.map(({ bookmarked: _bm, html: _html, ...rest }) => rest);
       const scopeSig = this.scoped.map((d) => d.meta.id).sort().join(',');
       this.cache.set('lookupAll', `${word}\u0000${scopeSig}`, toCache);
     }

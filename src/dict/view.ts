@@ -804,7 +804,8 @@ export class LiDictView extends ItemView {
     shareBtn.textContent = '🖼'; // A2：靜態圖標改 textContent
     // eslint-disable-next-line @typescript-eslint/no-misused-promises -- fire-and-forget 事件回調（UI 事件無人 await 返回值），行為保持——審計批次三。
     shareBtn.addEventListener('click', async () => {
-      if (!hits.length) return;
+      if (!hits.length || shareBtn.disabled) return;
+      shareBtn.disabled = true; // V-F13：連點防護——PNG 生成＋寫檔期間禁用，避免重複生成/同名覆寫
       try {
         liNotice(this.plugin.T('dict.share.generating'));
         // 樣式渲染分支：每 hit 先過 copyStyledHtml（inline CSS＋vault 圖片路徑）再進渲染
@@ -821,6 +822,8 @@ export class LiDictView extends ItemView {
         liNotice(this.plugin.T('dict.share.saved', { file }));
       } catch (e) {
         liNotice(this.plugin.T('dict.share.failed', { err: e instanceof Error ? e.message : String(e) }), 6000);
+      } finally {
+        shareBtn.disabled = false;
       }
     });
 
@@ -953,7 +956,7 @@ export class LiDictView extends ItemView {
       });
     }
     let blockIndex = 0;
-    for (const hit of hits) {
+    for (const [hitIndex, hit] of hits.entries()) { // V-F13：帶索引，hits.indexOf(hit) 於迴圈內 O(n²)
       const dictChanged = hit.dictName !== lastDict;
       if (collapsible) {
         // MDict-style collapsible dictionary block
@@ -1092,7 +1095,7 @@ export class LiDictView extends ItemView {
             .then(() => liNotice(this.plugin.T('dict.mdSaved')))
             .catch(() => liNotice(this.plugin.T('dict.mdSaveFail')));
         });
-        (frame).dataset.hitIndex = String(hits.indexOf(hit));
+        (frame).dataset.hitIndex = String(hitIndex);
         blockIndex++;
       } else {
         // legacy flat rendering
@@ -1136,7 +1139,7 @@ export class LiDictView extends ItemView {
             .then(() => liNotice(this.plugin.T('dict.mdSaved')))
             .catch(() => liNotice(this.plugin.T('dict.mdSaveFail')));
         });
-        (frame).dataset.hitIndex = String(hits.indexOf(hit));
+        (frame).dataset.hitIndex = String(hitIndex);
       }
     }
     // 卡頓修復：循環收尾排隊分幀 fill（單命中時 flatQueue 為空、已同步填畢，零排程開銷）。
@@ -1204,7 +1207,11 @@ export class LiDictView extends ItemView {
           if (imgMode !== 'data') return null;
           const ck = 'vault:' + vaultPath;
           const hit0 = inlineDataCache.get(ck);
-          if (hit0) return hit0;
+          if (hit0) { // V-F9：命中刷新到尾（真 LRU）——原僅插入序 FIFO，熱資源會被冷資源擠出
+            inlineDataCache.delete(ck);
+            inlineDataCache.set(ck, hit0);
+            return hit0;
+          }
           const buf = await this.plugin.app.vault.adapter.readBinary(normalizePath(vaultPath));
           if (buf.byteLength > 256 * 1024) return encodeURI(vaultPath);
           const ext = vaultPath.split('.').pop()?.toLowerCase() || 'png';
@@ -1750,7 +1757,11 @@ export class LiDictView extends ItemView {
     const toData = async (url: string, mime?: string): Promise<string | null> => {
       try {
         const cached = inlineDataCache.get(url);
-        if (cached) return cached;
+        if (cached) { // V-F9：同上——命中刷新到尾（真 LRU）
+          inlineDataCache.delete(url);
+          inlineDataCache.set(url, cached);
+          return cached;
+        }
         let buf: Uint8Array | null = null;
         let contentType = mime;
         // app:// 資源先查 URL→vaultPath 映射走 adapter.readBinary——
