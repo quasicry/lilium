@@ -2019,6 +2019,17 @@ console.log(`\n结果: ${passed} 通过, ${failures.length} 失败`);
   }
 }
 
+// ── 巴利語料門禁（GRETIL 2_pali pu 全 64 檔：6013 句＋3000 詞，IAST↔天城）──
+{
+  const { spawnSync } = await import("node:child_process");
+  const g = spawnSync(process.execPath, [path.join(path.dirname(import.meta.filename), "pali-gretil-gate.mjs")], { encoding: "utf8" });
+  console.log(g.stdout.trim().split("\n")[0]);
+  if (g.status !== 0) {
+    for (const line of (g.stdout + g.stderr).split("\n").slice(1)) if (line.trim()) console.error("GATE-FAIL: " + line.trim());
+    failures.push({ name: `pali-gretil-gate 紅燈 ${g.status}`, e: new Error("pali-gretil-gate 紅燈") });
+  }
+}
+
 // ── 僧伽羅語料門禁（Aksharamukha describe/Sinhala：119 字＋36 詞＋6 句，IAST 進出）──
 {
   const { spawnSync } = await import("node:child_process");
