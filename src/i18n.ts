@@ -170,13 +170,13 @@ export const DICT: Record<string, Entry> = {
     "zh-TW": "辭典模組未載入",
     },
   "dict.onboard.empty": {
-    "zh": "尚未加载任何辞典——把 .mdx/.lex0.xml 等辞典文件放进「辞典文件夹」（设置 → 辞典；留空＝扫描整个仓库），或打开设置添加来源后即可查词。",
-    "ja": "辞書が未読込です——.mdx／.lex0.xml などの辞書ファイルを「辞書フォルダー」（設定 → 辞書。空欄＝保管庫全体を走査）に置くか、設定でソースを追加すると検索できます。",
-    "ko": "사전이 없습니다——.mdx/.lex0.xml 등 사전 파일을 '사전 폴더'(설정 → 사전; 비움＝전체 보관함 스캔)에 넣거나 설정에서 소스를 추가하면 조회할 수 있습니다.",
-    "en": "No dictionaries loaded yet — put .mdx/.lex0.xml files into the “Dictionary folder” (Settings → Dictionary; empty ＝ whole vault), or open settings to add sources, then look up words here.",
-    "fr": "Aucun dictionnaire chargé — placez des fichiers .mdx/.lex0.xml dans le « Dossier de dictionnaires » (Réglages → Dictionnaire ; vide ＝ tout le coffre), ou ajoutez des sources dans les réglages pour lancer des recherches.",
-    "de": "Noch keine Wörterbücher geladen — .mdx/.lex0.xml-Dateien in den „Wörterbuchordner“ legen (Einstellungen → Wörterbuch; leer ＝ gesamter Vault) oder in den Einstellungen Quellen hinzufügen, dann hier nachschlagen.",
-    "zh-TW": "尚未載入任何辭典——把 .mdx/.lex0.xml 等辭典檔放進「辭典檔案夾」（設定 → 辭典；留空＝掃描整個倉庫），或打開設定新增來源後即可查詞。",
+    "zh": "尚未加载任何辞典——把 .mdx/.lex0.xml/.p5.xml 等辞典文件放进「辞典文件夹」（设置 → 辞典；留空＝扫描整个仓库），或打开设置添加来源后即可查词。",
+    "ja": "辞書が未読込です——.mdx／.lex0.xml/.p5.xml などの辞書ファイルを「辞書フォルダー」（設定 → 辞書。空欄＝保管庫全体を走査）に置くか、設定でソースを追加すると検索できます。",
+    "ko": "사전이 없습니다——.mdx/.lex0.xml/.p5.xml 등 사전 파일을 '사전 폴더'(설정 → 사전; 비움＝전체 보관함 스캔)에 넣거나 설정에서 소스를 추가하면 조회할 수 있습니다.",
+    "en": "No dictionaries loaded yet — put .mdx/.lex0.xml/.p5.xml files into the “Dictionary folder” (Settings → Dictionary; empty ＝ whole vault), or open settings to add sources, then look up words here.",
+    "fr": "Aucun dictionnaire chargé — placez des fichiers .mdx/.lex0.xml/.p5.xml dans le « Dossier de dictionnaires » (Réglages → Dictionnaire ; vide ＝ tout le coffre), ou ajoutez des sources dans les réglages pour lancer des recherches.",
+    "de": "Noch keine Wörterbücher geladen — .mdx/.lex0.xml/.p5.xml-Dateien in den „Wörterbuchordner“ legen (Einstellungen → Wörterbuch; leer ＝ gesamter Vault) oder in den Einstellungen Quellen hinzufügen, dann hier nachschlagen.",
+    "zh-TW": "尚未載入任何辭典——把 .mdx/.lex0.xml/.p5.xml 等辭典檔放進「辭典檔案夾」（設定 → 辭典；留空＝掃描整個倉庫），或打開設定新增來源後即可查詞。",
     },
   "dict.onboard.add": {
     "zh": "打开辞典设置",
@@ -713,13 +713,13 @@ export const DICT: Record<string, Entry> = {
     "de": "Noch keine Wörterbücher importiert"
   },
   "dict.empty.desc": {
-    "zh": "支持 MDict (.mdx/.mdd) 与 TEI Lex-0 (.lex0.xml)。",
-    "zh-TW": "支援 MDict (.mdx/.mdd) 與 TEI Lex-0 (.lex0.xml)。",
-    "en": "Supports MDict (.mdx/.mdd) and TEI Lex-0 (.lex0.xml).",
-    "ja": "MDict (.mdx/.mdd)、TEI Lex-0 (.lex0.xml) に対応します。",
-    "ko": "MDict(.mdx/.mdd), TEI Lex-0(.lex0.xml) 지원.",
-    "fr": "Prend en charge MDict (.mdx/.mdd) et TEI Lex-0 (.lex0.xml).",
-    "de": "Unterstützt MDict (.mdx/.mdd) und TEI Lex-0 (.lex0.xml)."
+    "zh": "支持 MDict (.mdx/.mdd) 与 TEI Lex-0 (.lex0.xml/.p5.xml)。",
+    "zh-TW": "支援 MDict (.mdx/.mdd) 與 TEI Lex-0 (.lex0.xml/.p5.xml)。",
+    "en": "Supports MDict (.mdx/.mdd) and TEI Lex-0 (.lex0.xml/.p5.xml).",
+    "ja": "MDict (.mdx/.mdd)、TEI Lex-0 (.lex0.xml/.p5.xml) に対応します。",
+    "ko": "MDict(.mdx/.mdd), TEI Lex-0(.lex0.xml/.p5.xml) 지원.",
+    "fr": "Prend en charge MDict (.mdx/.mdd) et TEI Lex-0 (.lex0.xml/.p5.xml).",
+    "de": "Unterstützt MDict (.mdx/.mdd) und TEI Lex-0 (.lex0.xml/.p5.xml)."
   },
   "dict.empty.hint": {
     "zh": "将辞典文件放入仓库任意文件夹（建议 dictionaries/），然后在管理页扫描导入。",
@@ -966,13 +966,13 @@ export const DICT: Record<string, Entry> = {
     "de": "Wörterbuchordner"
   },
   "dict.set.foldersDesc": {
-    "zh": "逗号分隔的仓库内文件夹路径；留空＝扫描整个仓库。插件会递归扫描 .mdx/.mdd、TEI Lex-0 (.lex0.xml)，以及同名配套的 .css/.js/字体文件。",
-    "zh-TW": "逗號分隔的倉庫內檔案夾路徑；留空＝掃描整個倉庫。插件會遞迴掃描 .mdx/.mdd、TEI Lex-0 (.lex0.xml)，以及同名配套的 .css/.js/字體檔案。",
-    "en": "Comma-separated vault folder paths; leave empty to scan the whole vault. The plugin recursively scans .mdx/.mdd, TEI Lex-0 (.lex0.xml), plus same-named companion .css/.js/font files.",
-    "ja": "カンマ区切りの vault 内フォルダーパス。空欄＝保管庫全体を走査。.mdx/.mdd、TEI Lex-0 (.lex0.xml) と同名の .css/.js/フォントを再帰的に走査します。",
-    "ko": "쉼표로 구분된 vault 폴더 경로. 비움＝전체 보관함 스캔. .mdx/.mdd, TEI Lex-0(.lex0.xml) 및 동명 .css/.js/글꼴 재귀 스캔.",
-    "fr": "Chemins de dossiers séparés par des virgules ; vide ＝ analyse du coffre entier. Analyse récursive de .mdx/.mdd, TEI Lex-0 et des .css/.js/polices homonymes.",
-    "de": "Komma-getrennte Vault-Ordnerpfade; leer ＝ gesamten Vault scannen. Rekursiver Scan von .mdx/.mdd, TEI Lex-0 sowie gleichnamigen .css/.js-/Schriftdateien."
+    "zh": "留空＝扫描整个仓库。插件会递归扫描 .mdx/.mdd、TEI Lex-0 (.lex0.xml/.p5.xml)，以及同名配套的 .css/.js/字体文件。",
+    "zh-TW": "留空＝掃描整個倉庫。插件會遞迴掃描 .mdx/.mdd、TEI Lex-0 (.lex0.xml/.p5.xml)，以及同名配套的 .css/.js/字體檔案。",
+    "en": "Leave empty to scan the whole vault. The plugin recursively scans .mdx/.mdd, TEI Lex-0 (.lex0.xml/.p5.xml), plus same-named companion .css/.js/font files.",
+    "ja": "空欄＝保管庫全体を走査。.mdx/.mdd、TEI Lex-0 (.lex0.xml/.p5.xml) と同名の .css/.js/フォントを再帰的に走査します。",
+    "ko": "비움＝전체 보관함 스캔. .mdx/.mdd, TEI Lex-0(.lex0.xml/.p5.xml) 및 동명 .css/.js/글꼴 재귀 스캔.",
+    "fr": "Vide ＝ analyse du coffre entier. Analyse récursive de .mdx/.mdd, TEI Lex-0/.p5.xml et des .css/.js/polices homonymes.",
+    "de": "Leer ＝ gesamten Vault scannen. Rekursiver Scan von .mdx/.mdd, TEI Lex-0/.p5.xml sowie gleichnamigen .css/.js-/Schriftdateien."
   },
   "dict.set.crossNavMain": {
     "zh": "直排写作系统设置",
@@ -1767,13 +1767,13 @@ export const DICT: Record<string, Entry> = {
     "de": "Dateien auswählen"
   },
   "dict.import.hint": {
-    "zh": "支持 MDict(.mdx/.mdd)、TEI Lex-0(.lex0.xml)。配套文件请一次全部选中；单文件上限 1 GB，导入后自动扫描。",
-    "zh-TW": "支援 MDict(.mdx/.mdd)、TEI Lex-0(.lex0.xml)。配套檔案請一次全部選取；單檔上限 1 GB，匯入後自動掃描。",
-    "ja": "MDict(.mdx/.mdd)、TEI Lex-0(.lex0.xml) に対応。セットのファイルはまとめて選択してください。1 ファイル 1 GB まで。取り込み後に自動スキャンします。",
-    "ko": "MDict(.mdx/.mdd), TEI Lex-0(.lex0.xml) 지원. 구성 파일은 한 번에 모두 선택하세요. 파일당 최대 1 GB. 가져온 후 자동으로 스캔합니다.",
-    "en": "Supports MDict (.mdx/.mdd) and TEI Lex-0 (.lex0.xml). Select all companion files at once; 1 GB per file. A rescan runs automatically after import.",
-    "fr": "Prend en charge MDict (.mdx/.mdd) et TEI Lex-0 (.lex0.xml). Sélectionnez tous les fichiers associés en une fois ; 1 Go par fichier. Une analyse automatique suit l'import.",
-    "de": "Unterstützt MDict (.mdx/.mdd) und TEI Lex-0 (.lex0.xml). Zusammengehörige Dateien gemeinsam auswählen; 1 GB pro Datei. Nach dem Import wird automatisch gescannt."
+    "zh": "支持 MDict(.mdx/.mdd)、TEI Lex-0(.lex0.xml/.p5.xml)。配套文件请一次全部选中；单文件上限 1 GB，导入后自动扫描。",
+    "zh-TW": "支援 MDict(.mdx/.mdd)、TEI Lex-0(.lex0.xml/.p5.xml)。配套檔案請一次全部選取；單檔上限 1 GB，匯入後自動掃描。",
+    "ja": "MDict(.mdx/.mdd)、TEI Lex-0(.lex0.xml/.p5.xml) に対応。セットのファイルはまとめて選択してください。1 ファイル 1 GB まで。取り込み後に自動スキャンします。",
+    "ko": "MDict(.mdx/.mdd), TEI Lex-0(.lex0.xml/.p5.xml) 지원. 구성 파일은 한 번에 모두 선택하세요. 파일당 최대 1 GB. 가져온 후 자동으로 스캔합니다.",
+    "en": "Supports MDict (.mdx/.mdd) and TEI Lex-0 (.lex0.xml/.p5.xml). Select all companion files at once; 1 GB per file. A rescan runs automatically after import.",
+    "fr": "Prend en charge MDict (.mdx/.mdd) et TEI Lex-0 (.lex0.xml/.p5.xml). Sélectionnez tous les fichiers associés en une fois ; 1 Go par fichier. Une analyse automatique suit l'import.",
+    "de": "Unterstützt MDict (.mdx/.mdd) und TEI Lex-0 (.lex0.xml/.p5.xml). Zusammengehörige Dateien gemeinsam auswählen; 1 GB pro Datei. Nach dem Import wird automatisch gescannt."
   },
   "dict.import.format": {
     "zh": "格式",
@@ -1956,8 +1956,8 @@ export const DICT: Record<string, Entry> = {
     "de": ".mdx erforderlich; .mdd ist ein optionales Ressourcenpaket"
   },
   "dict.import.fmt.teiLex0": {
-    "zh": "TEI Lex-0（.lex0.xml / .p5.xml / .zip / tar 包）",
-    "zh-TW": "TEI Lex-0（.lex0.xml / .p5.xml / .zip / tar 包）",
+    "zh": "TEI Lex-0（.lex0.xml / .p5.xml / .zip / tar）",
+    "zh-TW": "TEI Lex-0（.lex0.xml / .p5.xml / .zip / tar）",
     "ja": "TEI Lex-0（.lex0.xml / .p5.xml / .zip / tar）",
     "ko": "TEI Lex-0(.lex0.xml / .p5.xml / .zip / tar)",
     "en": "TEI Lex-0 (.lex0.xml / .p5.xml / .zip / tar)",

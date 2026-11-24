@@ -3,7 +3,7 @@
 /**
  * lilium 辭典 — TEI Lex-0 reader（模塊③ 辭典橋）。
  *
- * Lex-0 = TEI 官方詞典最小基線模型（bcdh/tei-lex-0；「0」＝零級最小起點）。
+ * Lex-0 = TEI 官方辭典最小基線模型（bcdh/tei-lex-0；「0」＝零級最小起點）。
  * 本 reader 把 Lex-0 實例（<TEI> 文件，內含 <entry> 集）解析為 li 條目模型，
  * 與 XDXF reader 同形：純字串/正則解析、不 import obsidian、Node 可直接測。
  *
@@ -1080,7 +1080,7 @@ export class Lex0Reader {
   }
 
   prefix(word: string, limit = 30): string[] {
-    this.ensureIndex(); // v0.1.44：同上
+    this.ensureIndex(); // 同上
     const w = word.toLowerCase().trim();
     if (!this.sortedKeys) this.sortedKeys = Array.from(this.index.keys()).sort();
     const [s, e] = prefixRange(this.sortedKeys, w);
