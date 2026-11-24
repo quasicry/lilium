@@ -70,12 +70,21 @@ interface TranslitPanelState {
   ctSchemeId: string;
 }
 
-const st: TranslitPanelState = {
-  src: '', toNative: true, schemeId: '', out: '', usedSchemeId: '', stats: null, ms: 0,
-  amb: [], ambChoices: [], tibAmbig: 'auto', xApprox: 'auto',
-  sa: '', sb: '', sOut: '', sRule: '', sSutra: '',
-  ctSchemeId: '',
-};
+/** 轉寫頁籤會話狀態的初始值工廠（V-F3：狀態改為面板實例級——每個渲染的
+ * 面板各持一份，關閉其一不再清掉另一面板的用戶文本；實例隨面板閉包銷毀，
+ * 不再由模組級常駐引用持有大文本）。 */
+function newTranslitPanelState(): TranslitPanelState {
+  return {
+    src: '', toNative: true, schemeId: '', out: '', usedSchemeId: '', stats: null, ms: 0,
+    amb: [], ambChoices: [], tibAmbig: 'auto', xApprox: 'auto',
+    sa: '', sb: '', sOut: '', sRule: '', sSutra: '',
+    ctSchemeId: '',
+  };
+}
+
+/** 最近一次渲染面板的實例狀態（僅供測試鉤子 getTranslitState 讀取；
+ * 生產路徑一律用 renderTranslitPanel 內的實例參數，不經此變數）。 */
+let lastPanelSt: TranslitPanelState | null = null;
 
 /** 方案顯示名（依介面語言取 label；缺 i18n 時退回 id） */
 function schemeName(scheme: TransliterationScheme, fallback: string, lang?: string): string {
@@ -221,6 +230,9 @@ function injectStyle(): void {
  */
 export function renderTranslitPanel(body: HTMLElement, _view: LiDictView, plugin: DictFeature): void {
   injectStyle();
+  // V-F3：每個面板實例各持一份狀態（隨本次渲染的閉包存續），不再共用模組級單例。
+  const st = newTranslitPanelState();
+  lastPanelSt = st; // 供測試鉤子讀取（見 getTranslitState）
   const el = body.createDiv({ cls: 'li-articles li-translit' });
   el.createEl('h3', { cls: 'li-panel-title', text: plugin.T('dict.tab.translit') });
   // 標題下實驗性功能注釋一行（i18n 化隨 UI 語言）
@@ -424,7 +436,7 @@ export function renderTranslitPanel(body: HTMLElement, _view: LiDictView, plugin
   const schemes = listPickerSchemes();
   if (!schemes.length) {
     work.createEl('p', { cls: 'li-col-hint', text: plugin.T('dict.collation.translitNone') });
-    renderSandhiLab(el, plugin);
+    renderSandhiLab(el, plugin, st);
     return;
   }
 
@@ -608,7 +620,7 @@ export function renderTranslitPanel(body: HTMLElement, _view: LiDictView, plugin
     if (!useSrc && !useOut) { liNotice(plugin.T('dict.translit.export.pick')); return; }
     closeExport();
     // A2：exportMd 內部含 vault 寫入，可能拋錯——catch 後提示，不留 unhandled rejection。
-    exportMd(plugin, { src: useSrc, out: useOut }).catch((e) => {
+    exportMd(plugin, st, { src: useSrc, out: useOut }).catch((e) => {
       console.error('[lilium] translit export:', e);
       liNotice(plugin.T('common.operationFailed'), 8000);
     });
@@ -948,10 +960,10 @@ export function renderTranslitPanel(body: HTMLElement, _view: LiDictView, plugin
   });
 
   // ---------- 檢字表（全外掛唯一入口，下拉式選方案） ----------
-  renderCharTableBox(el, plugin, schemes, schemeSel);
+  renderCharTableBox(el, plugin, schemes, st, schemeSel);
 
   // ---------- 連聲合成（輔助工具，維持折疊） ----------
-  renderSandhiLab(el, plugin);
+  renderSandhiLab(el, plugin, st);
 }
 
 /**
@@ -972,6 +984,7 @@ function renderCharTableBox(
   root: HTMLElement,
   plugin: DictFeature,
   schemes: TransliterationScheme[],
+  st: TranslitPanelState,
   syncFrom?: HTMLSelectElement
 ): void {
   // 「檢字表可檢視語言」設定（主插件設定；空陣列 = 全部開啟）
@@ -1032,7 +1045,7 @@ function renderCharTableBox(
 
 // ------------------------------------------------------------------ 連聲合成
 
-function renderSandhiLab(root: HTMLElement, plugin: DictFeature): void {
+function renderSandhiLab(root: HTMLElement, plugin: DictFeature, st: TranslitPanelState): void {
   const box = root.createEl('details', { cls: 'li-col-sandhi' });
   box.createEl('summary', { text: plugin.T('dict.collation.sandhi') });
   const inner = box.createDiv({ cls: 'li-col-translit-inner' });
@@ -1126,22 +1139,23 @@ function renderSandhiLab(root: HTMLElement, plugin: DictFeature): void {
 
 // ------------------------------------------------------------------ 測試鉤子
 
-/** 暴露模組級狀態給冒煙測試斷言（僅讀取，不污染生產邏輯）。 */
-export function getTranslitState(): TranslitPanelState {
-  return st;
+/** 暴露面板會話狀態給冒煙測試斷言（僅讀取，不污染生產邏輯）。
+ * V-F3 後狀態為面板實例級，這裡回傳最近一次渲染面板的實例。 */
+export function getTranslitState(): TranslitPanelState | null {
+  return lastPanelSt;
 }
 
-/** B11：插件 unload／面板關閉時清模組級會話狀態——上限 10 萬碼點的 src/out
- * 大文本不再跨插件生命週期駐留（reload 後舊文本重現＋記憶體常駐）。 */
+/** B11：面板關閉時清該面板的會話狀態——上限 10 萬碼點的 src/out
+ * 大文本不再跨面板生命週期駐留。V-F3 後狀態隨面板實例閉包存續，關閉面板
+ * 釋放 DOM 引用即連帶釋放狀態，此處僅清「最近渲染實例」的殘留引用，
+ * 不再影響其他存活面板的用戶文本。 */
 export function resetTranslitSessionState(): void {
-  st.src = ''; st.out = ''; st.usedSchemeId = ''; st.stats = null; st.ms = 0;
-  st.amb = []; st.ambChoices = [];
-  st.sa = ''; st.sb = ''; st.sOut = ''; st.sRule = ''; st.sSutra = '';
+  lastPanelSt = null;
 }
 
 // ------------------------------------------------------------------ 導出
 
-async function exportMd(plugin: DictFeature, sel: { src: boolean; out: boolean }): Promise<void> {
+async function exportMd(plugin: DictFeature, st: TranslitPanelState, sel: { src: boolean; out: boolean }): Promise<void> {
   const used = getScheme(st.usedSchemeId);
   const dirText = st.toNative ? plugin.T('dict.collation.translitToNative') : plugin.T('dict.collation.translitToRoman');
   const schemeText = used ? schemeName(used, st.usedSchemeId, panelLang(plugin)) : plugin.T('dict.collation.translitAuto');
@@ -1160,7 +1174,10 @@ async function exportMd(plugin: DictFeature, sel: { src: boolean; out: boolean }
     // 蘭札方案的原文（粘貼框）同為天城碼位——正文字體棧不含蘭札族即回落天城字形；
     // 與輸出段同款行內 span 自帶 font-family（雙視圖存活載體），其他文種維持 code fence。
     if (used?.group === 'ranjana') {
-      const span = `<span style="font-family: 'Nithya Ranjana DU'">${st.src.trim()}</span>`;
+      // V-F7：行內 HTML span 內的用戶文本須跳脫（& < >），對照複製路徑
+      // （copyBtn click → ClipboardItem text/html）的同構處理，防代碼注入/破版。
+      const span = `<span style="font-family: 'Nithya Ranjana DU'">${st.src.trim()
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</span>`;
       lines.push('## ' + plugin.T('dict.translit.export.secSrc'), '', span, '');
     } else {
       lines.push('## ' + plugin.T('dict.translit.export.secSrc'), '', '```', st.src.trim(), '```', '');
@@ -1173,7 +1190,9 @@ async function exportMd(plugin: DictFeature, sel: { src: boolean; out: boolean }
     // font-family（note-builder 體例：inline style 是唯一雙視圖存活載體），
     // 閱讀態與 Live Preview 編輯態都直接顯示蘭朒字形；其他文種維持 code fence。
     if (used?.group === 'ranjana') {
-      const span = `<span style="font-family: 'Nithya Ranjana DU'">${out}</span>`;
+      // V-F7：同上——輸出段 span 文本亦須跳脫（與複製路徑同構）。
+      const span = `<span style="font-family: 'Nithya Ranjana DU'">${out
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</span>`;
       lines.push('## ' + plugin.T('dict.translit.export.secOut'), '', span, '');
     } else {
       lines.push('## ' + plugin.T('dict.translit.export.secOut'), '', '```', out, '```', '');

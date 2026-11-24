@@ -158,8 +158,9 @@ export class LiDictView extends ItemView {
     // 同處清 lastResults/pendingFrames，大辭典條目 HTML 不再跨面板生命週期常駐。
     // B10：debounce 在面板關閉後仍可能於 120ms 內觸發——cancel() 消掉關閉後活動。
     this.updateSuggestionsDebounced.cancel();
-    this.frameRo?.disconnect();
-    this.frameRo = null;
+    for (const ro of this.frameRos.values()) ro.disconnect();
+    this.frameRos.clear();
+    this.frameLoadHandlers.clear(); // V-F4：load handler 記錄隨 frame 一併清空
     this.lastResults = [];
     this.pendingFrames = [];
     // 卡頓修復（legacy flat 分幀填充）：面板關閉後不再為舊 DOM 續排 fill 幀。
@@ -242,7 +243,10 @@ export class LiDictView extends ItemView {
         const idx = f.dataset.hitIndex !== undefined ? Number(f.dataset.hitIndex) : i;
         const hit = Number.isInteger(idx) ? hits[idx] : undefined;
         i++;
-        if (!hit || !f.isConnected) continue;
+        // V-F4：lazy 契約——只重填已填充（dataset.filled）的 frame；
+        // 折疊未展開的空殼 frame 交由首次展開時的 fillFrame 按當下主題填，不在此破契約。
+        const filled = (f as HTMLIFrameElement & { dataset: Record<string, string> }).dataset.filled;
+        if (!hit || !f.isConnected || !filled) continue;
         this.fillFrame(f, hit.html, hit.keyText, hit.dictId);
       }
     } catch { /* 主題切換重填失敗不阻斷 */ }
@@ -1313,7 +1317,20 @@ export class LiDictView extends ItemView {
    *  inlineFrameAssets 內聯時據此走 adapter.readBinary——requestUrl 不支持 app://）。 */
   private frameAssetPaths = new Map<string, string>();
   /** B8：當前詞條 iframe body 的 ResizeObserver（fillFrame 換新前 disconnect 舊例，防洩漏）。 */
-  private frameRo: ResizeObserver | null = null;
+  // V-F1：per-frame ResizeObserver 管理——單槽 frameRo 會在 fillFrame 換新時
+  // disconnect 上一幀的 observer（expandAll/queueFlatFill 多 iframe 時首幀高度
+  // 跟隨被殺＋N-1 個 RO 殘留），改為按 frame 各自持有、各自斷開。
+  private frameRos = new Map<HTMLIFrameElement, ResizeObserver>();
+  /** 斷開並移除指定 frame 的 ResizeObserver；順手清掃已分離 frame 的殘留 RO。 */
+  private detachFrameRo(frame: HTMLIFrameElement | null): void {
+    if (frame) {
+      const ro = this.frameRos.get(frame);
+      if (ro) { ro.disconnect(); this.frameRos.delete(frame); }
+    }
+    for (const [f, ro] of this.frameRos) {
+      if (!f.isConnected) { ro.disconnect(); this.frameRos.delete(f); }
+    }
+  }
   private pendingFrames: Array<{ frame: HTMLIFrameElement; html: string; keyText: string; dictId?: string }> = [];
 
   /** 發音宿主按鈕兜底：資產根全域按 basename 探實檔（copyStyledHtml 內 probeAssetFile 的公用版）。 */
@@ -1352,11 +1369,21 @@ export class LiDictView extends ItemView {
     for (const f of q) this.fillFrame(f.frame, f.html, f.keyText, f.dictId);
   }
 
+  /** V-F4：per-frame load handler 記錄——fillFrame 對同一 iframe 重填（主題切換）
+   * 時先移除舊 handler 再掛新的，避免 listener 逐次累積重複執行。 */
+  private frameLoadHandlers = new Map<HTMLIFrameElement, () => void>();
+
   private fillFrame(frame: HTMLIFrameElement, html: string, keyText: string, dictId?: string): void {
-    // B8：舊 iframe 被面板重建拋棄時，其 body 上的 ResizeObserver 仍持有引用
-    // （fillFrame 每次查詢都會建新 iframe）——新 fill 前先斷開上一個 observer。
-    this.frameRo?.disconnect();
-    this.frameRo = null;
+    // B8/V-F1：舊 iframe 被面板重建拋棄時，其 body 上的 ResizeObserver 仍持有引用——
+    // 只斷開本 frame 自己的舊 observer（per-frame 槽），不再波及他幀；
+    // 已分離 frame 的殘留 RO 一併清掃。
+    this.detachFrameRo(frame);
+    // V-F4：同 frame 重填前先移除上一次掛的 load handler（否則逐次累積）。
+    const prevLoad = this.frameLoadHandlers.get(frame);
+    if (prevLoad) {
+      frame.removeEventListener('load', prevLoad);
+      this.frameLoadHandlers.delete(frame);
+    }
     if (!this.assetBasemap) {
       this.pendingFrames.push({ frame, html, keyText, dictId });
       void this.ensureAssetBasemap().then(() => this.flushPendingFrames());
@@ -1418,7 +1445,7 @@ export class LiDictView extends ItemView {
         );
       } else {
         // TEI 缺字圖形資產缺失（如 koktai img/ 未隨包發佈）：把 li-lex0-g-img 破圖替換為
-        // 佔位字形框（□＋gRef 尾碼），並對已改寫但載入失敗者 onerror 兜底。
+        // 佔位字形框（□＋gRef 尾碼）。
         processed = processed.replace(
           /<img\b[^>]*class="[^"]*li-lex0-g-img[^"]*"[^>]*>/g,
           (m: string) => {
@@ -1428,10 +1455,10 @@ export class LiDictView extends ItemView {
           },
         );
       }
-      processed = processed.replace(
-        /(<img\b[^>]*class="[^"]*li-lex0-g-img[^"]*")((?:(?!onerror)[^>])*?)\/>/g,
-        '$1$2 onerror="this.outerHTML=&quot;<span class=&quot;li-lex0-g-missing&quot;>□</span>&quot;"/>',
-      );
+      // V-F8：原於此處寫入 img onerror 屬性做「載入失敗→佔位框」兜底，但
+      // sanitizeHtml 白名單會剝除事件屬性，該字串從未生效（死代碼）——移除。
+      // 對已改寫但載入失敗的破圖，inlineFrameAssets 內聯失敗時保留原 URL，
+      // 瀏覽器顯示原生破圖樣式；不做後綁（iframe 內 DOM 事件需逐圖繫，成本大於收益）。
     }
     // 詞條內「目錄」entry:// 鏈接移除——區塊標題列已有宿主 TOC 按鈕，
     // 同一跳轉在 iframe 內再顯示一次屬功能重複，且 iframe 內點擊在移動端 WebView 本就
@@ -1498,7 +1525,9 @@ export class LiDictView extends ItemView {
     const bundledTail = bundledFontFamilyTail(processed);
     const doc = `<!DOCTYPE html><html class="${dark ? 'li-dark' : 'li-light'}"><head><meta charset="utf-8">${cssLinks}<style>${bundledFaceCss}${inlineCss}${fontFace}${UD_FRAME_CSS}${darkCss}body{font-family:var(--font-text, sans-serif), ${bundledTail}, sans-serif;}</style></head>
 <body>${bodyInner}</body></html>`;
-    iframe.addEventListener('load', () => {
+    // V-F4：註冊 load handler 並記錄——重填時先移除舊 handler（見 fillFrame 開頭），
+    // 避免同一 iframe 多次 fill 後 listener 逐次累積重複執行。
+    const loadHandler = () => {
       try {
         const body = iframe.contentDocument?.body;
         if (!body) return;
@@ -1528,7 +1557,7 @@ export class LiDictView extends ItemView {
         fitFrame();
         const ro = new ResizeObserver(fitFrame);
         ro.observe(body);
-        this.frameRo = ro; // B8：記錄實例引用，供下一次 fillFrame 換新時 disconnect
+        this.frameRos.set(iframe, ro); // V-F1：per-frame 槽記錄，重填/關閉時各自 disconnect
         iframe.addEventListener('load', fitFrame, { once: true });
         // 移動端 iframe 內合成 click 可能被宿主手勢層攔截——handler 同時掛 touchend，
         // touchHandled 旗標防 click 合成後雙觸發；IIFE 內所有分支共用。
@@ -1706,7 +1735,9 @@ export class LiDictView extends ItemView {
       } catch {
         /* cross-origin */
       }
-    });
+    };
+    this.frameLoadHandlers.set(iframe, loadHandler); // V-F4：記錄供重填時對稱移除
+    iframe.addEventListener('load', loadHandler);
     iframe.srcdoc = doc;
   }
 
