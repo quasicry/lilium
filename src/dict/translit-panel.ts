@@ -845,7 +845,30 @@ export function renderTranslitPanel(body: HTMLElement, _view: LiDictView, plugin
     if (!st.out) { liNotice(plugin.T('dict.collation.translitNeedText')); return; }
     const api = typeof navigator !== 'undefined' ? navigator.clipboard : undefined;
     if (!api?.writeText) { liNotice(plugin.T('dict.collation.translitNone')); return; }
-    void api.writeText(displayedOut())
+    const text = displayedOut();
+    // 蘭札方案（輸出原生）：複製格式改為 HTML——span 自帶 font-family
+    // 'Nithya Ranjana DU'（0.2.x 匯出 MD 行內 span 同款載體），收件端
+    // （Word/網頁/備忘錄）套 inline style 直接顯示蘭札字形；正文字體棧
+    // 不含蘭札族時須靠收件端已安裝字體，故同放 text/plain fallback。
+    const used = getScheme(st.usedSchemeId);
+    if (st.toNative && used?.group === 'ranjana' && typeof ClipboardItem !== 'undefined' && api.write) {
+      const html = `<span style="font-family: 'Nithya Ranjana DU'">${text
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</span>`;
+      const item = new ClipboardItem({
+        'text/html': new Blob([html], { type: 'text/html' }),
+        'text/plain': new Blob([text], { type: 'text/plain' }),
+      });
+      void api.write([item])
+        .then(() => liNotice(plugin.T('dict.copyDone')))
+        .catch(() =>
+          // HTML flavor 寫入失敗（權限/環境）→ 退純文字，行為不劣化
+          api.writeText(text)
+            .then(() => liNotice(plugin.T('dict.collation.translitCopied')))
+            .catch(() => liNotice(plugin.T('dict.collation.translitNone')))
+        );
+      return;
+    }
+    void api.writeText(text)
       .then(() => liNotice(plugin.T('dict.collation.translitCopied')))
       .catch(() => liNotice(plugin.T('dict.collation.translitNone')));
   });
