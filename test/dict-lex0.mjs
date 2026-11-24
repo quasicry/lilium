@@ -450,5 +450,85 @@ await test("re/tr/trans：既有 cit type=translation 行為不變（回歸：li
   assert.match(dog.html, /\[fr\]/);
 });
 
+// ---- choice／oVar／pVar（TEI 校勘語義群＋例句內變體參照）
+
+const mkEntry = (inner, charDeclXml = '') =>
+  `<?xml version="1.0"?><TEI xmlns="http://www.tei-c.org/ns/1.0" type="lex-0"><teiHeader><fileDesc><titleStmt><title>ChoiceTest</title></titleStmt></fileDesc></teiHeader>` +
+  (charDeclXml ? `<standOff>${charDeclXml}</standOff>` : '') +
+  `<text><body><entry xml:id="c1"><form type="lemma"><orth>choiceword</orth></form>${inner}</entry></body></text></TEI>`;
+
+await test("choice/oVar/pVar：orig/reg 選 reg（orig 文本不輸出）", () => {
+  const r = new Lex0Reader(mkEntry(`<sense><choice><orig>colour</orig><reg>color</reg></choice></sense>`));
+  const a = r.lookupAll("choiceword")[0];
+  assert.match(a.html, /<span class="li-lex0-choice" data-choice-type="reg">color<\/span>/);
+  assert.ok(!a.html.includes("colour"), "被替代 orig 文本不得輸出: " + a.html);
+});
+
+await test("choice/oVar/pVar：sic/corr 選 corr（sic 錯字不輸出）", () => {
+  const r = new Lex0Reader(mkEntry(`<sense><choice><sic>teh</sic><corr>the</corr></choice></sense>`));
+  const a = r.lookupAll("choiceword")[0];
+  assert.match(a.html, /data-choice-type="corr">the</);
+  assert.ok(!a.html.includes("teh"), "sic 錯字不得輸出");
+});
+
+await test("choice/oVar/pVar：abbr/expan 選 expan", () => {
+  const r = new Lex0Reader(mkEntry(`<sense><choice><abbr>Dr.</abbr><expan>Doctor</expan></choice></sense>`));
+  const a = r.lookupAll("choiceword")[0];
+  assert.match(a.html, /data-choice-type="expan">Doctor</);
+  assert.ok(!a.html.includes("Dr."));
+});
+
+await test("choice/oVar/pVar：多 unclear 選 cert=high", () => {
+  const r = new Lex0Reader(mkEntry(`<sense><choice><unclear cert="low">ab</unclear><unclear cert="high">cd</unclear></choice></sense>`));
+  const a = r.lookupAll("choiceword")[0];
+  assert.match(a.html, /data-choice-type="unclear">cd</);
+  assert.ok(!a.html.includes("ab<"), "低 cert unclear 文本不得輸出");
+});
+
+await test("choice/oVar/pVar：g 在 choice 內保留字形映射", () => {
+  const gaijiDecl = `<char xml:id="gg1"><mapping type="standard"><g>𡿺</g></mapping></char>`;
+  const r = new Lex0Reader(mkEntry(`<sense><choice><sic>誤字</sic><corr><g ref="#gg1"/></corr></choice></sense>`, gaijiDecl));
+  const a = r.lookupAll("choiceword")[0];
+  assert.match(a.html, /data-choice-type="corr"/);
+  assert.match(a.html, /li-lex0-g" data-gref="gg1">𡿺</, "選中 corr 內 g 應映射: " + a.html);
+  assert.ok(!a.html.includes("誤字"));
+});
+
+await test("choice/oVar/pVar：未知配對型退化取首個子元素", () => {
+  const r = new Lex0Reader(mkEntry(`<sense><choice><seg>first</seg><seg>second</seg></choice></sense>`));
+  const a = r.lookupAll("choiceword")[0];
+  assert.match(a.html, /li-lex0-choice[^>]*>first</);
+  assert.ok(!a.html.includes("second"));
+});
+
+await test("choice/oVar/pVar：oVar 例句渲染 data-type", () => {
+  const r = new Lex0Reader(mkEntry(`<cit type="example"><quote>an <oVar type="pt">took</oVar> book</quote></cit>`));
+  const a = r.lookupAll("choiceword")[0];
+  assert.match(a.html, /<span class="li-lex0-ovar" data-type="pt">took<\/span>/);
+  assert.match(a.html, /<div class="li-lex0-ex">an /, "例句前導文本保留");
+  assert.match(a.html, /<\/span> book</, "例句後續文本保留");
+});
+
+await test("choice/oVar/pVar：pVar 渲染 li-lex0-pvar", () => {
+  const r = new Lex0Reader(mkEntry(`<cit type="example"><quote>a <pVar type="pt">way</pVar> road</quote></cit>`));
+  const a = r.lookupAll("choiceword")[0];
+  assert.match(a.html, /<span class="li-lex0-pvar" data-type="pt">way<\/span>/);
+});
+
+await test("choice/oVar/pVar：既有 oRef/pRef 行為不變（回歸）", () => {
+  // quote 路徑：oRef/pRef 自閉合 → 詞頭佔位文本（既有 textOf 拍平行為）
+  const r = new Lex0Reader(mkEntry(`<cit type="example"><quote>I <oRef/> it</quote></cit><cit type="example"><quote>the <pRef target="#c1"/></quote></cit>`));
+  const a = r.lookupAll("choiceword")[0];
+  assert.match(a.html, /<div class="li-lex0-ex">I choiceword it<\/div>/, "oRef 例句內佔位仍為詞頭文本");
+  assert.match(a.html, /the choiceword/, "pRef 例句內佔位仍為詞頭文本");
+});
+
+await test("choice/oVar/pVar：既有 oRef/pRef 配對帶內文回歸（quote 內照舊拍平）", () => {
+  const r = new Lex0Reader(mkEntry(`<cit type="example"><quote>I <oRef type="cap">did</oRef> it</quote></cit><sense>out of quote <oRef type="cap">x</oRef> end</sense>`));
+  const a = r.lookupAll("choiceword")[0];
+  assert.ok(!a.html.includes("did"), "quote 內 oRef 內文由詞頭佔位替代（既有行為）");
+  assert.match(a.html, /<span class="li-lex0-oref" data-oref-type="cap">choiceword<\/span>/, "quote 外 oRef 佔位 span 既有渲染不變");
+});
+
 console.log(`\n${pass} passed, ${fail} failed`);
 process.exit(fail ? 1 : 0);

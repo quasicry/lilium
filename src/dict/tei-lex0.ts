@@ -92,6 +92,19 @@ function textOf(xml: string): string {
 }
 
 /** 取屬性值（name 須為合法屬性名）。 */
+/**
+ * <choice>（TEI 3.4/11.3 校勘語義群）規範形挑選：
+ * 按子元素名優先取規範形——corr > expan > reg >（其餘首個）。
+ * 文本正確性優先：被替代的 orig/sic/abbr 文本不輸出（否則校勘字並排產生錯誤文本）。
+ */
+const CHOICE_REGULARIZING = ['corr', 'expan', 'reg'];
+
+/** 多個 <unclear> 時取 cert 屬性最高者（high > medium > low > 無）。 */
+const CERT_RANK: Record<string, number> = { high: 3, medium: 2, moderate: 2, low: 1 };
+function certRank(tag: string): number {
+  return CERT_RANK[attr(tag, 'cert') || ''] ?? 0;
+}
+
 function attr(tag: string, name: string): string | undefined {
   // C6：\b 對 name 前接 '-'/':' 等字元失效（可誤中子串）。iOS 16.4 以下不支援
   // lookbehind（MOB-REGEX 閘），改手動錨點：逐位置檢查 name 起點前一字符不屬屬性名字元集。
@@ -260,6 +273,27 @@ class EntryRenderer {
     }
   }
 
+  /** choice 內頂層子元素（不含嵌套同名）：{ tag, openTag, inner }。 */
+  private topLevelChildren(xml: string): { tag: string; openTag: string; inner: string }[] {
+    const out: { tag: string; openTag: string; inner: string }[] = [];
+    let i = 0;
+    while (i < xml.length) {
+      const lt = xml.indexOf('<', i);
+      if (lt < 0) break;
+      const tagM = xml.slice(lt).match(/^<([a-zA-Z][a-zA-Z0-9]*)\b[^>]*?(\/?)>/);
+      if (!tagM) { i = lt + 1; continue; }
+      const tag = tagM[1];
+      const openTag = tagM[0];
+      const openEnd = lt + openTag.length;
+      if (tagM[2] === '/') { i = openEnd; continue; }
+      const close = findMatching(xml, openEnd, tag);
+      if (close === null) break;
+      out.push({ tag, openTag, inner: xml.slice(openEnd, close.start) });
+      i = close.end;
+    }
+    return out;
+  }
+
   private handleElement(tag: string, openTag: string, inner: string, depth: number, senseNo: string): void {
     switch (tag) {
       case 'sense': {
@@ -329,9 +363,29 @@ class EntryRenderer {
               .replace(/<pRef\b[^>]*\/>|<pRef\b[^>]*>[\s\S]*?<\/pRef>/g, (m: string) => {
                 const t = (m.match(/target="#([^"]+)"/) || [])[1] || '';
                 return this.pronById.get(t) || hw;
+              })
+              // TEI 9.3.1.2：quote 內 oVar/pVar 為配對元素帶內文——textOf 會剝殼留內文
+              // （不丟文本），但為了保住斜體語義，先以私有佔位符包住內文；
+              // esc() 之後再把佔位符換回 span（私有區字元不經 esc，零 raw XML 直通）
+              .replace(/<oVar\b[^>]*>([\s\S]*?)<\/oVar>/g, (m: string, t: string) => {
+                const ty = attr(m, 'type') || '';
+                return `\u0001${ty ? `\u0005data-type\u0006${esc(ty)}\u0007` : ''}\u0008${t}\u0002`;
+              })
+              .replace(/<pVar\b[^>]*>([\s\S]*?)<\/pVar>/g, (m: string, t: string) => {
+                const ty = attr(m, 'type') || '';
+                return `\u0003${ty ? `\u0005data-type\u0006${esc(ty)}\u0007` : ''}\u0008${t}\u0004`;
               });
             const q = textOf(qRaw);
-            this.parts.push(`<div class="li-lex0-ex">${esc(q)}</div>`);
+            const qEsc = esc(q)
+              .replace(/\u0001/g, '<span class="li-lex0-ovar"')
+              .replace(/\u0002/g, '</span>')
+              .replace(/\u0003/g, '<span class="li-lex0-pvar"')
+              .replace(/\u0004/g, '</span>')
+              .replace(/\u0005/g, ' ')
+              .replace(/\u0006/g, '="')
+              .replace(/\u0007/g, '"')
+              .replace(/\u0008/g, '>');
+            this.parts.push(`<div class="li-lex0-ex">${qEsc}</div>`);
           }
           const tr = inner.match(/<cit\b[^>]*type="translation"[^>]*>[\s\S]*?<quote\b[^>]*>([\s\S]*?)<\/quote>/);
           if (tr) {
@@ -497,6 +551,54 @@ class EntryRenderer {
         // 發音引用（例句中指向某 pron，如 umfahren 兩讀）——TEI 10.4：斜體詞頭佔位
         const t = attr(openTag, 'target') || '';
         this.parts.push(`<span class="li-lex0-pref"${t ? ` data-target="${esc(t)}"` : ''}>${esc(this.entryHw || '…')}</span>`);
+        return;
+      }
+      case 'choice': {
+        // TEI 校勘語義群（orig/reg、abbr/expan、sic/corr、多 unclear@cert）——
+        // 文本正確性優先：只輸出單一規範形文本，被替代文本（orig/sic/abbr）不輸出
+        // （拍平會把刪字與添字並排產生錯誤文本）。無已知配對型則退化取首個子元素文本。
+        const kids = this.topLevelChildren(inner);
+        if (!kids.length) return;
+        let chosen = kids[0];
+        // 多 unclear：取 cert 最高者
+        if (kids.every((k) => k.tag === 'unclear') && kids.length > 1) {
+          chosen = kids.reduce((best, k) => (certRank(k.openTag) > certRank(best.openTag) ? k : best));
+        } else {
+          for (const want of CHOICE_REGULARIZING) {
+            const hit = kids.find((k) => k.tag === want);
+            if (hit) { chosen = hit; break; }
+          }
+        }
+        const ctype = kids.every((k) => k.tag === 'unclear')
+          ? 'unclear'
+          : chosen.tag;
+        const before = this.parts.length;
+        // 遞迴渲染選中子元素——choice 內 <g ref> 字形映射天然保留（koktai 實錘）
+        this.renderBody(chosen.inner, depth + 1, senseNo);
+        const bodyHtml = this.parts.slice(before).join('');
+        this.parts.length = before;
+        if (bodyHtml && /li-lex0-g/.test(bodyHtml)) {
+          this.parts.push(`<span class="li-lex0-choice" data-choice-type="${esc(ctype)}">${bodyHtml}</span>`);
+        } else {
+          const t = textOf(chosen.inner);
+          if (t) this.parts.push(`<span class="li-lex0-choice" data-choice-type="${esc(ctype)}">${esc(t)}</span>`);
+        }
+        return;
+      }
+      case 'oVar': {
+        // TEI 9.3.1.2 orthographic-variant reference（例句內異體參照）——比照 oRef 佔位模式
+        const type = attr(openTag, 'type') || '';
+        const t = textOf(inner);
+        if (!t) return;
+        this.parts.push(`<span class="li-lex0-ovar"${type ? ` data-type="${esc(type)}"` : ''}>${esc(t)}</span>`);
+        return;
+      }
+      case 'pVar': {
+        // TEI 9.3.1.2 pronunciation-variant reference（例句內讀音變體參照）——比照 pRef 佔位模式
+        const type = attr(openTag, 'type') || '';
+        const t = textOf(inner);
+        if (!t) return;
+        this.parts.push(`<span class="li-lex0-pvar"${type ? ` data-type="${esc(type)}"` : ''}>${esc(t)}</span>`);
         return;
       }
       case 'hyph': {

@@ -2025,6 +2025,14 @@ body.li-editor-vertical-active .li-native-page .MJX-TEX {
   font-style: italic;
   color: var(--text-muted, #999);
 }
+/* TEI 9.3.1.2 例句內變體參照（oVar/pVar）：斜體，比照 pRef */
+.li-lex0-ovar {
+  font-style: italic;
+}
+.li-lex0-pvar {
+  font-style: italic;
+  color: var(--text-muted, #999);
+}
 .li-lex0-hyph {
   letter-spacing: 0.02em;
 }
