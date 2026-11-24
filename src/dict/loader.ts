@@ -74,6 +74,8 @@ export async function loadMdict(
     assetWriter?: AssetWriter;
     dictId?: string;
     extractAssets?: boolean;
+    /** P2-6：mdd 資產抽取總量預算（bytes）——缺省 800MB（mdd-assets.ts 內定） */
+    mddAssetBudgetBytes?: number;
     onProgress?: (phase: string, done: number, total: number) => void;
   } = {},
 ): Promise<LoadResult> {
@@ -104,6 +106,8 @@ export async function loadMdict(
         writeBinary: (p, d) => opts.assetWriter!.writeBinary(p, d),
         vaultFolder: ASSET_FOLDER,
         dictId: opts.dictId,
+        // P2-6：設定頁 mddAssetBudgetMb 透傳（此前該設定是安慰劑——僅存不讀）
+        maxTotalBytes: opts.mddAssetBudgetBytes,
         onProgress: (done, total) => opts.onProgress?.('mdd', done, total),
       });
       assets = res.assets;

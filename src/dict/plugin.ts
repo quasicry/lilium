@@ -113,8 +113,8 @@ async function readFileHead(file: File): Promise<Uint8Array | null> {
 
 export interface LiDictSettings {
   /**
-   * 舊版「辭典檔案夾」欄位：掃描已改為整個 vault，此欄位不再被讀取。
-   * 保留宣告只為相容舊 data.json（既有使用者設定仍能載入，不會因缺欄位而重置）。
+   * 「辭典檔案夾」欄位：非空時掃描僅限這些資料夾（遞歸），留空＝掃描整個倉庫
+   * （collectDictFolders 為準）。導入目錄永遠納入掃描範圍。
    * （刻意不用 deprecated 標記——官方 no-deprecated 規則會誤報且禁用指令不被審核允許。）
    */
   folders: string[];
@@ -717,6 +717,9 @@ export class DictFeature {
           try {
             await this.plugin.app.vault.createBinary(norm, buf);
           } catch {
+            // P3-8：此降級寫出的檔不在 vault 索引內，app:// 資源 URL 必 404
+            // （上方註釋實錘）——保留寫入（比拋錯好）但留警告供診斷。
+            console.warn('[lilium] createBinary 失敗，降級 adapter 直寫（資源 URL 將 404）:', norm);
             await this.plugin.app.vault.adapter.writeBinary(norm, buf);
           }
         }
@@ -1269,7 +1272,11 @@ export class DictFeature {
               const gz = await new Promise<Uint8Array>((res, rej) =>
                 gzipAsync(new TextEncoder().encode(wrapped), (err, out) => (err ? rej(err) : res(out))),
               );
-              if (gz.length) await this.plugin.app.vault.adapter.writeBinary(lex0CachePath, gz.buffer as ArrayBuffer);
+              if (gz.length) {
+                await this.plugin.app.vault.adapter.writeBinary(lex0CachePath, gz.buffer as ArrayBuffer);
+                // P2-7：登記磁盤緩存路徑——刪除辭典時一併清 .gz（此前僅 mdx 登記，TEI 緩存成孤兒）
+                this.scanCacheFiles.set(result.dict.meta.id, lex0CachePath);
+              }
             } catch { /* 序列化失敗不阻載入 */ }
             const st = child.stat;
             this.scanCacheMap.set(`tei-lex0-${folderKey0}-${dictBaseName(child.name)}`, { dict: result.dict, sig: `${st.mtime}:${st.size}` });
@@ -1364,6 +1371,8 @@ export class DictFeature {
           assetWriter: this.settings.extractMddAssets ? this.assetWriter() : undefined,
           dictId,
           extractAssets: this.settings.extractMddAssets,
+          // P2-6：設定頁預算透傳（Mb→bytes）
+          mddAssetBudgetBytes: this.settings.mddAssetBudgetMb * 1024 * 1024,
           onProgress: (phase, done, total) => {
             if (this.scanAbort) return;
             const now = Date.now();
@@ -1434,11 +1443,6 @@ export class DictFeature {
     }
   }
 
-  private hasSiblingIfo(folder: TFolder, base: string): boolean {
-    return folder.children.some(
-      (c) => c instanceof TFile && c.name.toLowerCase() === `${base.toLowerCase()}.ifo`,
-    );
-  }
 
   /** Attach standalone css/js/font files to a dictionary as companion assets */
   private async attachCompanions(
@@ -1667,7 +1671,8 @@ export class DictFeature {
     try {
       const entries = await this.plugin.app.vault.adapter.list(`${ASSET_FOLDER}/.scan-cache`);
       for (const f of [...entries.files, ...entries.folders]) {
-        if (f.endsWith('.json')) await this.plugin.app.vault.adapter.remove(f).catch(() => {});
+        // P2-7：TEI 快取是 .gz（lex0-*），只清 .json 漏掉它
+        if (f.endsWith('.json') || f.endsWith('.gz')) await this.plugin.app.vault.adapter.remove(f).catch(() => {});
       }
     } catch { /* 資料夾不存在＝無緩存 */ }
   }
