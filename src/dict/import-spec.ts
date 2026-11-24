@@ -70,8 +70,8 @@ export const DICT_IMPORT_SPECS: Record<DictFormat, DictFormatSpec> = {
     format: 'tei-lex0',
     labelKey: 'dict.import.fmt.teiLex0',
     hintKey: 'dict.import.hint.teiLex0',
-    accept: '.xml,.lex0.xml,.tar.gz,.tar.xz,.tgz',
-    requiredGroups: [['.lex0.xml', '.xml', '.tar.gz', '.tar.xz', '.tgz']],
+    accept: '.xml,.lex0.xml,.tar.gz,.tar.xz,.tgz,.zip',
+    requiredGroups: [['.lex0.xml', '.xml', '.tar.gz', '.tar.xz', '.tgz', '.zip']],
     optional: [],
     multi: false,
   },
@@ -269,6 +269,9 @@ export function sniffFormat(ext: string, head: Uint8Array | null): SniffResult {
     case '.tar.xz':
     case '.tgz':
       return isGzip(head) ? null : 'other';
+    case '.zip':
+      // PK 魔數即放行（內容成員嗅探在 loader 層抽最大 .xml 後進行）
+      return head[0] === 0x50 && head[1] === 0x4b ? null : 'other';
     default:
       return null;
   }

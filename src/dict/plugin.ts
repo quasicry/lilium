@@ -42,6 +42,7 @@ import {
   loadLex0FromCache,
   loadLex0,
   extractTeiTarAssetMembers,
+  extractTeiZipAssetMembers,
   AssetWriter,
   ASSET_FOLDER,
   LEGACY_ASSET_FOLDER,
@@ -1224,7 +1225,9 @@ export class DictFeature {
            * extractTeiTarAssetMembers 免再 gunzip 一次（冷路徑雙重解壓消除）。 */
           if (this.settings.extractMddAssets) {
             try {
-              const assetMembers = extractTeiTarAssetMembers(result.bytes || data);
+              const src = result.bytes || data;
+              const isZip = src.length > 4 && src[0] === 0x50 && src[1] === 0x4b;
+              const assetMembers = isZip ? extractTeiZipAssetMembers(src) : extractTeiTarAssetMembers(src);
               const assets = (result.dict.meta.assets ||= []);
               const writer = this.assetWriter();
               for (const m of assetMembers) {

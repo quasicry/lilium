@@ -5,7 +5,7 @@
  * mdd asset extraction, companion css/js/font integration, dict info export.
  */
 
-import { gunzipSync } from 'fflate';
+import { gunzipSync, unzipSync } from 'fflate';
 import { MdictReader } from './mdict';
 import { Lex0Reader } from './tei-lex0';
 import {
@@ -155,6 +155,37 @@ function iterTarMembers(bytes: Uint8Array): TeiTarMember[] {
   return out;
 }
 
+/** zip 抽最大 .xml 成員（DILA 三典 .zip 分發實錘；PK 魔數）。 */
+export function extractLargestXmlFromZip(bytes: Uint8Array): Uint8Array | null {
+  try {
+    const files = unzipSync(bytes);
+    let best: Uint8Array | null = null;
+    let bestName = '';
+    for (const name of Object.keys(files)) {
+      if (!/\.xml$/i.test(name) || name.startsWith('__MACOSX')) continue;
+      const d = files[name];
+      if (!best || d.length > best.length) { best = d; bestName = name; }
+    }
+    void bestName;
+    return best;
+  } catch { return null; }
+}
+
+/** ① TEI 圖形資產通路（zip 版）：img/audio/css 成員抽取，模式同 extractTeiTarAssetMembers。 */
+export function extractTeiZipAssetMembers(bytes: Uint8Array): Array<{ name: string; data: Uint8Array; kind: 'image' | 'audio' | 'css' }> {
+  const kinds: Array<'image' | 'audio' | 'css'> = ['image', 'audio', 'css'];
+  const out: Array<{ name: string; data: Uint8Array; kind: 'image' | 'audio' | 'css' }> = [];
+  try {
+    const files = unzipSync(bytes);
+    for (const name of Object.keys(files)) {
+      if (name.startsWith('__MACOSX') || name.endsWith('/')) continue;
+      const kind = kinds.find((k) => ASSET_KIND_RES[k].test(name.toLowerCase()));
+      if (kind) out.push({ name, data: files[name], kind });
+    }
+  } catch { /* 損壞 zip：空清單，不拖垮詞典本體 */ }
+  return out;
+}
+
 /**
  * ① TEI 圖形資產通路：tar/資料夾導入 TEI 時抽取 img/audio/css 類成員，
  * 掛 dict.meta.assets（對照 MDict extractMddAssets 模式）——view.ts 的
@@ -225,6 +256,11 @@ export function loadLex0(data: Uint8Array, fileName: string): LoadResult {
     // tar 包裝——ustar 魔數在偏移 257，抽最大 .xml 成員
     if (bytes.length > 262 && String.fromCharCode(...bytes.subarray(257, 262)) === 'ustar') {
       const inner = extractLargestXmlFromTar(bytes);
+      if (inner) bytes = inner;
+    }
+    // zip 包裝（DILA 三典實際分發格式）——PK 魔數，抽最大 .xml 成員
+    if (bytes.length > 4 && bytes[0] === 0x50 && bytes[1] === 0x4b && (bytes[2] === 3 || bytes[2] === 5 || bytes[2] === 7)) {
+      const inner = extractLargestXmlFromZip(bytes);
       if (inner) bytes = inner;
     }
     const text = new TextDecoder('utf-8').decode(bytes);
