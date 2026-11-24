@@ -388,6 +388,43 @@ class EntryRenderer {
         if (t) this.parts.push(`<details class="li-lex0-etym"><summary>etymology</summary><div>${esc(t)}</div></details>`);
         return;
       }
+      case 're': {
+        // TEI dictionaries <re>（related entry 相關條目交叉引用）——比照 <xr> 兩段式：
+        // 導入期只記 data-target（內部 <ref target="…"> 優先，退化取 re 自身 target 屬性），
+        // 查詢期由 view.ts 既按 .li-lex0-ref class 選擇補連結（零額外代碼）。re@type 作 data-xr-type。
+        const reType = attr(openTag, 'type') || '';
+        const refM = inner.match(/<ref\b[^>]*>/)?.[0] || '';
+        const tid = attr(refM, 'target') || attr(openTag, 'target') || '';
+        const refMatch = inner.match(/<ref\b[^>]*>([\s\S]*?)<\/ref>/);
+        const refText = refMatch ? textOf(refMatch[1]) : textOf(inner);
+        if (!refText) return;
+        const tidAttr = tid ? ` data-target="${esc(tid)}"` : '';
+        this.parts.push(
+          `<span class="li-lex0-re"><span class="li-lex0-xr-label">related entry</span> ` +
+            `<span class="li-lex0-ref"${tidAttr}${reType ? ` data-xr-type="${esc(reType)}"` : ''}>${esc(refText)}</span></span>`,
+        );
+        return;
+      }
+      case 'tr': {
+        // TEI dictionaries <tr>（translation equivalent 翻譯等價）——比照 cit type=translation 渲染。
+        // cit 內的 tr 仍由 cit 情境消費；此 case 處理獨立/容內出現的 tr。
+        const lang = attr(openTag, 'xml:lang');
+        const t = textOf(inner);
+        if (!t) return;
+        const tlang = lang ? ` <span class="li-lex0-lang">[${esc(lang)}]</span>` : '';
+        this.parts.push(`<div class="li-lex0-tr">${esc(t)}${tlang}</div>`);
+        return;
+      }
+      case 'trans': {
+        // TEI dictionaries <trans>（translation information 容器）——透明殼轉 div，
+        // 內容（tr/cit/desc/bibl…）遞迴渲染；空 trans 不留殼。
+        this.parts.push(`<div class="li-lex0-trans">`);
+        const before = this.parts.length;
+        this.renderBody(inner, depth + 1, senseNo);
+        if (this.parts.length === before) this.parts.pop();
+        else this.parts.push('</div>');
+        return;
+      }
       case 'xr': {
         const type = attr(openTag, 'type') || 'related';
         const refM = inner.match(/<ref\b[^>]*>([\s\S]*?)<\/ref>/);

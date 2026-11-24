@@ -148,12 +148,12 @@ await test("健壯：未閉合 entry → droppedEntries，其餘條目存活", (
 
 await test("健壯：未知元素拍平＋warning 計數", () => {
   const xml = `<?xml version="1.0"?><TEI xmlns="http://www.tei-c.org/ns/1.0" type="lex-0"><teiHeader><fileDesc><titleStmt><title>T</title></titleStmt></fileDesc></teiHeader><text><body>
-<entry xml:id="x"><form type="lemma"><orth>foo</orth></form><re>odd-thing-here</re></entry>
+<entry xml:id="x"><form type="lemma"><orth>foo</orth></form><frob>odd-thing-here</frob></entry>
 </body></text></TEI>`;
   const r = new Lex0Reader(xml);
   const a = r.lookupAll("foo")[0];
   assert.match(a.html, /odd-thing-here/);
-  assert.ok((r.warnings.unknownElements.get("re") || 0) >= 1);
+  assert.ok((r.warnings.unknownElements.get("frob") || 0) >= 1);
 });
 
 await test("健壯：空檔／無 entry", () => {
@@ -375,6 +375,79 @@ await test("charDecl glyph＋多 mapping：既有 char/standard 行為不變（�
   const c = r.lookupAll("例")[0];
   assert.match(c.html, /<span class="li-lex0-g" data-gref="char001" data-galt="𠀾">例<\/span>/);
   assert.equal(r.charDecl.get("char001").graphic, "gaiji/char001.png");
+});
+
+// ---- re/tr/trans：自建樣例（dictionaries module 雙語詞典核心元素）
+const rex = `<?xml version="1.0" encoding="UTF-8"?>
+<TEI xmlns="http://www.tei-c.org/ns/1.0">
+<teiHeader><fileDesc><titleStmt><title>re/tr/trans test</title></titleStmt><publicationStmt><p>test</p></publicationStmt><sourceDesc><p>test</p></sourceDesc></fileDesc>
+<encodingDesc><listPrefixDef><prefixDef ident="d" matchPattern="(.+)" replacementPattern="#d.\\1"/></listPrefixDef></encodingDesc>
+</teiHeader>
+<text><body>
+<entry xml:id="d.tiau2"><form type="lemma"><orth>tiau2</orth></form><sense><def>聲調別義</def>
+<re type="denotation"><ref target="#d.pi2">pi2</ref></re>
+<trans><tr xml:lang="en">pitch-differentiated</tr><cit type="translation" xml:lang="en"><quote>to pitch</quote></cit></trans>
+</sense></entry>
+<entry xml:id="d.pi2"><form type="lemma"><orth>pi2</orth></form><sense><def>flat</def></sense></entry>
+<entry xml:id="d.bilingual"><form type="lemma"><orth>salut</orth></form>
+<tr xml:lang="en">hello</tr>
+<trans><tr xml:lang="en">greeting</tr><desc>common greeting</desc></trans>
+</entry>
+</body></text></TEI>
+`;
+
+await test("re/tr/trans：re 的 data-target／ref 文本／xr-label", () => {
+  const r = new Lex0Reader(rex);
+  const a = r.articles.find((x) => x.xmlId === "d.tiau2");
+  assert.match(a.html, /<span class="li-lex0-re"><span class="li-lex0-xr-label">related entry<\/span> <span class="li-lex0-ref" data-target="#d\.pi2" data-xr-type="denotation">pi2<\/span><\/span>/);
+});
+
+await test("re/tr/trans：re 兩段式 idToKey 可解析 target 條目", () => {
+  const r = new Lex0Reader(rex);
+  assert.equal(r.idToKey.get("d.pi2"), "pi2");
+  assert.equal(r.idToKey.get("d.tiau2"), "tiau2");
+});
+
+await test("re/tr/trans：re 自身 target 屬性退化（無內部 ref）", () => {
+  const r = new Lex0Reader(`<?xml version="1.0"?><TEI xmlns="http://www.tei-c.org/ns/1.0"><teiHeader><fileDesc><titleStmt><title>t</title></titleStmt><publicationStmt><p>p</p></publicationStmt><sourceDesc><p>s</p></sourceDesc></fileDesc></teiHeader><text><body><entry xml:id="e1"><form type="lemma"><orth>aa</orth></form><re target="#e2">bb</re></entry><entry xml:id="e2"><form type="lemma"><orth>bb</orth></form></entry></body></text></TEI>`);
+  const a = r.articles.find((x) => x.xmlId === "e1");
+  assert.match(a.html, /<span class="li-lex0-ref" data-target="#e2">bb<\/span>/); // 無 type 時 data-xr-type 省略
+});
+
+await test("re/tr/trans：獨立 tr → li-lex0-tr＋xml:lang 標記", () => {
+  const r = new Lex0Reader(rex);
+  const a = r.articles.find((x) => x.xmlId === "d.bilingual");
+  assert.match(a.html, /<div class="li-lex0-tr">hello <span class="li-lex0-lang">\[en\]<\/span><\/div>/);
+});
+
+await test("re/tr/trans：trans 遞迴——殼 li-lex0-trans 含 tr/desc", () => {
+  const r = new Lex0Reader(rex);
+  const a = r.articles.find((x) => x.xmlId === "d.bilingual");
+  assert.match(a.html, /<div class="li-lex0-trans">\s*<div class="li-lex0-tr">greeting <span class="li-lex0-lang">\[en\]<\/span><\/div>\s*<span class="li-lex0-pc">common greeting<\/span>\s*<\/div>/);
+});
+
+await test("re/tr/trans：trans 內含 tr＋cit type=translation 既有路徑", () => {
+  const r = new Lex0Reader(rex);
+  const a = r.articles.find((x) => x.xmlId === "d.tiau2");
+  assert.match(a.html, /<div class="li-lex0-trans">/);
+  assert.match(a.html, /pitch-differentiated/);
+  assert.match(a.html, /<div class="li-lex0-tr">to pitch/); // cit type=translation 既有路徑仍通
+});
+
+await test("re/tr/trans：既有 xr 行為不變（回歸：xr 渲染＋data-target）", () => {
+  const r = new Lex0Reader(sample);
+  const xydog = r.articles.find((a) => a.xmlId === "XY.dog");
+  assert.match(xydog.html, /li-lex0-xr-label/);
+  const withTarget = r.articles.find((a) => a.html.includes("data-target="));
+  assert.match(withTarget.html, /data-target="#[\w.]+"/);
+});
+
+await test("re/tr/trans：既有 cit type=translation 行為不變（回歸：li-lex0-tr）", () => {
+  const r = new Lex0Reader(sample);
+  const dog = r.lookupAll("dog")[0];
+  assert.match(dog.html, /li-lex0-tr/);
+  assert.match(dog.html, /chien/);
+  assert.match(dog.html, /\[fr\]/);
 });
 
 console.log(`\n${pass} passed, ${fail} failed`);
