@@ -384,7 +384,7 @@ class EntryRenderer {
               // 會被下方還原步驟誤認為佔位符而破壞 HTML 結構——先剝除（C0 控制字元
               // 在 HTML 語義中本就非法，textOf 拍平語義零損失）。
               // 下行正則字元類是刻意的佔位符範圍（no-control-regex 豁免）：
-              // eslint-disable-next-line no-control-regex
+              // eslint-disable-next-line no-control-regex -- C0 控制字元是本函數的私有佔位符哨兵（刻意設計，見上方註釋），剝除原文撞碼防結構破壞
               .replace(/[\u0001-\u0008]/g, '')
               .replace(/<oVar\b[^>]*>([\s\S]*?)<\/oVar>/g, (m: string, t: string) => {
                 const ty = attr(m, 'type') || '';
@@ -397,21 +397,21 @@ class EntryRenderer {
             const q = textOf(qRaw);
             // 佔位符還原（\u0001–\u0008 哨兵→span 屬性/括弧；no-control-regex 逐行豁免）：
             const qEsc = esc(q)
-              // eslint-disable-next-line no-control-regex
+              // eslint-disable-next-line no-control-regex -- 佔位符哨兵還原（刻意設計）：\u0001–\u0008 為私有區控制字元，不經 esc 直通、無用戶輸入面
               .replace(/\u0001/g, '<span class="li-lex0-ovar"')
-              // eslint-disable-next-line no-control-regex
+              // eslint-disable-next-line no-control-regex -- 佔位符哨兵還原（刻意設計）：\u0001–\u0008 為私有區控制字元，不經 esc 直通、無用戶輸入面
               .replace(/\u0002/g, '</span>')
-              // eslint-disable-next-line no-control-regex
+              // eslint-disable-next-line no-control-regex -- 佔位符哨兵還原（刻意設計）：\u0001–\u0008 為私有區控制字元，不經 esc 直通、無用戶輸入面
               .replace(/\u0003/g, '<span class="li-lex0-pvar"')
-              // eslint-disable-next-line no-control-regex
+              // eslint-disable-next-line no-control-regex -- 佔位符哨兵還原（刻意設計）：\u0001–\u0008 為私有區控制字元，不經 esc 直通、無用戶輸入面
               .replace(/\u0004/g, '</span>')
-              // eslint-disable-next-line no-control-regex
+              // eslint-disable-next-line no-control-regex -- 佔位符哨兵還原（刻意設計）：\u0001–\u0008 為私有區控制字元，不經 esc 直通、無用戶輸入面
               .replace(/\u0005/g, ' ')
-              // eslint-disable-next-line no-control-regex
+              // eslint-disable-next-line no-control-regex -- 佔位符哨兵還原（刻意設計）：\u0001–\u0008 為私有區控制字元，不經 esc 直通、無用戶輸入面
               .replace(/\u0006/g, '="')
-              // eslint-disable-next-line no-control-regex
+              // eslint-disable-next-line no-control-regex -- 佔位符哨兵還原（刻意設計）：\u0001–\u0008 為私有區控制字元，不經 esc 直通、無用戶輸入面
               .replace(/\u0007/g, '"')
-              // eslint-disable-next-line no-control-regex
+              // eslint-disable-next-line no-control-regex -- 佔位符哨兵還原（刻意設計）：\u0001–\u0008 為私有區控制字元，不經 esc 直通、無用戶輸入面
               .replace(/\u0008/g, '>');
             this.parts.push(`<div class="li-lex0-ex">${qEsc}</div>`);
           }
