@@ -11,8 +11,8 @@
  * 摩尼文＝RTL 連寫字母文字，源出 Aramaic，經 Syriac 演化；摩尼教東傳後以此書寫
  * 中古波斯語／帕提亞語／粟特語／回鶻語等（吐魯番摩尼教文獻主流文字）。
  * 與回鶻文（olduyghur.ts）同源異流：回鶻文源自粟特草書，摩尼文保留 Aramaic
- * 的獨立字母身份——**VATEC 轉寫慣例的「字形身份」（如 ṭ＝Tau 變體）正是
- * 摩尼文獨立碼位所承載的層**（詳見提案-olduyghur-vatec兼容.md §6）。
+ * 的獨立字母身份——**轉寫慣例的「字形身份」（如 ṭ＝Tau 變體）正是
+ * 摩尼文獨立碼位所承載的層**。
  *
  * 本方案特點：
  *   · 拉丁側依 L2/11-123R §3 記法（ʾ b β g γ d h w z ž j j̈ x y k k̇ k̈ l δ θ m n s ʿ ʿ̈ p f c q q̇ q̈ r š ś t）；
@@ -257,10 +257,6 @@ function isManichaeanAbbv(ch: string): boolean {
   const c = ch.codePointAt(0) ?? 0;
   return c >= ABBV_FIRST && c <= ABBV_LAST;
 }
-function isManichaeanPunct(ch: string): boolean {
-  const c = ch.codePointAt(0) ?? 0;
-  return c >= PUNCT_FIRST && c <= PUNCT_LAST;
-}
 
 export function isManichaeanUnicode(text: string): boolean {
   for (const ch of text) {
@@ -386,7 +382,6 @@ export function manichaeanToLatin(input: string, opts?: ManichaeanTranslitOption
     if (n !== undefined) { out += n; i += 1; continue; }
 
     // 字母＋縮寫符（字母後緊跟 10AE5/10AE6）
-    const nxt = chars[i + 1] ?? "";
     if (isManichaeanLetter(ch)) {
       const base = LETTER_TO_LATIN[ch] ?? ch;
       out += base;

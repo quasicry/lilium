@@ -298,6 +298,32 @@ console.log("[④b 摩尼文方案 — L2/11-123R 記法往返]");
   console.log(`  ④c 摩尼文 VATEC man 段錨: ${mOk}/${vatecMan.length} 往返閉合`);
 }
 
+// ============ ③d UWB（Uigurisches Wörterbuch）引文錨 ============
+// 出處：Göttingen 科學院回鶻語詞典線上版（woerterbuchnetz.de sigle=UWB），3,874 條 lemma 全量引文，
+// 記法＝von Gabain 學術轉寫（清洗後：括號補字展開、lemma 縮寫展開、出處剝除，見語料檔註釋）。
+// 抽樣 200 案驗證：記法直入方案（latinToOldUyghur 零錯誤零透傳）。
+{
+  const { readFileSync } = await import("node:fs");
+  const corpus = JSON.parse(readFileSync(new URL("./data/uwb-olduyghur-corpus.json", import.meta.url), "utf8"));
+  const rows = corpus.rows;
+  const stride = Math.max(1, Math.floor(rows.length / 200));
+  const sample = rows.filter((_, i) => i % stride === 0).slice(0, 200);
+  const SO = lib.getScheme("olduyghur");
+  let uOk = 0;
+  for (const r of sample) {
+    try {
+      const native = SO.romanToNative(r.n);
+      if (/[\u{10F70}-\u{10F7F}]/u.test(native)) uOk++;
+      else failures.push(`③d UWB 空映射: ${r.lemid} ${r.n.slice(0, 50)}`);
+    } catch (e) {
+      failures.push(`③d UWB 例外: ${r.lemid} ${r.n.slice(0, 50)} ${e.message.slice(0, 60)}`);
+    }
+  }
+  fail += sample.length - uOk;
+  pass += uOk;
+  console.log(`  ③d UWB 引文錨: ${uOk}/${sample.length} 映射成功（語料全量 ${rows.length} 行）`);
+}
+
 console.log(`\n結果: ${pass} 通过, ${fail} 失败`);
 if (fail > 0) {
   console.log("失敗清單（前 20）：");
