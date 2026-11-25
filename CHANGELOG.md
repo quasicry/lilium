@@ -1,3 +1,16 @@
+## 0.3.5
+
+### 修復
+- 藏文轉寫保真（G-T1e）：雙 tsheg／行尾 tsheg／EOF tsheg 納入 `<ts>` 顯式 token 透傳（此前被靜默吞掉或還原成錯誤個數）；轉寫緩衝尾隨換行原樣還原（`bod\n` 此前輸出丟 `\n`），G-T1d 正字場景不回歸。
+- 轉寫面板狀態列／歧義按鈕顯隱條件五處修正（方向門控布爾缺 `!` 實錘）；面板狀態由模組級單例改為每面板實例，多面板不再互相串狀態；導出 Markdown 蘭札 span 補 `&`/`<`/`>` 跳脫。
+- 辭典掃描重掃時剔除已 dispose 的辭典殘留實例（防內存屍體累積）；MDX/TEI 磁盤快取加 `srcSig`（mtime:size）——源檔變更後舊快取自動棄用重建（此前永不失效）。
+- TEI 缺字圖資產（gaiji）恢復：`.zip`/`.tar.gz` 分發的辭典 mdd 資產此前從容器重載路徑丟失（實測丁福保 zip 155 資產恢復）；資料夾/裸 XML 舊路徑零變化。
+- 查詢結果 HTML 快取剝離大欄位（data.json 膨脹主因）；快取落盤 debounce 1.5s→10s 合併寫；TEI 快取 gzip 改 worker 異步（主執行緒數百 ms 卡頓消除）＋落盤登記（刪辭典時一併清理，此前 `.gz` 成孤兒）。
+- 設定 `mddAssetBudgetMb` 真正生效（此前安慰劑——僅存不讀，現透傳到 mdd 資產抽取預算）；`folders` 設定註釋與實際行為矛盾修正。
+- 詞典視圖：iframe 每幀獨立 ResizeObserver（popout 多視窗洩漏）；lazy 載入契約恢復（`dataset.filled` 守衛）；PNG 分享連點防護；音頻播放失敗靜默；搜尋重繪 O(n²)→O(n)；inline 圖片快取 FIFO→真 LRU；sanitize 必剝 `onerror` 死代碼清理。
+- 引擎效能：brahmic 字表建構加 WeakMap memo（梵語系方案 native↔roman 1000 次 2,566ms→150ms）；藏文歧義比較器加 memo。轉寫長文本 10KB 實測 53ms（用戶無感，面板極限 100KB 一次性按鈕觸發不構成卡頓——性能項結案留檔）。
+- TEI P5 分發慣例 `.p5.xml` 補入設置頁「所需檔案」格式表。
+
 ## 0.3.4
 
 ### 新增
