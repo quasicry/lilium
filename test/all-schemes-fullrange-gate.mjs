@@ -90,6 +90,7 @@ const RANGES = {
   "mongolian": [[0x1800, 0x18AF], [0x11660, 0x1167F]],
   "manchu-mollendorff": [[0x1800, 0x18AF]],
   "olduyghur": [[0x10F70, 0x10FAF]], // r73h：舊值 10C00=Old Hungarian 誤區段——回鶻文正確區段 10F70-10FAF（Unicode 14）
+  "manichaean": [[0x10AC0, 0x10AFF]], // 摩尼文（Unicode 14）：字母 10AC0-10AE4＋縮寫符/數字/標點至 10AFF
   "uyghur-uly": [[0x0600, 0x06FF]],
   "ranjana-iast": [[0x0900, 0x097F]],
   "aligali-iast": [[0x1800, 0x18AF]],
@@ -102,6 +103,7 @@ const NATIVE_RANGES = [
   [0x0D80, 0x0DFF], [0x11580, 0x115FF], [0x10A00, 0x10A5F], [0x11000, 0x1107F],
   [0xA840, 0xA87F], [0x11C00, 0x11CBF], [0x11A00, 0x11AAF], [0x1800, 0x18AF],
   [0x11660, 0x1167F], [0x10C00, 0x10CFF], [0x0600, 0x06FF],
+  [0x10AC0, 0x10AFF], [0x10F70, 0x10FAF],
 ];
 function isNativeCp(cp) { return NATIVE_RANGES.some(([a, b]) => cp >= a && cp <= b); }
 const stripEsc = (s) => s.replace(/\\u[0-9A-Fa-f]{4,6}/g, "");
