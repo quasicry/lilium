@@ -278,6 +278,13 @@ console.log("[④b 摩尼文方案 — L2/11-123R 記法往返]");
   ok(S.nativeToRoman(pn) === "<dot><n1><n10>", "④b 標點數字往返", S.nativeToRoman(pn));
   // 文種判定
   ok(lib.detectScript("𐫀𐫁𐫃") === "manichaean", "④b detectScript");
+  // ZWNJ 斷連（核心規範 Ch10 §10.5：ALEPH 與非 BETH/BHETH 間斷連指定符）往返無損
+  const zwnj = "\u200C";
+  const nb = S.romanToNative("b" + zwnj + "š");
+  ok(nb.includes(zwnj) && S.nativeToRoman(nb) === "b" + zwnj + "š", "④b ZWNJ 斷連往返", JSON.stringify(nb));
+  // TATWEEL（U+0640 詞形圖形延伸）透傳往返
+  const nt = S.nativeToRoman("\u{10AC1}\u0640\u{10AC2}");
+  ok(nt.includes("\u0640"), "④b TATWEEL 透傳", JSON.stringify(nt));
 }
 
 // ============ ④c 摩尼文 VATEC man 段錨（Manichäisch-Türkische Texte 抽樣）============

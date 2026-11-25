@@ -7,6 +7,14 @@
  * 轉寫依據：Everson & Durkin-Meisterernst & Pournader & Afshar,
  * *Second revised proposal for encoding the Manichaean script in the SMP of the UCS*,
  * UTC L2/11-123R（§3 Names and ordering 的 Latin 欄、§4 縮寫符、§4.1 VS-1 變體、§5 數字、§7 標點）。
+ * 核心規範：The Unicode Standard Ch 10 §10.5「Manichaean」（10.5.1 U+10AC0–U+10AFF）——
+ * 連寫整形（Table 10-4~7 雙連/右連/左連/不連四組）、兩個強制連字（SADHE+YODH/NUN，Table 10-8）、
+ * ALEPH 通常僅右連 BETH/BHETH（偶 GIMEL），斷連以 U+200C ZWNJ（透傳保留，見 VS_VARIANTS 段註釋）、
+ * 詞形圖形延伸可用 U+0640 ARABIC TATWEEL（透傳保留）、標點語義（10AF2 大單位/節末、10AF3 小單位/
+ * 半節末、10AF4 句內子單位、10AF0/10AF1/10AF5 標題題注起訖、10AF6 行填充省略號）。
+ * Unicode 18.0 復核（2026 精讀）：本區塊 18.0 無新增碼位；StandardizedVariants-18.0.0 之
+ * Manichaean 五條 VS-1（10AC5/10AC6/10AD6/10AD7/10AE1 FE00，isolate 限定、10AD6 另列 final）
+ * 與本方案 VS_VARIANTS 一致——無碼位層變更。
  *
  * 摩尼文＝RTL 連寫字母文字，源出 Aramaic，經 Syriac 演化；摩尼教東傳後以此書寫
  * 中古波斯語／帕提亞語／粟特語／回鶻語等（吐魯番摩尼教文獻主流文字）。
@@ -187,6 +195,14 @@ const VS_VARIANTS = new Set<number>([
 const VS1 = 0xfe00;
 const VS1_MARK = "<v1>";
 
+/**
+ * 格式字符透傳（核心規範 Ch10 §10.5 依據）：
+ *   · U+200C ZWNJ——ALEPH 通常僅右連 BETH/BHETH（偶 GIMEL），與其他字母間須以
+ *     ZWNJ 斷連；規範明文指定。入向/出向均原樣透傳（往返無損，gate ④b 固化）。
+ *   · U+0640 ARABIC TATWEEL——詞形圖形延伸（規範明文可借用于摩尼文）；同樣透傳。
+ * 兩者非本方案 token，解析器不識別即天然原樣通過，行為與規範一致。
+ */
+
 /** 字母碼位 → 拉丁（反查，先到先得；含別名鍵不覆蓋主鍵） */
 const LETTER_TO_LATIN: Record<string, string> = (() => {
   const rev: Record<string, string> = {};
@@ -202,14 +218,20 @@ const SPECIAL_KEYS = Object.keys(SPECIAL_SEQUENCES).sort((a, b) => b.length - a.
 
 /* ---------------- 標點與數字 ---------------- */
 
-/** 標點 → ASCII 對應（雙向；§7 標點系統） */
+/** 標點 → ASCII 對應（雙向；§7 標點系統；語義依核心規範 Ch10 §10.5「Punctuation」段） */
 const LATIN_TO_PUNCT: Record<string, number> = {
+  // 標題起訖
   "<star>": 0x10af0,
+  // 標題/題注起訖
   "<fleuron>": 0x10af1,
+  // 散文大單位／韻文一節末
   "<ddwd>": 0x10af2,
+  // 散文小單位／韻文半節末
   "<dwd>": 0x10af3,
+  // 句內子單位／列舉單位
   "<dot>": 0x10af4,
   "<twodots>": 0x10af5,
+  // 行填充（省略號式）
   "<filler>": 0x10af6,
 };
 const PUNCT_TO_LATIN: Record<string, string> = (() => {
