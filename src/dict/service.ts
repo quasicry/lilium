@@ -311,12 +311,14 @@ export class DictService {
       }
     }
     // 主路徑命中寫快取（lemma/變體回退路徑不寫——value 語義為精確命中）。
-    // P1-4a：快取序列化剝離 html（整段詞條 HTML 不該持久化，data.json 曾因此極度膨脹）。
-    // 讀回時 html 為空的 hit 會在 lookupAll 快取讀取路徑被判為未命中，走正常查詢重建。
+    // P1-4a 修正：記憶體快取保留完整含 html 的 value（否則同 session 快取永不命中，
+    // 每次查詢都全量重建＝快取反而成純開銷）；html 剝離移到 plugin flushCache 落盤
+    // 序列化時做——data.json 瘦身目標不變，記憶體命中真正生效。
+    // 磁盤還原值（啟動載入 entries）不含 html，lookupAll 讀取路徑的 some(!h.html)
+    // 守衛仍會判未命中重建，兩種來源語義皆正確。
     if (hits.length && this.cache) {
-      const toCache = hits.map(({ bookmarked: _bm, html: _html, ...rest }) => rest);
       const scopeSig = this.scoped.map((d) => d.meta.id).sort().join(',');
-      this.cache.set('lookupAll', `${word}\u0000${scopeSig}`, toCache);
+      this.cache.set('lookupAll', `${word}\u0000${scopeSig}`, hits);
     }
     return hits;
   }

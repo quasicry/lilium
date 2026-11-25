@@ -544,10 +544,13 @@ export class DictFeature {
       // 查詞快取先（快、且與辭典掃描無關），不被下面的掃描延遲拖住
       const raw = await this.data.read();
       const entries = raw.dictLookupCache as Array<unknown> | undefined;
-      if (Array.isArray(entries)) {
-        this.cache = new LookupCache(entries as never, () => this.flushCacheDebounced());
-        this.service.setCache(this.cache);
-      }
+      // 快取掛載不設門檻——無落盤 entries（首次安裝/新 vault）也建空例並接上 service，
+      // 否則同 session 查詢快取整體失效（service.cache null＝lookupAll 快取路徑全跳）。
+      this.cache = new LookupCache(
+        Array.isArray(entries) ? (entries as never) : undefined,
+        () => this.flushCacheDebounced(),
+      );
+      this.service.setCache(this.cache);
 
       // 辭典掃描是啟動期最重的工作（要重新讀檔並解析每部辭典的索引）。
       // 原本在 onLayoutReady 裡 await，會把 Obsidian 的版面渲染一起卡住；
@@ -609,7 +612,18 @@ export class DictFeature {
     if (!this.cache.isDirty()) return;
     try {
       await this.data.mutate((raw: RawData) => {
-        raw.dictLookupCache = this.cache.entries();
+        // P1-4a：html 剝離在落盤序列化時執行（記憶體快取保留完整 value 供同 session 命中，
+        // service.lookupAll 依賴它；data.json 只存 keyText 等輕欄位，啟動讀回後由
+        // lookupAll 的 some(!h.html) 守衛判未命中重建）。
+        raw.dictLookupCache = this.cache.entries().map((e) => {
+          const v = e.value;
+          if (!Array.isArray(v)) return e;
+          const slim = v.map((h: { bookmarked?: unknown; html?: unknown; [k: string]: unknown }) => {
+            const { bookmarked: _bm, html: _html, ...rest } = h;
+            return rest;
+          });
+          return { ...e, value: slim };
+        });
       });
       this.cache.markClean();
     } catch (e) {

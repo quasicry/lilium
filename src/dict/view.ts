@@ -1526,7 +1526,9 @@ export class LiDictView extends ItemView {
 <body>${bodyInner}</body></html>`;
     // V-F4：註冊 load handler 並記錄——重填時先移除舊 handler（見 fillFrame 開頭），
     // 避免同一 iframe 多次 fill 後 listener 逐次累積重複執行。
+    let loadFired = false;
     const loadHandler = () => {
+      loadFired = true;
       try {
         const body = iframe.contentDocument?.body;
         if (!body) return;
@@ -1554,6 +1556,9 @@ export class LiDictView extends ItemView {
           } catch { /* iframe 已分離 */ }
         };
         fitFrame();
+        // 重入安全：loadHandler 可能因移動端 load 保險被手動補跑——先斷舊 RO 再建新，防重複 observe 疊加。
+        const prevRo = this.frameRos.get(iframe);
+        if (prevRo) prevRo.disconnect();
         const ro = new ResizeObserver(fitFrame);
         ro.observe(body);
         this.frameRos.set(iframe, ro); // V-F1：per-frame 槽記錄，重填/關閉時各自 disconnect
@@ -1740,6 +1745,18 @@ export class LiDictView extends ItemView {
     this.frameLoadHandlers.set(iframe, loadHandler); // V-F4：記錄供重填時對稱移除
     iframe.addEventListener('load', loadHandler);
     iframe.srcdoc = doc;
+    // 移動端詞條空白防禦：部分 WebView（Capacitor）對 srcdoc iframe 的 load 事件
+    // 存在不出/遲到前科（B41a-f 同族）——load 不發＝loadHandler 全跳＝inlineFrameAssets
+    // 與 fitFrame 都不跑：圖片不內聯、高度恆 0＝「區塊內容顯示空白」。
+    // 保險：短延遲後 body 已有子節點而 load 仍未發→手動補跑一次（各步驟重入安全：
+    // inlineFrameAssets 逐節點改寫、fitFrame 幂等；RO/事件掛載用 wired 標記防重複）。
+    window.setTimeout(() => {
+      if (loadFired) return;
+      try {
+        const body = iframe.contentDocument?.body;
+        if (body && body.childElementCount > 0) loadHandler();
+      } catch { /* 已分離 */ }
+    }, 300);
   }
 
   /**
