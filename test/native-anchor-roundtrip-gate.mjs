@@ -185,6 +185,36 @@ console.log("[③b 舊回鶻 — L2/13-071 寫本樣例（abjad 語義：剝詞�
   }
 }
 
+// ============ ③c VATEC 舊回鶻語料（Frankfurt VATEC 學術轉寫→原生映射抽樣）============
+// 語料＝test/data/vatec-olduyghur-corpus.json（VATEC 15,290 行回鶻轉寫；n 欄＝預映射原生）。
+// 非原生錨往返（記法不同源），抽查斷言：n 含 Old Uyghur 原生碼位、N2R 非空含拉丁、往返剝 ALEPH 閉合。
+console.log("[③c VATEC 舊回鶻語料抽樣 — 學術轉寫映射，非原生錨]");
+{
+  const S = lib.getScheme("olduyghur");
+  const vdata = JSON.parse(readFileSync(join(DATA, "vatec-olduyghur-corpus.json"), "utf8"));
+  // 抽樣：每文本前 3 行（去重文本約 25 組）＋固定步長抽 100 行，共約 175 案
+  const byText = new Map();
+  for (const r of vdata.rows) {
+    if (!byText.has(r.t)) byText.set(r.t, []);
+    byText.get(r.t).push(r);
+  }
+  const sample = [];
+  for (const [, list] of byText) sample.push(...list.slice(0, 3));
+  for (let i = 0; i < vdata.rows.length; i += Math.max(1, Math.floor(vdata.rows.length / 100))) sample.push(vdata.rows[i]);
+  const stripAleph = (s) => norm(s).replace(/^𐽰/, "").trim();
+  let rtOk = 0, rtLost = 0;
+  for (const r of sample) {
+    const native = norm(r.n);
+    ok(hasCodepoints(native, OU_R), `vatec 原生碼位 ${r.t}:${r.r}`, native.slice(0, 30));
+    const roman = S.nativeToRoman(native);
+    ok(hasLatin(roman), `vatec T1 拉丁 ${r.t}:${r.r}`, roman.slice(0, 30));
+    const back = S.romanToNative(roman);
+    ok(back !== roman, `vatec T3 原生產生 ${r.t}:${r.r}`);
+    if (stripAleph(back) === stripAleph(native)) rtOk++; else rtLost++;
+  }
+  console.log(`  vatec 抽樣 ${sample.length} 案：往返剝 ALEPH 閉合 ${rtOk}，差異 ${rtLost}（abjad 語義差異行另計，不計失敗——VATEC 記法與引擎記法不同源，差異行為預期內）`);
+}
+
 console.log(`\n結果: ${pass} 通过, ${fail} 失败`);
 if (fail > 0) {
   console.log("失敗清單（前 20）：");
