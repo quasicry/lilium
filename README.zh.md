@@ -19,21 +19,21 @@
 |---|---|
 | 梵文 Sanskrit | IAST |
 | 巴利文 Pali | IAST |
+| 婆羅米文 Brahmi | IAST |
+| 犍陀羅語 Gandhari（佉盧虱吒文） | IAST |
+| 僧伽羅文 Sinhala | IAST |
+| 悉曇體 Siddham | IAST |
 | 蘭札體 Rañjanā | IAST |
 | 藏文 Tibetan | Wylie、Wylie 擴展 |
+| 瑪欽文 Marchen | Wylie ↔ Unicode |
+| 方形札那巴扎爾文 Zanabazar Square | Wylie 擴展 ↔ Unicode |
+| 索永布文 Soyombo | Wylie 擴展 ↔ Unicode |
 | 滿文 Manchu | Möllendorff ↔ Unicode |
 | 阿禮嘎禮 Ali-Gali | 蒙/滿借音字母 IAST |
 | 維吾爾文 Uyghur | ULY ↔ UEY |
 | 回鶻文 Old Uyghur | 拉丁 ↔ Unicode |
 | 蒙古文 Mongolian | 學術拉丁 ↔ Unicode |
 | 八思巴字 ʼPhags-pa | Poppe ↔ Unicode |
-| 瑪欽文 Marchen | Wylie ↔ Unicode |
-| 方形札那巴扎爾文 Zanabazar Square | Wylie 擴展 ↔ Unicode |
-| 索永布文 Soyombo | Wylie 擴展 ↔ Unicode |
-| 婆羅米文 Brahmi | IAST |
-| 犍陀羅語 Gandhari（佉盧虱吒文） | IAST |
-| 僧伽羅文 Sinhala | IAST |
-| 悉曇體 Siddham | IAST |
 
 **注意：轉寫為實驗性功能，近似映射！**
 

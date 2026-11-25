@@ -19,21 +19,21 @@
 |---|---|
 | Sanskrit | IAST |
 | Pali | IAST |
+| Brahmi | IAST |
+| Gandhari (Kharoshthi) | IAST |
+| Sinhala | IAST |
+| Siddham | IAST |
 | Ranjana (Rañjanā) | IAST |
 | Tibetan | Wylie, extended Wylie |
+| Marchen | Wylie ↔ Unicode |
+| Zanabazar Square | extended Wylie ↔ Unicode |
+| Soyombo | extended Wylie ↔ Unicode |
 | Manchu | Möllendorff ↔ Unicode |
 | Ali-Gali | borrowed-letter IAST (Mongolian/Manchu) |
 | Uyghur | ULY ↔ UEY |
 | Old Uyghur | Latin ↔ Unicode |
 | Mongolian | Academic Latin ↔ Unicode |
 | ʼPhags-pa | Poppe ↔ Unicode |
-| Marchen | Wylie ↔ Unicode |
-| Zanabazar Square | extended Wylie ↔ Unicode |
-| Soyombo | extended Wylie ↔ Unicode |
-| Brahmi | IAST |
-| Gandhari (Kharoshthi) | IAST |
-| Sinhala | IAST |
-| Siddham | IAST |
 
 **Note: Transliteration is an experimental feature and provides only an approximate mapping.**
 
