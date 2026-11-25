@@ -11,6 +11,7 @@ export * from "../src/translit-ui";
 export * from "../src/dict/translit-run";
 export * from "../src/uyghur";
 export * from "../src/olduyghur";
+export * from "../src/manichaean";
 export * from "../src/brahmic";
 export * from "../src/siddham";
 export * from "../src/kharoshthi";

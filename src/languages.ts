@@ -18,6 +18,7 @@ export type ScriptId =
   | "mongolian" // 蒙古文
   | "manchu" // 滿文（與蒙古文共用 Unicode 區段）
   | "olduyghur" // 回鶻文
+  | "manichaean" // 摩尼文（U+10AC0–U+10AFF；RTL 連寫，摩尼教東傳文獻主流文字，Unicode 14.0）
   | "arabic" // 阿拉伯文（含波斯語、烏爾都語等用阿拉伯字母書寫的語言）
   | "hebrew" // 希伯來文（含意第緒語）
   | "latin" // 拉丁/其它橫排文種（含希臘、西里爾等）
@@ -190,6 +191,26 @@ export const SCRIPTS: Record<ScriptId, ScriptProfile> = {
     fontStack: ["Noto Serif Old Uyghur", "Noto Sans Mongolian", "sans-serif"],
     autoTcy: false,
     note: { zh: "回鶻文爲蒙古文之源，直寫列序自左向右（U+10F70–U+10FAF）。", en: "Ancestor of the Mongolian script; vertical columns run left to right." },
+  },
+  manichaean: {
+    id: "manichaean",
+    label: { zh: "摩尼文", "zh-TW": "摩尼文", ja: "マニ文字", ko: "마니 문자", en: "Manichaean", fr: "Manichéen", de: "Manichäisch", },
+    htmlLang: "xmn",
+    // 摩尼文爲 RTL 連寫字母文字（同阿拉伯/希伯來），直排會破壞連寫詞形——必須橫排 + rtl
+    writingMode: "horizontal-tb",
+    textOrientation: "mixed",
+    pageProgression: "rtl",
+    bidi: "rtl",
+    gridAligned: false,
+    lineBreak: "auto",
+    wordBreak: "normal",
+    centerPunctuation: false,
+    fontStack: ["Noto Sans Manichaean", "Noto Sans Syriac Eastern", "Estrangelo Edessa", "serif"],
+    autoTcy: false,
+    note: {
+      zh: "摩尼文爲 RTL 連寫文字（U+10AC0–U+10AFF），橫排 + 從右向左。中古波斯語/帕提亞語/粟特語/回鶻語的摩尼教文獻主流文字。",
+      en: "Manichaean is an RTL joining script (U+10AC0–U+10AFF); horizontal RTL is used.",
+    },
   },
   arabic: {
     id: "arabic",
@@ -553,6 +574,8 @@ const LANG_ALIASES: Record<string, ScriptId> = {
   mn: "mongolian", mon: "mongolian", "mn-mong": "mongolian",
   mnc: "manchu", manchu: "manchu",
   oui: "olduyghur", "old-uyghur": "olduyghur", "olduyghur": "olduyghur",
+  // 摩尼文（摩尼教東傳文獻主流文字；中古波斯/帕提亞/粟特/回鶻語）
+  xmn: "manichaean", manichaean: "manichaean", mani: "manichaean",
   // 阿拉伯字母系（含波斯語、烏爾都語、普什圖語；現代維吾爾語獨立見下）
   ar: "arabic", ara: "arabic", arb: "arabic", "ar-eg": "arabic", "ar-sa": "arabic",
   fa: "arabic", fas: "arabic", per: "arabic", ur: "arabic", urd: "arabic",
@@ -627,6 +650,7 @@ export function countScripts(text: string): Record<string, number> {
     mongolian: 0,
     manchu: 0,
     olduyghur: 0,
+    manichaean: 0,
     arabic: 0,
     hebrew: 0,
     latin: 0,
@@ -651,6 +675,7 @@ export function countScripts(text: string): Record<string, number> {
     const cp = ch.codePointAt(0) ?? 0;
     if (isBidiControl(cp)) continue;
     if (cp >= 0x10f70 && cp <= 0x10faf) counts.olduyghur++;
+    else if (cp >= 0x10ac0 && cp <= 0x10aff) counts.manichaean++;
     else if (cp >= 0x1860 && cp <= 0x1877) counts.manchu++;
     else if (cp >= 0x1800 && cp <= 0x18af) counts.mongolian++;
     else if ((cp >= 0x3040 && cp <= 0x30ff) || (cp >= 0xff66 && cp <= 0xff9f)) counts.kana++;
@@ -730,6 +755,7 @@ export const SCRIPT_SAMPLE_CHAR: Record<ScriptId, string> = {
   manchu: "ᡳ", // U+1873 滿文 ali gali i
   xibe: "ᡦ", // U+1866 滿文／錫伯文共用
   olduyghur: "𐽰", // U+10F70
+  manichaean: "𐫀", // U+10AC0（Manichaean Aleph；摩尼教東傳文獻主流文字，RTL）
   arabic: "ا", // U+0627
   hebrew: "א", // U+05D0
   latin: "A",
@@ -832,6 +858,8 @@ export function suggestFlow(text: string, thresholds: Partial<ScriptThresholds> 
   const c = countScripts(text);
 
   if (c.olduyghur >= t.oldUyghurMin) return "olduyghur";
+  // 摩尼文：碼位獨特（U+10AC0–U+10AFF），單字元即判定（同回鶻/佉盧的「少量即可優先」）
+  if (c.manichaean > 0) return "manichaean";
   if (c.manchu >= t.manchuMin) return "manchu";
   if (c.mongolian >= t.mongolianMin) return "mongolian";
 

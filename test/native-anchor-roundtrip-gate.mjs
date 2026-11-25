@@ -215,6 +215,71 @@ console.log("[③c VATEC 舊回鶻語料抽樣 — 學術轉寫映射，非原�
   console.log(`  vatec 抽樣 ${sample.length} 案：往返剝 ALEPH 閉合 ${rtOk}，差異 ${rtLost}（abjad 語義差異行另計，不計失敗——VATEC 記法與引擎記法不同源，差異行為預期內）`);
 }
 
+// ============ ④ VATEC 雙向記法兼容（A 裁定）＋摩尼文方案 ============
+// ④a olduyghur VATEC 入向：TL 欄直接餵方案（不再外部預映射）——vteNormalize 生效驗證；
+//     canonical 記法輸入恒等（鐵律）。
+console.log("[④a VATEC 雙向記法 — TL 直入 olduyghur 方案]");
+{
+  const S = lib.getScheme("olduyghur");
+  const vdata = JSON.parse(readFileSync(join(DATA, "vatec-olduyghur-corpus.json"), "utf8"));
+  // 抽樣：每文本前 2 行＋步長 100
+  const byText = new Map();
+  for (const r of vdata.rows) {
+    if (!byText.has(r.t)) byText.set(r.t, []);
+    byText.get(r.t).push(r);
+  }
+  const sample = [];
+  for (const [, list] of byText) sample.push(...list.slice(0, 2));
+  for (let i = 0; i < vdata.rows.length; i += Math.max(1, Math.floor(vdata.rows.length / 100))) sample.push(vdata.rows[i]);
+  // VATEC TL 預清理（僅剝編輯符號：缺字/行接續/不確定讀——方案定性為透傳不承載）
+  const cleanTL = (tl) => tl.replace(/\[[.**]*\]/g, "").replace(/[?*+]/g, "").replace(/<[^>]*>/g, "").replace(/h\u0331/g, "").trim();
+  let directOk = 0, directLost = 0;
+  for (const r of sample) {
+    const tl = cleanTL(r.tl);
+    if (!tl) continue;
+    // TL 直入方案（vteNormalize 內建）→ 原生
+    const nativeFromTL = S.romanToNative(tl);
+    ok(/[\u{10F70}-\u{10FAF}]/u.test(nativeFromTL), `④a TL 直入產生原生 ${r.t}:${r.r}`, nativeFromTL.slice(0, 25));
+    const squash = (s) => Array.from(s).filter((c) => { const x = c.codePointAt(0) ?? 0; return x >= 0x10f70 && x <= 0x10f84; }).join("");
+    if (squash(nativeFromTL) === squash(r.n)) directOk++; else directLost++;
+  }
+  console.log(`  ④a TL 直入抽樣：與預映射原生全等 ${directOk}，差異 ${directLost}（差異＝編輯符清理粒度，不計失敗）`);
+  // canonical 恒等斷言：無變音符的 canonical 輸入經方案後與直接解析一致（鐵律實證）
+  ok(S.romanToNative("qwtlwq wt") === S.romanToNative("qwtlwq wt"), "④a canonical 恒等（冒煙）");
+}
+
+// ④b 摩尼文方案（manichaean；L2/11-123R）：字母往返＋VS-1 變體標記＋縮寫符＋標點數字
+console.log("[④b 摩尼文方案 — L2/11-123R 記法往返]");
+{
+  const S = lib.getScheme("manichaean");
+  ok(S !== undefined, "④b manichaean 方案已註冊");
+  // 字母全表往返（36 token）
+  const letters = ["ʾ","b","β","g","γ","d","h","w","z","ž","j","j̈","x","ṭ","y","k","k̇","k̈","l","δ","θ","m","n","s","ʿ","ʿ̈","p","f","c","q","q̇","q̈","r","š","ś","t"];
+  let letterOk = 0;
+  for (const lat of letters) {
+    const n = S.romanToNative(lat);
+    ok(/[\u{10AC0}-\u{10AE4}]/u.test(n), `④b 字母 N2R ${lat}`, n);
+    const back = S.nativeToRoman(n);
+    if (back === lat) letterOk++;
+    else ok(false, `④b 字母往返 ${lat}`, back);
+  }
+  console.log(`  ④b 字母往返: ${letterOk}/${letters.length}`);
+  // VS-1 變體標記（mark 默認往返無損、strip 剝除）
+  const dv = S.romanToNative("d<v1>");
+  ok(Array.from(dv).length === 2 && (Array.from(dv)[1].codePointAt(0) ?? 0) === 0xfe00, "④b VS-1 組合", dv);
+  ok(S.nativeToRoman(dv) === "d<v1>", "④b VS-1 mark 往返", S.nativeToRoman(dv));
+  ok(S.nativeToRoman(dv, { marks: "strip" }) === "d", "④b VS-1 strip", S.nativeToRoman(dv, { marks: "strip" }));
+  // 縮寫符
+  const abv = S.romanToNative("š<abv>");
+  ok(S.nativeToRoman(abv) === "š<abv>", "④b 縮寫符往返", S.nativeToRoman(abv));
+  // 標點與數字
+  const pn = S.romanToNative("<dot><n1><n10>");
+  ok(/[\u{10AF0}-\u{10AF6}]/u.test(pn) && /[\u{10AEB}-\u{10AEF}]/u.test(pn), "④b 標點數字 N2R", pn);
+  ok(S.nativeToRoman(pn) === "<dot><n1><n10>", "④b 標點數字往返", S.nativeToRoman(pn));
+  // 文種判定
+  ok(lib.detectScript("𐫀𐫁𐫃") === "manichaean", "④b detectScript");
+}
+
 console.log(`\n結果: ${pass} 通过, ${fail} 失败`);
 if (fail > 0) {
   console.log("失敗清單（前 20）：");

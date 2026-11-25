@@ -34,6 +34,7 @@ import "./indic";
 import "./aligali";
 import "./uyghur";
 import "./olduyghur";
+import "./manichaean";
 import "./brahmic";
 import "./siddham";
 import "./kharoshthi";

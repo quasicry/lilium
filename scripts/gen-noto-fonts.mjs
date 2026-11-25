@@ -56,6 +56,13 @@ const FONTS = [
     note: "SIL OFL 1.1。回鶻文（U+10F70–U+10FAF），直寫列序自左向右。",
   },
   {
+    fileName: "NotoSansManichaean-Regular.ttf",
+    family: "Noto Sans Manichaean",
+    id: "noto-sans-manichaean",
+    scripts: ["manichaean"],
+    note: "SIL OFL 1.1。摩尼文（Manichaean，U+10AC0–U+10AFF，51 碼位全覆蓋），RTL 連寫字母文字，摩尼教東傳文獻（中古波斯/帕提亞/粟特/回鶻語）主流文字。",
+  },
+  {
     fileName: "NotoSansSinhala-Regular.ttf",
     family: "Noto Sans Sinhala",
     id: "noto-sans-sinhala",

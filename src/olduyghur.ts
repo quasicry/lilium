@@ -270,6 +270,15 @@ export interface OldUyghurTranslitOptions {
    * - `strip`：剝離組合點，只輸出基礎字母讀法。
    */
   dots?: OldUyghurDotMode;
+  /**
+   * 拉丁記法風格（A 裁定 VATEC 雙向兼容）：
+   * - `"canonical"`（默認）：L2/20-191 規範記法——q/ž/w/β/δ 風格，**現行行為不變**；
+   * - `"vatec"`：VATEC（法蘭克福前伊斯蘭古突厥文本庫）von Gabain 學術慣例——
+   *   q→q̈（U+0308）、ž→z̤（U+0324）、waw 輔音→v、δ→d。
+   * 僅影響 R2N 出向；N2R 入向一律先經 vteNormalize 預規範化（對 canonical
+   * 記法輸入恒等，見下）。
+   */
+  style?: "canonical" | "vatec";
 }
 const dotModeOf = (opts?: OldUyghurTranslitOptions): OldUyghurDotMode =>
   (opts)?.dots ?? "read";
@@ -306,10 +315,81 @@ function latinAtWordStart(chars: string[], i: number): boolean {
   return false;
 }
 
+/* ---------------- VATEC 記法預規範化（A 裁定雙向兼容） ---------------- */
+
+/**
+ * VATEC TL 欄（von Gabain 慣例）→ 引擎 canonical 記法的預規範化。
+ *
+ * 【恒等性保證】本函數只處理「引擎 canonical 記法不會產生的序列」——
+ * 對既有 canonical 輸入逐字不變（鐵律：現行行為零變化）。逐項依據：
+ *   1. ṭ（t+U+0323）→ t：VATEC 摩尼文 Tau 變體標記（konv 明文 Ausnahme）；
+ *      字形身份層在 10F70 區無對應碼位（Unicode 合併），歸一到 t。
+ *   2. q̈（q+U+0308）→ q：VATEC 讀法消歧標記＝引擎 q（heth+兩點上讀法）同義。
+ *   3. z̤（z+U+0324）→ ž：VATEC zayin 加兩下點讀 ž＝引擎 ž（zayin+兩點下）同義。
+ *   4. k̈（k+U+0308）→ k：kaph 變體標記，讀法同 k。
+ *   5. ḏ（d+U+0331）→ d：VATEC 雙寫強調記法之一（-ḏ-），剝變音符保 d。
+ *   6. v → w：VATEC 以 v 記詞中 waw（yʿvyz→yavız 實證）；引擎記法無 v 字母，
+ *      無撞鍵風險，此為唯一字母級替換。
+ *   7. ʿ（U+02BF ayin）→ 剝：外語詞標記，引擎無對應碼位。
+ *   8. ẖ（h+U+0331）→ 剝：VATEC 行填充符（konv 明文）。
+ *   9. 孤立變音符（U+0307/0304/0308/0323/0324/0331 殘餘）→ 剝：清理殼。
+ *  10. 雙寫強調 -x- → x：剝兩側連接號（konv：Doppelschreibung zur Emphase）。
+ *
+ * 【寫本現象標記】VATEC 的缺字/校勘符號（[....]、[**]、?、+ 行接續）屬編輯符號
+ * 非語言內容——**保留在輸入串中**由主解析透傳（方括號/問號/加號非引擎 token），
+ * 不在本函數剝除（用戶可自行清理）；此註釋僅記載定性。
+ */
+const VATEC_COMBINING: Record<string, string> = {
+  // t + U+0323 → t（Tau 變體歸一）
+  "t\u0323": "t",
+  // q + U+0308 → q（讀法消歧＝引擎 q）
+  "q\u0308": "q",
+  // z + U+0324 → ž（zayin 兩下點讀 ž）
+  "z\u0324": "\u017e",
+  // k + U+0308 → k
+  "k\u0308": "k",
+  // d + U+0331 → d
+  "d\u0331": "d",
+};
+
+const VATEC_ORPHAN_COMBINING = new Set(["\u0307", "\u0304", "\u0308", "\u0323", "\u0324", "\u0331"]);
+
+function vteNormalize(input: string): string {
+  // 逐字符掃描：先吃「字母+組合變音符」組合，再處理孤兒變音符與 v→w。
+  const chars = Array.from(input);
+  let out = "";
+  for (let i = 0; i < chars.length; i++) {
+    const ch = chars[i];
+    const nxt = chars[i + 1] ?? "";
+    const pair = VATEC_COMBINING[ch + nxt];
+    if (pair !== undefined) {
+      out += pair;
+      i += 1;
+      continue;
+    }
+    if (VATEC_ORPHAN_COMBINING.has(nxt) && !VATEC_ORPHAN_COMBINING.has(ch)) {
+      // 字母後跟未被收錄的組合變音符：剝變音符保字母（保守：僅當組合無定義）
+      out += ch;
+      i += 1;
+      continue;
+    }
+    if (VATEC_ORPHAN_COMBINING.has(ch)) {
+      // 孤兒變音符（前無字母或已處理）：剝
+      continue;
+    }
+    if (ch === "\u02bf") continue; // ʿ ayin：剝
+    if (ch === "v") { out += "w"; continue; } // VATEC waw 輔音
+    out += ch;
+  }
+  return out;
+}
+
 /* ---------------- 拉丁 → 回鶻文 ---------------- */
 
 /** 拉丁轉寫 → 回鶻文 Unicode */
 export function latinToOldUyghur(input: string, _opts?: OldUyghurTranslitOptions): string {
+  // 記法兼容——入口預規範化（對 canonical 記法輸入恒等，見 vteNormalize 註釋）
+  input = vteNormalize(input);
   // 注：拉丁側不區分 dots 模式——`<d1>`…`<d4>` 標記在 read 模式下也會輸出
   // （用於保存「不改變讀音」的加點），故反向一律解析，否則往返丟點。
   // P1-1 性能修復：原實現在迴圈內 `chars.slice(i).join("")` 做全尾拷貝（O(n²)，
@@ -402,6 +482,25 @@ export function latinToOldUyghur(input: string, _opts?: OldUyghurTranslitOptions
 /** 回鶻文 Unicode → 拉丁轉寫 */
 export function oldUyghurToLatin(input: string, opts?: OldUyghurTranslitOptions): string {
   const mode = dotModeOf(opts);
+  const style = opts?.style ?? "canonical";
+  let result = oldUyghurToLatinCanonical(input, mode);
+  // A 裁定：VATEC 出向風格（style:"vatec"）——von Gabain 慣例後處理：
+  //   q→q̈（U+0308 讀法消歧標記）、ž→z̤（U+0324）、waw 輔音→v、δ→d。
+  // canonical（默認）路徑完全不變（鐵律）。
+  if (style === "vatec") {
+    result = result
+      .replace(/q/g, "q\u0308")
+      .replace(/\u017e/g, "z\u0324")
+      .replace(/δ/g, "d");
+    // waw 輔音→v：waw 作元音載體（o/u）與詞首輔音保持 w；此處後處理無上下文，
+    // 採 VATEC 慣例整體 v（VATEC TL 欄詞首亦偶作 w，但主體記法為 v）。
+    result = result.replace(/w/g, "v");
+  }
+  return result;
+}
+
+/** canonical 記法出向（原 oldUyghurToLatin 主體，逐字未動） */
+function oldUyghurToLatinCanonical(input: string, mode: OldUyghurDotMode): string {
   const chars = Array.from(input);
   let out = "";
   let i = 0;

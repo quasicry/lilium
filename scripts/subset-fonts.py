@@ -37,6 +37,7 @@ COMMON = "U+0020-007E,U+00A0-00FF,U+2000-206F,U+3000-303F"
 SCRIPT_RANGES = {
     "mongolian":  "U+1800-18AF,U+11660-1167F",          # 蒙古 / 滿 / 錫伯
     "olduyghur":  "U+10F70-10FAF",                       # 回鶻
+    "manichaean": "U+10AC0-10AFF",                       # 摩尼文
     "arabic":     "U+0600-06FF,U+0750-077F,U+0870-089F,U+FB50-FDFF,U+FE70-FEFF",
     "hebrew":     "U+0590-05FF,U+FB1D-FB4F",
     "sinhala":    "U+0D80-0DFF",
@@ -51,6 +52,7 @@ FONTS = [
     ("NotoNaskhArabic-Regular.ttf",     "arabic"),
     ("NotoSerifHebrew-Regular.ttf",     "hebrew"),
     ("NotoSerifOldUyghur-Regular.ttf",  "olduyghur"),
+    ("NotoSansManichaean-Regular.ttf",  "manichaean"),
     ("NotoSansSinhala-Regular.ttf",     "sinhala"),
     ("NotoSansDevanagari-Regular.ttf",  "devanagari"),
     ("NotoSerifTibetan-Regular.ttf",    "tibetan"),

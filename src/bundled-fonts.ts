@@ -186,7 +186,11 @@ const FRAME_SCRIPT_RANGES: Array<[number, number, string]> = [
   [0x0d80, 0x0dff, "Noto Sans Sinhala"],
   [0x1800, 0x18af, "Noto Sans Mongolian"],
   [0x0600, 0x06ff, "Noto Naskh Arabic"],
+  // 修復：Noto Serif Old Uyghur 此前僅掛 Old Turkic 如尼區（10C00），
+  // 回鶻文本尊區段 10F70–10FAF 漏掛＝詞條 iframe/正文棧缺字形。補掛：
   [0x10c00, 0x10c4f, "Noto Serif Old Uyghur"],
+  [0x10f70, 0x10faf, "Noto Serif Old Uyghur"], // Old Uyghur U+10F70–U+10FAF（含組合點/標點）
+  [0x10ac0, 0x10aff, "Noto Sans Manichaean"], // Manichaean U+10AC0–U+10AFF（含縮寫符/數字/標點）
   [0x11580, 0x115ff, "Noto Sans Siddham"], // Siddham U+11580–U+115FF
   // 蘭朒體無標準 Unicode，插件文本走天城碼位 U+0900–U+097F（languages.ts ranjana.note
   //   體例）——映射須對準實際碼位，否則 familiesForText 檢測不到蘭朒文本，
