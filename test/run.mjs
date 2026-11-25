@@ -2066,6 +2066,17 @@ console.log(`\n结果: ${passed} 通过, ${failures.length} 失败`);
   console.log(`olduyghur-ambiguity-gate: ${ambOk}/${data.cases.length}（L2/13-071 表8 寫本歧義：t/d 混用＝TAW 兼表、aleph 有無＝matres lectionis，read 模式讀音歸一）`);
 }
 
+// ── 原生文字錨雙向往返門禁（婆羅米 aksharamukha 錨＋僧伽羅 UD 錨＋回鶻 UEY/TS 錨；透傳防杜 T1-T3）──
+{
+  const { spawnSync } = await import("node:child_process");
+  const g = spawnSync(process.execPath, [path.join(path.dirname(import.meta.filename), "native-anchor-roundtrip-gate.mjs")], { encoding: "utf8" });
+  console.log(g.stdout.trim().split("\n").filter((l) => /si 往返|uey pairs|ts 句|結果/.test(l)).join("；") || "native-anchor-gate: 無輸出");
+  if (g.status !== 0) {
+    for (const line of (g.stdout + g.stderr).split("\n")) if (line.trim()) console.error("GATE-FAIL: " + line.trim());
+    failures.push({ name: `native-anchor-roundtrip-gate 紅燈 ${g.status}`, e: new Error("native-anchor-roundtrip-gate 紅燈") });
+  }
+}
+
 
 // ── r59 批次丙斷言（檔尾）──
 {

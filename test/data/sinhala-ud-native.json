@@ -1,0 +1,682 @@
+{
+ "source": "Universal Dependencies UD_Sinhala-STB (test, 100 sent) + UD_Sinhala-Appuwa (test, 69 sent); native text + official Translit annotation (UCSC corpus)",
+ "license": "UD (CC BY-SA 4.0 for v2.x releases; see LINDAT)",
+ "sentences": [
+  {
+   "native": "එසේ ගිය සෑම කෙනාම පාවා දෙන්නකු ලෙස සැලකේ .",
+   "translit": " esē giya sǣma kenāma pāvā dennaku lesa sælakē ."
+  },
+  {
+   "native": "ෆොන්සේකා මහතා ද හමුදාවේ සෙබළුන් පාවා දී තිබේ .",
+   "translit": " fonsēkā mahatā da hamudāvē sebaḷun pāvā dī tibē ."
+  },
+  {
+   "native": "ආරක්ෂක ලේකම්වරයා ඊට නිසි පිළිතුරු ලබා දී තිබේ .",
+   "translit": " ārakṣaka lēkamvarayā īṭa nisi piḷituru labā dī tibē ."
+  },
+  {
+   "native": "මේ පිළිබඳ වැඩි විස්තර පසුව හෙළිදරව් වනු ඇත .",
+   "translit": " mē piḷibaňda væḍi vistara pasuva heḷidarav vanu æta ."
+  },
+  {
+   "native": "ඔහු ඊට අවශ්‍ය සියලු දේ සකසා ගෙන තිබේ .",
+   "translit": " ohu īṭa avaśya siyalu dē sakasā gena tibē ."
+  },
+  {
+   "native": "අප ගේ කතාව අමෙරිකාවේ පුරවැසිභාවය ගැන නො වේ .",
+   "translit": " apa gē katāva amerikāvē puravæsibhāvaya gæna no vē ."
+  },
+  {
+   "native": "මෙහි දී අයථා ක්‍රියා ගණනාවක් සිදු වී ඇත .",
+   "translit": " mehi dī ayathā kriyā gaṇanāvak sidu vī æta ."
+  },
+  {
+   "native": "අනෙකුත් සමාගම් නුසුදුසු බව පවසා ප්‍රතික්ෂේප කර ඇත .",
+   "translit": " anekut samāgam nusudusu bava pavasā pratikṣēpa kara æta ."
+  },
+  {
+   "native": "එය බුද්ධිමත් ජනතාව ම තීන්දු කළ යුතු ය .",
+   "translit": " eya buddhimat janatāva ma tīndu kaḷa yutu ya ."
+  },
+  {
+   "native": "මෙබඳු යක්ෂයන් දේශපාලන පිට්ටනියෙන් පිටුවහල් කළ යුතු ය .",
+   "translit": " mebaňdu yakṣayan dēśapālana piṭṭaniyen piṭuvahal kaḷa yutu ya ."
+  },
+  {
+   "native": "රණවිරුවන් ජීවිත පරිත්‍යාගයෙන් දිනාගත් නිදහස අහෝසි වනු ඇත .",
+   "translit": " raṇaviruvan jīvita parityāgayen dināgat nidahasa ahōsi vanu æta ."
+  },
+  {
+   "native": "මහින්ද රාජපක්ෂ මහතා එම ඉල්ලීම ඉටු කළේ ය .",
+   "translit": " mahinda rājapakṣa mahatā ema illīma iṭu kaḷē ya ."
+  },
+  {
+   "native": "මැස්සන් ඇහිරුණු අලුත් කඩය මාස කිහිපයකින් වසා දැමිණි .",
+   "translit": " mæssan æhiruṇu alut kaḍaya māsa kihipayakin vasā dæmiṇi ."
+  },
+  {
+   "native": "ඉතා සුළු කාලයකින් ම එම ව්‍යාපෘති අහෝසි විය .",
+   "translit": " itā suḷu kālayakin ma ema vyāpr̥ti ahōsi viya ."
+  },
+  {
+   "native": "උද්ධමනය ශීඝ්‍ර ලෙස ඉහළ යෑම තවත් කාරණයෙකි .",
+   "translit": " uddhamanaya śīghra lesa ihaḷa yǣma tavat kāraṇayeki ."
+  },
+  {
+   "native": "ආර්ථිකය පිළිබඳ දැනුම එහි දී අනිවාර්ය වේ .",
+   "translit": " ārthikaya piḷibaňda dænuma ehi dī anivārya vē ."
+  },
+  {
+   "native": "මහින්ද රාජපක්ෂ මහතාට පුළුල් ආර්ථික දර්ශනයක් තිබේ .",
+   "translit": " mahinda rājapakṣa mahatāṭa puḷul ārthika darśanayak tibē ."
+  },
+  {
+   "native": "ඒ බව බොහෝ විද්වතුන් පෙන්වා දී තිබේ .",
+   "translit": " ē bava bohō vidvatun penvā dī tibē ."
+  },
+  {
+   "native": "හමුදා ප්‍රධානයකු රාජ්‍යයක පවතින යුද රහස් දනී .",
+   "translit": " hamudā pradhānayaku rājyayaka pavatina yuda rahas danī ."
+  },
+  {
+   "native": "ප්‍රවෘත්තිය පළ වීමෙන් පසු රට ගිනි ගනී .",
+   "translit": " pravr̥ttiya paḷa vīmen pasu raṭa gini ganī ."
+  },
+  {
+   "native": "ඒ ගැන තීන්දුවක් ගැනීම ජනතාවට භාර කරමු .",
+   "translit": " ē gæna tīnduvak gænīma janatāvaṭa bhāra karamu ."
+  },
+  {
+   "native": "ඒ දෙපොළ එකිනෙකා ට ආශිර්වාද කර ගනිති .",
+   "translit": " ē depoḷa ekinekā ṭa āśirvāda kara ganiti ."
+  },
+  {
+   "native": "එම පක්ෂයට මවුබිම ගැන බරපතළ හැඟීමක් නැත .",
+   "translit": " ema pakṣayaṭa mavubima gæna barapataḷa hæňgīmak næta ."
+  },
+  {
+   "native": "එබඳු තැනැත්තන් ෂැවොලින් ආරාමවලට වැද්දගන්නේ ද නැත .",
+   "translit": " ebaňdu tænættan ṣævolin ārāmavalaṭa væddagannē da næta ."
+  },
+  {
+   "native": "ඔහු ගරිල්ලා සංවිධානයක දේශපාලන අංශ ප්‍රධානියා ය .",
+   "translit": " ohu garillā saṁvidhānayaka dēśapālana aṁśa pradhāniyā ya ."
+  },
+  {
+   "native": "ඔහු කලකට පෙර තම දක්ෂතාව පෙන්වූයේ ලේඛනයෙනි .",
+   "translit": " ohu kalakaṭa pera tama dakṣatāva penvūyē lēkhanayeni ."
+  },
+  {
+   "native": "එය අද පොදු ධර්මතාවක් බවට පෙරැළී තිබේ .",
+   "translit": " eya ada podu dharmatāvak bavaṭa peræḷī tibē ."
+  },
+  {
+   "native": "වනාන්තරය පුරා සෝදිසි මෙහෙයුම් ද සිදු කෙරේ .",
+   "translit": " vanāntaraya purā sōdisi meheyum da sidu kerē ."
+  },
+  {
+   "native": "එබඳු තත්ත්වයක් 1990 දී ජපානයේ ඇති විය .",
+   "translit": " ebaňdu tattvayak 1990 dī japānayē æti viya ."
+  },
+  {
+   "native": "ඔහුට ආචාර කිරීම සඳහා බල්ලෙකුවත් සිටියේ නැත .",
+   "translit": " ohuṭa ācāra kirīma saňdahā ballekuvat siṭiyē næta ."
+  },
+  {
+   "native": "දැන් එහි උපරිම අවස්ථාව උදා වී තිබේ .",
+   "translit": " dæn ehi uparima avasthāva udā vī tibē ."
+  },
+  {
+   "native": "සාකච්ඡාවල අරමුණ අයවැය ඡන්දයෙන් ආණ්ඩුව පැරදවීම ය .",
+   "translit": " sākacchāvala aramuṇa ayavæya chandayen āṇḍuva pæradavīma ya ."
+  },
+  {
+   "native": "එහෙත් අවසානයේ ඔහු ඉලක්කය ජය ගත්තේ ය .",
+   "translit": " ehet avasānayē ohu ilakkaya jaya gattē ya ."
+  },
+  {
+   "native": "කලක් ඔහු පලස්තීනය වෙනුවෙන් පෙනී සිටියේ ය .",
+   "translit": " kalak ohu palastīnaya venuven penī siṭiyē ya ."
+  },
+  {
+   "native": "මහජන චීනය ගොඩනැඟුවේ මාඕ සේතුං සහෝදරයා ය .",
+   "translit": " mahajana cīnaya goḍanæňguvē māō sētuṁ sahōdarayā ya ."
+  },
+  {
+   "native": "නව ටැන්සානියාව බිහි කළේ ජුලියස් නියරේරේ ය .",
+   "translit": " nava ṭænsāniyāva bihi kaḷē juliyas niyarērē ya ."
+  },
+  {
+   "native": "ඒ අනාගත පුරවැසියන් ගේ දැනගැනීම සඳහා ය .",
+   "translit": " ē anāgata puravæsiyan gē dænagænīma saňdahā ya ."
+  },
+  {
+   "native": "එදා ජනතාව සිය යුතුකම ඉටු කළේ ය .",
+   "translit": " edā janatāva siya yutukama iṭu kaḷē ya ."
+  },
+  {
+   "native": "නූතන ඉරානය යනු ආසියාවේ බලවත් ම රාජ්‍යයෙකි .",
+   "translit": " nūtana irānaya yanu āsiyāvē balavat ma rājyayeki ."
+  },
+  {
+   "native": "ඒ ලෝකයා නො මඟ යැවීම සඳහා ය .",
+   "translit": " ē lōkayā no maňga yævīma saňdahā ya ."
+  },
+  {
+   "native": "ඉන් මෙරටට ලබාගත හැකි ආර්ථික වාසි රැසකි .",
+   "translit": " in meraṭaṭa labāgata hæki ārthika vāsi ræsaki ."
+  },
+  {
+   "native": "මේ ආශිර්වාදය ශ්‍රී ලංකාවට බෙහෙවින් වැදගත් ය .",
+   "translit": " mē āśirvādaya śrī laṁkāvaṭa behevin vædagat ya ."
+  },
+  {
+   "native": "යුරෝපා සංගමය ද එම අදහස ම දරයි .",
+   "translit": " yurōpā saṁgamaya da ema adahasa ma darayi ."
+  },
+  {
+   "native": "ලිප්ටන් වටරවුමේ පිකට් කිරීමට ද බාධාවක් නැත .",
+   "translit": " lipṭan vaṭaravumē pikaṭ kirīmaṭa da bādhāvak næta ."
+  },
+  {
+   "native": "එහෙත් අද තත්ත්වය මුළුමනින් ම සතුටුදායක ය .",
+   "translit": " ehet ada tattvaya muḷumanin ma satuṭudāyaka ya ."
+  },
+  {
+   "native": "එහි ඉතා පැහැදිලි හා ගැඹුරු අදහසක් තිබේ .",
+   "translit": " ehi itā pæhædili hā gæm̌buru adahasak tibē ."
+  },
+  {
+   "native": "ඉන්දියාව මෙන්ම පාකිස්ථානය ද අපේ මිතුරෝ ය .",
+   "translit": " indiyāva menma pākisthānaya da apē miturō ya ."
+  },
+  {
+   "native": "අවසන් මොහොතේ යථාර්ථය පිළිගන්නට යුනෙස්කෝ අධිපතිවරයාට සිදුවිය .",
+   "translit": " avasan mohotē yathārthaya piḷigannaṭa yuneskō adhipativarayāṭa siduviya ."
+  },
+  {
+   "native": "එහෙත් අද තත්ත්වය මුළුමනින් ම වෙනස් ය .",
+   "translit": " ehet ada tattvaya muḷumanin ma venas ya ."
+  },
+  {
+   "native": "ඒ ගැන කල්පනා කිරීම පවා භයානක ය .",
+   "translit": " ē gæna kalpanā kirīma pavā bhayānaka ya ."
+  },
+  {
+   "native": "ආණ්ඩුව ඒ සඳහා අවංක ප්‍රයත්නයක් දරමින් සිටී .",
+   "translit": " āṇḍuva ē saňdahā avaṁka prayatnayak daramin siṭī ."
+  },
+  {
+   "native": "මේ දෙදෙනා ම සිය කීර්තිය විනාශ කර ගත්හ .",
+   "translit": " mē dedenā ma siya kīrtiya vināśa kara gatha ."
+  },
+  {
+   "native": "රටට හිතැති හමුදා ප්‍රධානයකු කොමිස්වලට යට වන්නේ නැත .",
+   "translit": " raṭaṭa hitæti hamudā pradhānayaku komisvalaṭa yaṭa vannē næta ."
+  },
+  {
+   "native": "දෙවැන්න අත්අඩංගුවේ පසුවන කොටි ත්‍රස්තවාදීන් නිදහස් කිරීම ය .",
+   "translit": " devænna ataḍaṁguvē pasuvana koṭi trastavādīn nidahas kirīma ya ."
+  },
+  {
+   "native": "අද නිදහසේ හුස්ම පොදක් ගැනීමේ අවස්ථාව ජනතාවට තිබේ .",
+   "translit": " ada nidahasē husma podak gænīmē avasthāva janatāvaṭa tibē ."
+  },
+  {
+   "native": "හමුදා ප්‍රධානයා ම හමුදාවේ විනය කඩකර තිබේ .",
+   "translit": " hamudā pradhānayā ma hamudāvē vinaya kaḍakara tibē ."
+  },
+  {
+   "native": "දැන් ක්‍රියාත්මක වන්නේ එහි පළමු අදියර ය .",
+   "translit": " dæn kriyātmaka vannē ehi paḷamu adiyara ya ."
+  },
+  {
+   "native": "ඔවුනට ජාතියේ ප්‍රණාමය හිමි විය යුතු ය .",
+   "translit": " ovunaṭa jātiyē praṇāmaya himi viya yutu ya ."
+  },
+  {
+   "native": "එම නරපතීහු යුද ශිල්පයෙහි කෙළ පැමිණියෝ වූහ .",
+   "translit": " ema narapatīhu yuda śilpayehi keḷa pæmiṇiyō vūha ."
+  },
+  {
+   "native": "ඔව්හු යුද උපායෙහි දක්ෂ අභීත රණකාමීහු වෙති .",
+   "translit": " ovhu yuda upāyehi dakṣa abhīta raṇakāmīhu veti ."
+  },
+  {
+   "native": "එහි දී මතුවන ප්‍රධාන අභියෝග කිහිපයක් වේ .",
+   "translit": " ehi dī matuvana pradhāna abhiyōga kihipayak vē ."
+  },
+  {
+   "native": "සමූපකාරය සඳහා වූ බදු ක්‍රමය අත්හිටුවා තිබේ .",
+   "translit": " samūpakāraya saňdahā vū badu kramaya athiṭuvā tibē ."
+  },
+  {
+   "native": "එය හොඳ සහතිකයක් සේ සැලකිය හැකි ය .",
+   "translit": " eya hoňda sahatikayak sē sælakiya hæki ya ."
+  },
+  {
+   "native": "දෙවැන්න ජනතාව වෙනුවෙන් අඛණ්ඩව වැඩ කිරීම යි .",
+   "translit": " devænna janatāva venuven akhaṇḍava væḍa kirīma yi ."
+  },
+  {
+   "native": "එය තනිකර ම ආණ්ඩුව ගෙදර යැවීමේ සටනෙකි .",
+   "translit": " eya tanikara ma āṇḍuva gedara yævīmē saṭaneki ."
+  },
+  {
+   "native": "ඒ සියල්ල පරාජය කිරීමට දේශප්‍රේමීන්ට හැකි විණි .",
+   "translit": " ē siyalla parājaya kirīmaṭa dēśaprēmīnṭa hæki viṇi ."
+  },
+  {
+   "native": "ෆොන්සේකා මහතා ඉතා මෝඩ හා උද්ධච්ඡ කතාවක් ද කියා තිබේ .",
+   "translit": " fonsēkā mahatā itā mōḍa hā uddhaccha katāvak da kiyā tibē ."
+  },
+  {
+   "native": "මැතිවරණ පොරොන්දු පිළිබඳ ඉතා හොඳ වැටහීමක් මෙරට ජනතාවට තිබේ .",
+   "translit": " mætivaraṇa porondu piḷibaňda itā hoňda væṭahīmak meraṭa janatāvaṭa tibē ."
+  },
+  {
+   "native": "ශ්‍රී ලංකාව වැනි රාජ්‍යයක් ගොඩනැඟීම සඳහා ජනමූල නායකයකු අවශ්‍ය වේ .",
+   "translit": " śrī laṁkāva væni rājyayak goḍanæňgīma saňdahā janamūla nāyakayaku avaśya vē ."
+  },
+  {
+   "native": "යුද්ධයක් පවතින සමයක් තුළ බොහෝ දූෂිතකම් සිදු විය හැකි ය .",
+   "translit": " yuddhayak pavatina samayak tuḷa bohō dūṣitakam sidu viya hæki ya ."
+  },
+  {
+   "native": "මේ ගිවිසුමට විපක්ෂනායක රනිල් වික්‍රමසිංහ මහතා ද අස්සන් කර තිබේ .",
+   "translit": " mē givisumaṭa vipakṣanāyaka ranil vikramasiṁha mahatā da assan kara tibē ."
+  },
+  {
+   "native": "රනිල් වික්‍රමසිංහ මහතා මීට පෙර ද රට පාවා දුන්නේ ය .",
+   "translit": " ranil vikramasiṁha mahatā mīṭa pera da raṭa pāvā dunnē ya ."
+  },
+  {
+   "native": "එය ලෝකයේ සියලුම ප්‍රබල ජනමාධ්‍ය ආයතන මගින් ප්‍රචාරය කර තිබේ .",
+   "translit": " eya lōkayē siyaluma prabala janamādhya āyatana magin pracāraya kara tibē ."
+  },
+  {
+   "native": "එය හුදු දේශපාලන කයිවාරුවක් යැයි තවත් අය දැඩි විවේචන කළහ .",
+   "translit": " eya hudu dēśapālana kayivāruvak yæyi tavat aya dæḍi vivēcana kaḷaha ."
+  },
+  {
+   "native": "මේ සියල්ල ඉතා මැනැවින් ශ්‍රී ලංකාවට ගළපා ගත හැකි ය .",
+   "translit": " mē siyalla itā mænævin śrī laṁkāvaṭa gaḷapā gata hæki ya ."
+  },
+  {
+   "native": "සැබෑ ලෙස ම ශ්‍රී ලංකාව කිරෙන් ස්වයංපෝෂිත කළ හැකි රටකි .",
+   "translit": " sæbǣ lesa ma śrī laṁkāva kiren svayaṁpōṣita kaḷa hæki raṭaki ."
+  },
+  {
+   "native": "ඔහු පළමුව ප්‍රකාශ කෙළේ සිංගප්පූරුව ශ්‍රී ලංකාවක් කරන බව ය .",
+   "translit": " ohu paḷamuva prakāśa keḷē siṁgappūruva śrī laṁkāvak karana bava ya ."
+  },
+  {
+   "native": "දැන් යළිදු අදාළ ප්‍රදේශවල හැබෑවට ම භීතියක් පැතිර යමින් තිබේ .",
+   "translit": " dæn yaḷidu adāḷa pradēśavala hæbǣvaṭa ma bhītiyak pætira yamin tibē ."
+  },
+  {
+   "native": "එලෙස ම අතුරුදන්වීම් කිහිපයක් සිදු වී ඇති බව ද සත්‍යයෙකි .",
+   "translit": " elesa ma aturudanvīm kihipayak sidu vī æti bava da satyayeki ."
+  },
+  {
+   "native": "මෙය ආර්ථික විද්‍යාවේ දී හඳුන්වන්නේ කෙටි කාලීන උද්ධමනය ලෙස ය .",
+   "translit": " meya ārthika vidyāvē dī haňdunvannē keṭi kālīna uddhamanaya lesa ya ."
+  },
+  {
+   "native": "අය වැය විවාදය අතර දේශපාලන පිල් මාරු සිදු වෙමින් පවතී .",
+   "translit": " aya væya vivādaya atara dēśapālana pil māru sidu vemin pavatī ."
+  },
+  {
+   "native": "සෑම පක්ෂයක් ම එහි වගකීම භාරගත යුතුය .",
+   "translit": " sǣma pakṣayak ma ehi vagakīma bhāragata yutuya ."
+  },
+  {
+   "native": "ඔහු ඉතා අල්පේච්ඡ ජීවිතයක් ගතකළ ජනතා පුත්‍රයෙකි .",
+   "translit": " ohu itā alpēccha jīvitayak gatakaḷa janatā putrayeki ."
+  },
+  {
+   "native": "ඕනෑම රාජ්‍ය නායකයකුට ඉරානයෙන් ආරාධනා ලැබෙන්නේ නැත .",
+   "translit": " ōnǣma rājya nāyakayakuṭa irānayen ārādhanā læbennē næta ."
+  },
+  {
+   "native": "විවෘත ආර්ථික ක්‍රමය තුළ මහා පරිමාණ වෙළෙඳ මධ්‍යස්ථාන නගරයේ ඉදිවිණි .",
+   "translit": " vivr̥ta ārthika kramaya tuḷa mahā parimāṇa veḷeňda madhyasthāna nagarayē idiviṇi ."
+  },
+  {
+   "native": "මෙවර අයවැය ඉදිරිපත් වන්නේ ඉහත කී ආර්ථික දුෂ්කරතා මධ්‍යයේ ය .",
+   "translit": " mevara ayavæya idiripat vannē ihata kī ārthika duṣkaratā madhyayē ya ."
+  },
+  {
+   "native": "හම්බන්තොට පිහිටා ඇත්තේ ලොව කාර්ය බහුල නෞකා මාර්ගයක් ආසන්නයේ ය .",
+   "translit": " hambantoṭa pihiṭā ættē lova kārya bahula naukā mārgayak āsannayē ya ."
+  },
+  {
+   "native": "ශ්‍රී ලංකාව පිහිටා ඇත්තේ ඉන්දියන් සාගරයේ ඉතා වැදගත් කේන්ද්‍රස්ථානයක ය .",
+   "translit": " śrī laṁkāva pihiṭā ættē indiyan sāgarayē itā vædagat kēndrasthānayaka ya ."
+  },
+  {
+   "native": "කුමන්ත්‍රණය සාර්ථක කරගැනීමේ වැඩි ම උනන්දුව ඇත්තේ කොටි සංවිධානයට ය .",
+   "translit": " kumantraṇaya sārthaka karagænīmē væḍi ma unanduva ættē koṭi saṁvidhānayaṭa ya ."
+  },
+  {
+   "native": "වාණිජ මණ්ඩලයේ සාමාජිකයෝ කිහිප දෙනෙක් ද මෙවර අයවැය අගය කරති .",
+   "translit": " vāṇija maṇḍalayē sāmājikayō kihipa denek da mevara ayavæya agaya karati ."
+  },
+  {
+   "native": "අද තත්ත්වය බොහෝ සෙයින් ම වෙනස් ය .",
+   "translit": " ada tattvaya bohō seyin ma venas ya ."
+  },
+  {
+   "native": "මේ කතිකාව පිළිබඳ කිසිඳු හැඟීමක් අපට නැත .",
+   "translit": " mē katikāva piḷibaňda kisiňdu hæňgīmak apaṭa næta ."
+  },
+  {
+   "native": "එබඳු මිනිසුන් දඩයම් කිරීම ධනපති ක්‍රමයේ ලක්ෂණයෙකි .",
+   "translit": " ebaňdu minisun daḍayam kirīma dhanapati kramayē lakṣaṇayeki ."
+  },
+  {
+   "native": "කොසෝවෝ යනු සර්බියානු රාජ්‍යයේ සීමිත භූමි කලාපයෙකි .",
+   "translit": " kosōvō yanu sarbiyānu rājyayē sīmita bhūmi kalāpayeki ."
+  },
+  {
+   "native": "ඒ හැම ලිපියක ම වැදගත් උපදේශ තිබිණි .",
+   "translit": " ē hæma lipiyaka ma vædagat upadēśa tibiṇi ."
+  },
+  {
+   "native": "ආර්ථිකය හා සංස්කෘතිය ද සාඩම්බර තත්ත්වයක පැවැතිණි .",
+   "translit": " ārthikaya hā saṁskr̥tiya da sāḍambara tattvayaka pævætiṇi ."
+  },
+  {
+   "native": "එම ප්‍රදේශ හතර අතින් වටකරනු ලැබ තිබේ .",
+   "translit": " ema pradēśa hatara atin vaṭakaranu læba tibē ."
+  },
+  {
+   "native": "තෙවනුව ඔවුන් වන්නියේ මෙහෙයුම්වලට අත පොවනු ඇත .",
+   "translit": " tevanuva ovun vanniyē meheyumvalaṭa ata povanu æta ."
+  },
+  {
+   "native": "ඔහුට තවදුරටත් සමාවක් දිය නො හැකි ය .",
+   "translit": " ohuṭa tavaduraṭat samāvak diya no hæki ya ."
+  },
+  {
+   "native": "ඔහු අවධානය යොමුකර ඇත්තේ සල්ලි ගැන පමණය .",
+   "translit": " ohu avadhānaya yomukara ættē salli gæna pamaṇaya ."
+  },
+  {
+   "native": "මීට අවුරුදු හත්සීයකට විතර ඉස්සර ලංකාවේ යාපහුව කියලා පුංචි රජධානියක් තිබුනා .",
+   "translit": null
+  },
+  {
+   "native": "මේ රාජ්‍යය පාලනය කලේ බුවනෙකබා කියලා රජ කෙනෙක් .",
+   "translit": null
+  },
+  {
+   "native": "සතුරු උවදුරු වලින් තමන්ව රැක ගන්න රජතුමා කන්දක් උඩ අලුත් මාළිගාවක් ඉදිකෙරුවා .",
+   "translit": null
+  },
+  {
+   "native": "රජතුමා ඒකට තෝර ගත්තේ වීරගල කියන කන්දයි .",
+   "translit": null
+  },
+  {
+   "native": "අගමෙහෙසිය ඇතුලු පරිවාර බිසවුන් හැටපස්දෙනෙක් එක්ක රජතුමා අලුත් මාළිගාවේ පදිංචියට ගියා .",
+   "translit": null
+  },
+  {
+   "native": "රජතුමා වීරගල පදිංචියට ආපු එක ගැන මනාපයක් දැක්වුවේ නැති කෙනෙක් හිටියා .",
+   "translit": null
+  },
+  {
+   "native": "ඒ පළාතේ රටේ රාළයි ඒ .",
+   "translit": null
+  },
+  {
+   "native": "ගලබැද්දේරාළ අග්බෝ කුමාරයාට ගතු කියලා රජතුමාත් කුමාරයාත් අතර හතුරුකමක් ඇවිලෙව්වා .",
+   "translit": null
+  },
+  {
+   "native": "අග්බෝ කුමාරයා තමන්ට විරුද්ධව කැරැල්ලක් ගහන්න සූදානම් වෙන විත්තිය දැනගත්ත රජතුමා සතුරා විනාශ කරන්න වහාම හමුදාව රැස්කලා .",
+   "translit": null
+  },
+  {
+   "native": "ඉක්මනින්ම හමුදා දෙක අතර යුද්ධයක් ඇතිඋනා .",
+   "translit": null
+  },
+  {
+   "native": "රජතුමාගේ අගමෙහෙසියට ඒ වනවිට ළඳරු පුතෙක් හිටියා .",
+   "translit": null
+  },
+  {
+   "native": "යුද්ධෙට පිටත් වෙන්න ඉස්සෙල්ලා රජතුමා බිසෝවරුන්ට කරුනු පැහැදිලි කලා .",
+   "translit": null
+  },
+  {
+   "native": "මම කැරැල්ල මර්දනය කරන්න යනවා .",
+   "translit": null
+  },
+  {
+   "native": "යුද්ධේ අවසන් වෙන කොට පණිවිඩකාරයෙක් ඒවි .",
+   "translit": null
+  },
+  {
+   "native": "මං දින්නොත් සුදු කොඩියක් ඔසවාවි .",
+   "translit": null
+  },
+  {
+   "native": "පැරදුනොත් කළු කොඩියක් ඔසවාවි .",
+   "translit": null
+  },
+  {
+   "native": "ඊළඟ දවසේ බුවනෙකබා රජුගේ සේනාවත් අග්බෝ කුමාරයාගේ සේනාවත් අතර යුද්ධේ පටන් ගත්තා .",
+   "translit": null
+  },
+  {
+   "native": "යුද්ධෙන් අග්බෝ කුමාරයා මියගියා .",
+   "translit": null
+  },
+  {
+   "native": "බුවනෙකබා රජ ජය ගත්තා .",
+   "translit": null
+  },
+  {
+   "native": "කොඩි බාර පණිවිඩකාරයා පුරවරයට ගිහින් බිසෝවරුන්ටත් රට වැසියන්ටත් යුද්ධේ ප්‍රතිඵල දැනුම් දෙන්න පිටත් උනා .",
+   "translit": null
+  },
+  {
+   "native": "පණිවිඩකාරයා අතරමගදි රා පොලක නතර වෙලා රා බීලා වෙරි උනා .",
+   "translit": null
+  },
+  {
+   "native": "විහිළුවක් කරන්න හිතාගෙන මිනිහා කළු කොඩිය ඉස්සුවා .",
+   "translit": null
+  },
+  {
+   "native": "කළු කොඩිය දැකපු බිසෝවරු හිතුවා රජතුමා යුද්ධෙන් පරාද උනයි කියලා .",
+   "translit": null
+  },
+  {
+   "native": "අනේ ! බිසෝවරු හැට පස් දෙනාම බැළුම්ගලෙන් පැනලා සිය දිවි නසා ගත්තා .",
+   "translit": null
+  },
+  {
+   "native": "සටනින් ජය අරන් රාජ පෙරහැරෙන් මාලිගාවට ආපු රජතුමා මේ විනාසේ දැකලා කම්පාවෙලා ගලෙන් පැනලා සිය දිවි නසා ගත්තා .",
+   "translit": null
+  },
+  {
+   "native": "එදා මාළිගාවේ ඉතුරු උනේ බිළිඳු පුත් කුමාරා විතරයි .",
+   "translit": null
+  },
+  {
+   "native": "වාසනාවට එතෙන්ට ආපු මාළිගාවේ රෙදි නැන්දා පුංචි කුමාරයාව දැක්කා .",
+   "translit": null
+  },
+  {
+   "native": "රෙදි නැන්දා දරුවාව රෙදි කඩක ඔතාගෙන හංගගෙන මාළිගාවෙන් පැනලා ගියා .",
+   "translit": null
+  },
+  {
+   "native": "එදා රෙදි නැන්දා දරුවාව හංගපු තැන හැංගවත්ත නමින් ප්‍රසිද්ධ උනා .",
+   "translit": null
+  },
+  {
+   "native": "අන්තිමට කළුන්දෑවේ ගමරාළ අතට ළමයව ගියා .",
+   "translit": null
+  },
+  {
+   "native": "ළමයා අප්පුවා කියන නමින් සාමාන්‍ය ගමේ ළමයෙක් හැටියට හදා වඩා ගත්තා .",
+   "translit": null
+  },
+  {
+   "native": "කාලයක් යන කොට අප්පුවා හැඩි දැඩි තරුණයෙක් උනා .",
+   "translit": null
+  },
+  {
+   "native": "ඔය ගමරාළට දූලා දෙන්නෙක් හිටියා .",
+   "translit": null
+  },
+  {
+   "native": "වැඩිමල් දුව කළු එතනා , බාල දුව සිරිමල් එතනා .",
+   "translit": null
+  },
+  {
+   "native": "කළු එතනා සැරයි . බාල දුව සිරිමල් එතනා අප්පුවාට කරුණාවන්තයි .",
+   "translit": null
+  },
+  {
+   "native": "සිරිමල් එතනා අප්පුවාට නිතරම ගෞරවයෙන් සැලකුවා .",
+   "translit": null
+  },
+  {
+   "native": "ඉතින් ගමරාළ සිරිමල් එතනාව අප්පුවාට බන්දලා දුන්නා .",
+   "translit": null
+  },
+  {
+   "native": "මේ දෙන්නා බැඳලා අලුත් ගෙදරක පදිංචියට ගියා .",
+   "translit": null
+  },
+  {
+   "native": "ගමරාළගෙන් ඔවුන්ට ඉඩමකුයි කුඹුරකුයි හම්බ උනා .",
+   "translit": null
+  },
+  {
+   "native": "මේ වෙන කොට කුරුණෑගල රාජධානිය පාලනේ කලේ වත්හිමි කුමාරයායි .",
+   "translit": null
+  },
+  {
+   "native": "අර මියගිය බුවනෙකබා රජ්ජුරුවන්ට මුස්ලිම් බිසොවක් හිටියා .",
+   "translit": null
+  },
+  {
+   "native": "ඇයට උපන් කුමාරයා තමයි වත්හිමි කියන්නේ .",
+   "translit": null
+  },
+  {
+   "native": "අවාසනාවට මුස්ලිම් කුමාරයෙක් සිංහාසනේ ඉන්න එක ඇමැතිවරු රිස්සුවේ නෑ .",
+   "translit": null
+  },
+  {
+   "native": "කුමාරයාව මරන්න කුමන්ත්‍රණයක් දියත් කෙරුනා .",
+   "translit": null
+  },
+  {
+   "native": "කුරුණෑගල ඇතුගල මුදුනේ පවත්වන පිරිත් දේශනාවකට වත්හිමි කුමාරයාට ආරාධනා කලා .",
+   "translit": null
+  },
+  {
+   "native": "ඇමතිවරු සැලසුම් කරලා තිබුනු විදියට ඉදගෙන හිටිය ආසනෙත් එක්කම රජතුමා ගල් පර්වතයෙන් පහලට පෙරලා දැම්මා .",
+   "translit": null
+  },
+  {
+   "native": "වත්හිමි කුමාරයාගේ මරණෙන් පස්සේ රටේ රජකමට සුදුස්සෙක් තෝරගන්න එකයි ඊළඟ ප්‍රශ්නේ .",
+   "translit": null
+  },
+  {
+   "native": "මේ කාරිය බාර උනේ මංගල හස්තිරාජයාටයි .",
+   "translit": null
+  },
+  {
+   "native": "රජවාසල මඟුල් ඇතා කවුරුහරි ඉදිරියේ දණ ගහලා වැන්දොත් ඒ තැනැත්තා රටේ රජකමට පත් වෙනවා කියලා සම්ප්‍රදායක් ඒ කාලේ තිබුණා .",
+   "translit": null
+  },
+  {
+   "native": "ඇමැතිවරු පැරණි චාරිත්‍රේ හැටියට වැඩකලා .",
+   "translit": null
+  },
+  {
+   "native": "මඟුල් ඇතා සරසලා බෙර සක් හඬ මැද්දේ පෙරහැරේ යැව්වා .",
+   "translit": null
+  },
+  {
+   "native": "එදා අප්පුවා කුඹුරේ වැඩ .",
+   "translit": null
+  },
+  {
+   "native": "රන්බමරකෙත කියන කුඹුර හානවා .",
+   "translit": null
+  },
+  {
+   "native": "සිරිමල් එතනා දවල් ඇඹුල ගෙනාවා .",
+   "translit": null
+  },
+  {
+   "native": "අප්පුවා දවල් කෑම අරන් මහන්සිය නිවා ගන්න බිරිඳගේ උකුලේ ඔලුව තියාගෙන ටිකක් නිදාගත්තා .",
+   "translit": null
+  },
+  {
+   "native": "ටික වෙලාවකින් අප්පුවා හීනයක් දැක්කා .",
+   "translit": null
+  },
+  {
+   "native": "නඟුලේ මීයක් බැඳලා .",
+   "translit": null
+  },
+  {
+   "native": "අප්පුවා ඉක්මනට නැගිටලා සිරිමල් එතනාට හීනේ ගැන කිව්වා .",
+   "translit": null
+  },
+  {
+   "native": "සිරිමල් එතනා හීනේ තේරුම් කලා .",
+   "translit": null
+  },
+  {
+   "native": "\" එහෙනම් කිසිම අනුමානයක් නැහැ, ඔයා රජ වෙනවා , මං අගබිසොව \" කියලා සිරිමල් එතනා හිනා උනා .",
+   "translit": null
+  },
+  {
+   "native": "මේ කථාව යද්දි ආයෙත් බෙර සද්දයක් ඇහෙන්න පටන් ගත්තා .",
+   "translit": null
+  },
+  {
+   "native": "දෙන්නාට ඇස් අදහා ගන්න බැරි උනා .",
+   "translit": null
+  },
+  {
+   "native": "මංගල හස්ථි රාජයා වෙල්යායේ මැද්දෙන් මේ ගොල්ලො දිහාට ගරු ගාම්භීර තාලෙට එනවා .",
+   "translit": null
+  },
+  {
+   "native": "පිටිපස්සෙන් ඇමැතිවරු කන්ඩායමක් එක්ක ලොකු පෙරහැරක් .",
+   "translit": null
+  },
+  {
+   "native": "කුඹුරට ආපු මංගල හස්ථියා අප්පුවා ඉදිරියේ දණ ගහලා නමස්කාර කලා .",
+   "translit": null
+  },
+  {
+   "native": "අප්පුවා සුවඳ පැණින් නාවලා සළුපිළි අන්දවලා ඇතා පිටේ වාඩි කරවගෙන මාළිගයට කැන්දවාගෙන ගියා .",
+   "translit": null
+  },
+  {
+   "native": "මේ විදියට අප්පුවා ඇතුගල්පුරේ රජ උනා. සිරිමල් එතනා අග බිසව උනා .",
+   "translit": null
+  },
+  {
+   "native": "මියගිය වත්හිමි කුමාරයා දෙවි කෙනෙක් උනා .",
+   "translit": null
+  },
+  {
+   "native": "ජනී ජනයාගේ දුක බලන්න සුදු අශ්වයෙක් පිට නැගලා ඇතුගල හරහා සැරිසරන්නේ ඒ ගලේ බණ්ඩාර දෙවියෝ .",
+   "translit": null
+  }
+ ]
+}
