@@ -376,7 +376,7 @@ export function renderDictSections(
   ], 'dict.set.fmt.mdictNote');
   const row3 = tbody.createEl('tr');
   addFormatRow(row3, 'dict.set.fmt.teiLex0', [
-    ['code', '.lex0.xml'],
+    ['code', '.lex0.xml'], ['text', '/'], ['code', '.p5.xml'],
   ], 'dict.set.fmt.teiLex0Note');
 }
 
