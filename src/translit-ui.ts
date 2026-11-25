@@ -90,6 +90,8 @@ export const SCHEME_GROUP_SCRIPT: Record<string, ScriptId> = {
   uyghur: "uyghur",
   // 回鶻文（U+10F70–U+10FAF）與現代維吾爾文（阿拉伯字母）是不同文種，勿合併
   olduyghur: "olduyghur",
+  // 摩尼文（U+10AC0–U+10AFF）：RTL 連寫，摩尼教東傳文獻主流文字
+  manichaean: "manichaean",
   mongolian: "mongolian",
   manchu: "manchu",
   // Marchen：Wylie 同構，橫排 LTR
