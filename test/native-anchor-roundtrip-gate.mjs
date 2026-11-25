@@ -280,6 +280,24 @@ console.log("[④b 摩尼文方案 — L2/11-123R 記法往返]");
   ok(lib.detectScript("𐫀𐫁𐫃") === "manichaean", "④b detectScript");
 }
 
+// ============ ④c 摩尼文 VATEC man 段錨（Manichäisch-Türkische Texte 抽樣）============
+// VATEC 之 <ws=man> 段用 von Gabain 學術轉寫（ṭ＝摩尼 Tau 字形身份、ḏ、k̈、ẖ 行填充）。
+// 預規範語義與 olduyghur vteNormalize 同構；ẖ（行填充）與 \\（詞界校正）屬寫本現象標記，剝除後入錨。
+{
+  const S = lib.getScheme("manichaean");
+  const norm = (s) => s.replace(/ṭ/g, "t").replace(/ḏ/g, "d").replace(/k̈/g, "k").replace(/ẖ/g, "").replace(/\\/g, "");
+  // 出處：VATEC Manichäisch-Türkische Texte (BT 5/13) TL 欄 ws=man 段（全量僅 8 段，全收）
+  const vatecMan = ["ṭngry", "ʾḏgʾ", "qwynkʾ", "lym", "byrw", "yrwk̈yngʾẖ", "ʾʾlk̈ʾṭmyš", "wz", "yzḏʾn"];
+  let mOk = 0;
+  for (const raw of vatecMan) {
+    const n = norm(raw);
+    const native = S.romanToNative(n);
+    if (S.nativeToRoman(native) === n) mOk++; else fail++, failures.push(`④c 摩尼 VATEC 往返: ${raw} → ${n} → ${S.nativeToRoman(native)}`);
+  }
+  pass += mOk;
+  console.log(`  ④c 摩尼文 VATEC man 段錨: ${mOk}/${vatecMan.length} 往返閉合`);
+}
+
 console.log(`\n結果: ${pass} 通过, ${fail} 失败`);
 if (fail > 0) {
   console.log("失敗清單（前 20）：");
