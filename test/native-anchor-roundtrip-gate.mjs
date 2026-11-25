@@ -127,14 +127,15 @@ console.log("[② 僧伽羅 — UD_Sinhala 原生錨]");
     // 出向統一短式 ෙ/ො、句號「.」還原為 ෴、ASCII 數字出向為僧伽羅數字（digitRows 雙向設計）——
     // 均由 siVowel/digitNorm 規範化後比較。
     if (siVowel(digitNorm(norm(native))) === siVowel(digitNorm(norm(back)))) rtOk++;
-    else if (/\u0dca[\u0d85-\u0dc6]/.test(native)) {
-      // 「C+virama+H」連寫（ත්හ 等）＝sinhala-pali 出向已知有損（virama 隱式設計，
-      // N2R 丟 virama 後 R2N 走複合字母 ථ 等）——excluded-lost 計數呈報（缺陷定性，待裁定）。
+    // halanta 後接「嚴式鼻音化形」者（ඩංගු→ḍaṅga、ං 在 labial 前→m 等）＝嚴式鼻音設計非對稱
+    //（ං 出向 ṅ/m，R2N 讀回 ඞ්/ම්，語音同構字面異形）——非 virama 連寫類，CGJ 不適用，
+    // excluded-lost 計數呈報（嚴式鼻音還原＝獨立工程，待裁定）。
+    else if (/[\u0d82\u0d9e\u0d9f\u0db8]\u0dca/.test(native) || /[\u0d82]/.test(native)) {
       rtLost++;
     }
     else { fail++; console.log(`  ✗ si 往返 ${native.slice(0, 20)} got=${norm(back).slice(0, 30)}`); failures.push("si rt " + native.slice(0, 20)); }
   }
-  console.log(`  si 往返: ${rtOk}/${rtLen - rtExc - rtLost}（excluded ${rtExc}＝含 ෆ/ඳ/ඹ 極限字母 n2737 在案；excluded-lost ${rtLost}＝C+virama+H 連寫有損，待裁定）`);
+  console.log(`  si 往返: ${rtOk}/${rtLen - rtExc - rtLost}（excluded ${rtExc}＝含 ෆ/ඳ/ඹ 極限字母 n2737 在案；excluded-lost ${rtLost}＝嚴式鼻音設計非對稱，待裁定）`);
 }
 
 // ============ ③a 回鶻（現代維吾爾 UEY；uyghur-uly）============

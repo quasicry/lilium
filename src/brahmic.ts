@@ -192,6 +192,14 @@ export function brahmicRomanToNative(input: string, data: BrahmicChar[], virama?
   let lastConsLen = 0; // 最近發出輔音的字寬（用於前導元音重排）
   let i = 0;
   while (i < input.length) {
+    // CGJ（U+034F）：N2R 端 virama 連寫斷字符（見 brahmicNativeToRoman virama 分支註釋）——
+    // 透明剝除並重置 prevCat＝強制下一輔音作新音節首（t\u034fhi → ත්හි 而非 ථි）。
+    if (input.charCodeAt(i) === 0x034f) {
+      i++;
+      prevCat = null;
+      lastConsLen = 0;
+      continue;
+    }
     const rest = input.slice(i);
     let matched = false;
     for (const key of keys) {
@@ -292,6 +300,13 @@ export function brahmicNativeToRoman(input: string, data: BrahmicChar[], strictN
   const anusvaraRoman = data.find((d) => d.cat === "anusvara")?.roman ?? "ṃ";
   // 泰文 ง（ngo ngu）同作輔音與 niggahita：取資料表對應條目，使各方案自定義其值
   const ngConsRoman = data.find((d) => d.ch === "ง" && d.cat === "consonant")?.roman ?? "ṅ";
+  // virama 連寫斷字符判定用：roman token 集合（見 virama 分支註釋）
+  const { romanToCands: romanKeyCands } = buildMaps(data);
+  const romanKeys = new Set(allTokens(data));
+  // 旗標：上一輔音帶 virama（halanta），下一音節體輸出前須檢查複合 token 撞車
+  let viramaJoin = false;
+  let viramaSep: string | null = null;
+  let pendingViramaJoin = false;
   const ngAnusRoman = data.find((d) => d.ch === "ง" && d.cat === "anusvara")?.roman ?? ngConsRoman;
   let out = "";
   let pendingLV: string | null = null; // 待延後發出的前導元音羅馬字
@@ -458,6 +473,13 @@ export function brahmicNativeToRoman(input: string, data: BrahmicChar[], strictN
         // 套用 finalMap（RTGS 死音節尾輔音變體，如 ก์ → k）
         body = r;
         i += 2;
+        // 【N2R 有損防杜】virama 連寫（ත්හ → t+ha）若「本輔音尾字母＋下一輔音首字母」
+        // 恰構成 roman 複合 token（t+h="th"），R2N 端會讀成複合字母（ථ）＝往返有損。
+        // 插入 CGJ（U+034F COMBINING GRAPHEME JOINER）作顯式斷字符——R2N 端 CGJ
+        // 透明剝除並重置 prevCat，強制 "t"+"hi" 分詞（ත්හි）閉合。
+        // 僅在確實組成複合 key 時插入：dhamma 的 mm（非 token）等既有輸出零變化。
+        // 旗標於本輪 body 輸出後設置（viramaJoin=false 的檢查點在下一輪 out+=body 前）。
+        pendingViramaJoin = true;
       } else if (ncat === "anusvara") {
         // niggahita：基底 + 固有 a + ṃ（如 saṃ = sa + ṃ）
         // 嚴式鼻音化：後接同組塞音時改寫爲該組鼻音（saṅgha / sañcetanā / sambuddha）
@@ -484,11 +506,39 @@ export function brahmicNativeToRoman(input: string, data: BrahmicChar[], strictN
         body = r + impliedO + (pendingLV ?? INH);
         i++;
       }
+      // virama 連寫斷字符插入（見 virama 分支註釋）：旗標於上一輪 virama 分支設置，
+      // 本輪 body（＝halanta 後接的音節體）輸出**前**檢查：①「前輔音尾字母＋body 首字母」
+      // 組成 roman 複合 key（t+h="th"→ථ）＝撞車；② head 爲獨立元音（ත්අ 的 "t"+"a" 會被
+      // R2N 讀成固有 a）——兩類皆須 CGJ 斷開；其餘（dhamma 的 mm 等）零變化。
+      if (viramaJoin) {
+        viramaJoin = false;
+        if (body && viramaSep) {
+          const tail = [...viramaSep].pop() ?? "";
+          const head = [...body][0] ?? "";
+          const headCat = head ? romanKeyCands.get(head)?.[0]?.cat : undefined;
+          if (tail && head && (romanKeys.has(tail + head) || headCat === "ivowel")) out += "\u034f";
+        }
+        viramaSep = null;
+      }
       out += body;
+      if (pendingViramaJoin) { pendingViramaJoin = false; viramaJoin = true; viramaSep = body; }
       pendingLV = null;
       continue;
     }
     // 非輔音、非前導元音：直接映射（獨立元音 / 鼻音符 / 符號 / 數字 / 標點 / 透傳）
+    // virama 連寫斷字符（見 virama 分支註釋）：halanta 後接非輔音（ත්අ 等）同須檢查——
+    // "t"+"a" 會被 R2N 讀成固有 a（丟 virama 與獨立元音），插 CGJ 強制 ත්+අ 分詞。
+    if (viramaJoin) {
+      viramaJoin = false;
+      const emitted = roman != null ? roman : ch;
+      if (viramaSep && emitted) {
+        const tail = [...viramaSep].pop() ?? "";
+        const head = [...emitted][0] ?? "";
+        const headCat = head ? romanKeyCands.get(head)?.[0]?.cat : undefined;
+        if (tail && head && (romanKeys.has(tail + head) || headCat === "ivowel")) out += "\u034f";
+      }
+      viramaSep = null;
+    }
     out += roman != null ? roman : ch;
     i++;
   }
