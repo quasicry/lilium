@@ -1085,7 +1085,7 @@ export class LiDictView extends ItemView {
                   const p = await this.probeAssetFilePublic(sndFile.split(/[\\/]/).pop() || '');
                   if (p) asset = { mddKey: sndFile, vaultPath: p, kind: 'audio', size: 0 };
                 }
-                if (!asset) { liNotice(this.plugin.T('dict.audio.missing', { word: hit.keyText })); return; }
+                if (!asset) { liNotice(this.plugin.T('dict.audio.missing', { word: hit.keyText })); fbBtn.disabled = false; fbBtn.setText('\u25B6'); return; }
                 const buf = await this.plugin.app.vault.adapter.readBinary(asset.vaultPath);
                 let bytes = new Uint8Array(buf);
                 let mime = 'audio/ogg';
