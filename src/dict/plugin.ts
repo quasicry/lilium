@@ -55,6 +55,7 @@ import { getWordAtOffset } from './word-detection';
 import { cleanSelection } from './selection-clean';
 import { LookupSequence } from './lookup-sequence';
 import { HoverLookupController, TriggerKey } from './hover-lookup';
+import { convertChinese } from './zh-utils';
 import { FeatureLinkage } from './linkage';
 import { DataMutex, RawData } from '../shared/data-mutex';
 import { detectScript, resolveScriptAlias, ScriptId, segmenterLocaleFor, scriptLangCode } from '../languages';
@@ -283,7 +284,7 @@ export class DictFeature {
           const fast = this.service.lookupAll(word, { deferFallback: true });
           if (fast.length) {
             const ordered = this.reorderHitsByScript(fast, this.currentScriptId);
-            popup.setBody(HoverLookupController.renderHits(ordered));
+            popup.setBody(this.zhRender(HoverLookupController.renderHits(ordered)));
             return;
           }
           // 精確＋變體皆 miss：模糊/lemma 移出本幀，異步補充。
@@ -292,7 +293,7 @@ export class DictFeature {
               const hits = this.service.lookupAll(word);
               if (hits.length) {
                 const ordered = this.reorderHitsByScript(hits, this.currentScriptId);
-                popup.setBody(HoverLookupController.renderHits(ordered));
+                popup.setBody(this.zhRender(HoverLookupController.renderHits(ordered)));
               } else {
                 popup.setError(this.T('dict.hover.notFound', { word }));
               }
@@ -597,6 +598,19 @@ export class DictFeature {
       } catch {
         /* 卸載期忽略 */
       }
+    }
+  }
+
+  /** 懸停彈窗與主面板的繁簡轉換設置（zhConvert）對齊：renderHits 產出的純文字
+   *  摘要按同一設置轉換（'none' 時恆等直返，零開銷）。與 view.ts 主面板同源
+   *  convertChinese，行為一致；摘要已剝 HTML，轉換作用於純文字安全。 */
+  private zhRender(html: string): string {
+    const zhMode = this.settings.zhConvert || 'none';
+    if (zhMode === 'none') return html;
+    try {
+      return convertChinese(html, zhMode);
+    } catch {
+      return html;
     }
   }
 
