@@ -1061,7 +1061,10 @@ export class LiDictView extends ItemView {
         {
           const htmlHasSnd = /sound:\/[^"'\s>]+\.(?:mp3|wav|ogg|m4a|aac|flac|spx)/i.test(hit.html);
           const sndIsLink = /<a\b[^>]*href=["']sound:\/\//i.test(hit.html);
-          if (htmlHasSnd && (!sndIsLink || Platform.isMobile)) {
+          // 移動端：連結形態由熱點覆蓋層接管（mountAudioHotspots），▶ 僅在
+          // 「非連結形態」風險時兜底；桌面維持原兜底判準逐字不變（原本移動端
+          // 無條件 ▶ 是 iframe 事件層不可靠時期的過渡方案，熱點覆蓋層接管後收斂）。
+          if (htmlHasSnd && !sndIsLink) {
             const seenSnd = new Set<string>();
             const sndFiles: string[] = [];
             const sndRe = /href=["']sound:\/\/([^"']+\.(?:mp3|wav|ogg|m4a|aac|flac|spx))["']/gi;

@@ -474,6 +474,18 @@ console.log("[④b 摩尼文方案 — L2/11-123R 記法往返]");
   ok(css.includes(".li-audio-hotspot.is-active"), "audio-hotspot ⑪ 播放中視覺回饋");
 }
 
+// ─── 【fb-narrow】行動列 ▶ 兜底收斂（熱點覆蓋層接管連結形態） ───
+{
+  const fs2 = await import("node:fs");
+  const src = fs2.readFileSync(path.join(ROOT, "src/dict/view.ts"), "utf8");
+  ok(src.includes("if (htmlHasSnd && !sndIsLink) {"),
+    "fb-narrow ① ▶ 兜底僅非連結形態（兩平台統一；移動端連結形態歸熱點覆蓋層）");
+  ok(!src.includes("htmlHasSnd && (!sndIsLink || Platform.isMobile)"),
+    "fb-narrow ② 移動端無條件 ▶ 舊判準已撤");
+  ok(src.includes("if (Platform.isMobile) this.mountAudioHotspots(iframe, body, keyText);"),
+    "fb-narrow ③ 熱點覆蓋層仍為移動端連結形態主入口");
+}
+
 console.log(`\n結果: ${pass} 通过, ${fail} 失败`);
 if (fail > 0) {
   console.log("失敗清單（前 20）：");
