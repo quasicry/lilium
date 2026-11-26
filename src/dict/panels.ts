@@ -121,12 +121,12 @@ export class BookmarksPanel {
       });
     }
     const actionsRow = el.createDiv({ cls: 'li-bm-actions' });
-    const exportBtn = actionsRow.createEl('button', { cls: 'li-mini-btn', text: ctx.plugin.T('dict.bookmarks.export') });
+    const exportBtn = actionsRow.createEl('button', { cls: 'li-mini-btn li-bm-plain-btn', text: ctx.plugin.T('dict.bookmarks.export') });
     // eslint-disable-next-line @typescript-eslint/no-misused-promises -- fire-and-forget 事件回調（UI 事件無人 await 返回值），行為保持。
     exportBtn.addEventListener('click', async () => {
       await ctx.exportBookmarks();
     });
-    const clear = actionsRow.createEl('button', { cls: 'li-mini-btn', text: ctx.plugin.T('dict.bookmarks.clear') });
+    const clear = actionsRow.createEl('button', { cls: 'li-mini-btn li-bm-plain-btn', text: ctx.plugin.T('dict.bookmarks.clear') });
     // eslint-disable-next-line @typescript-eslint/no-misused-promises -- fire-and-forget 事件回調（UI 事件無人 await 返回值），行為保持。
     clear.addEventListener('click', async () => {
       ctx.plugin.store.data.bookmarks = [];
