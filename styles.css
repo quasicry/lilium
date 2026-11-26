@@ -1196,6 +1196,11 @@ body.li-editor-vertical-active .li-native-page .MJX-TEX {
   border: 1px solid var(--background-modifier-border);
   background: var(--background-secondary);
 }
+.li-root .li-bm-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
 .li-root .li-bm-word, .li-root .li-group-name, .li-root .li-loaded-name {
   flex: 1 1 auto;
   min-width: 0;

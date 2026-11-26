@@ -26,7 +26,7 @@ import { sanitizeHtml, extractStyleBlocks } from './sanitize';
 import { LookupHit, LiDict } from './service';
 import { FullTextHandle } from './fulltext';
 import { renderToPng } from './share';
-import { fileTimestamp } from './export';
+import { fileTimestamp, exportMarkdownToVault } from './export';
 import { convertChinese, fixChineseLineWrap, } from './zh-utils';
 import { buildExternalSourceLinks } from './externals';
 import { cssStringLiteral } from '../font-name';
@@ -439,6 +439,48 @@ export class LiDictView extends ItemView {
    * S2：組裝面板渲染上下文（DictPanelCtx）。每次渲染即時快照——面板拿到的是
    * 當下的 view 狀態與動作，面板本身不持有 view 引用（照實依賴，不預留）。
    */
+  /**
+   * 書籤匯出 MD：逐書籤詞 lookup→copyStyledHtml（imgMode 'data'＝data URI 內嵌，
+   * 與筆記/匯出通路同形態）→normalizeEntryBlocks 包塊，合併為單一 MD 寫入
+   * lilium/Shares/（沿用 exportMarkdownToVault 落點＋防碰撞檔名慣例）。
+   */
+  private async exportBookmarksMarkdown(): Promise<void> {
+    const items = this.plugin.store.data.bookmarks;
+    if (!items.length) {
+      liNotice(this.plugin.T('dict.bookmarks.exportEmpty'));
+      return;
+    }
+    const lines: string[] = [
+      `# ${this.plugin.T('dict.bookmarks.title')} (${items.length})`,
+      '',
+      `${this.plugin.T('dict.bookmarks.exportDate')}: ${new Date().toLocaleString()}`,
+      '',
+    ];
+    let exported = 0;
+    for (const b of items) {
+      const hits = this.plugin.service.lookupAll(b.word);
+      lines.push(`---`, '', `## ${b.word}`, '');
+      const meta: string[] = [];
+      if (hits.length) meta.push(hits[0].dictName);
+      meta.push(new Date(b.createdAt).toLocaleDateString());
+      lines.push(`> ${meta.join(' · ')}`, '');
+      if (hits.length) {
+        const styled = normalizeEntryBlocks(await this.copyStyledHtml(hits[0], hits[0].dictId ?? b.dictId, 'data'));
+        lines.push(styled, '');
+        exported++;
+      } else {
+        lines.push(this.plugin.T('dict.bookmarks.exportMiss', { word: b.word }), '');
+      }
+    }
+    await exportMarkdownToVault(
+      this.plugin,
+      `${this.plugin.T('dict.bookmarks.exportFile')}-${fileTimestamp()}.md`,
+      lines,
+      'dict.bookmarks.exportDone',
+    );
+    if (exported < items.length) liNotice(this.plugin.T('dict.bookmarks.exportPartial', { ok: String(exported), total: String(items.length) }));
+  }
+
   private panelCtx(): DictPanelCtx {
     return {
       plugin: this.plugin,
@@ -454,6 +496,7 @@ export class LiDictView extends ItemView {
       reorderDict: (id, delta) => this.reorderDict(id, delta),
       renderResults: (articles, word, hits) => this.renderResults(articles, word, hits),
       fillFrame: (frame, html, keyText, dictId) => this.fillFrame(frame, html, keyText, dictId),
+      exportBookmarks: () => this.exportBookmarksMarkdown(),
     };
   }
 

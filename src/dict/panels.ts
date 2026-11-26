@@ -45,6 +45,8 @@ export interface DictPanelCtx {
   renderResults(articles: HTMLElement, word: string, hits: Array<LookupHit & { dictId: string }>): void;
   /** 詞條 iframe 填充（仍留 view.ts：renderResults 專用但與 doLookup 同鏈） */
     fillFrame(frame: HTMLIFrameElement, html: string, keyText: string, dictId?: string): void;
+  /** 書籤匯出 MD（lilium/Shares/，保留書籤詞條 styled 內容） */
+  exportBookmarks(): Promise<void>;
 }
 
 /** lookup 面板（原 view.ts renderLookupPanel + renderWelcome，原樣搬移） */
@@ -118,7 +120,13 @@ export class BookmarksPanel {
         ctx.renderShell();
       });
     }
-    const clear = el.createEl('button', { cls: 'li-mini-btn', text: ctx.plugin.T('dict.bookmarks.clear') });
+    const actionsRow = el.createDiv({ cls: 'li-bm-actions' });
+    const exportBtn = actionsRow.createEl('button', { cls: 'li-mini-btn', text: ctx.plugin.T('dict.bookmarks.export') });
+    // eslint-disable-next-line @typescript-eslint/no-misused-promises -- fire-and-forget 事件回調（UI 事件無人 await 返回值），行為保持。
+    exportBtn.addEventListener('click', async () => {
+      await ctx.exportBookmarks();
+    });
+    const clear = actionsRow.createEl('button', { cls: 'li-mini-btn', text: ctx.plugin.T('dict.bookmarks.clear') });
     // eslint-disable-next-line @typescript-eslint/no-misused-promises -- fire-and-forget 事件回調（UI 事件無人 await 返回值），行為保持。
     clear.addEventListener('click', async () => {
       ctx.plugin.store.data.bookmarks = [];

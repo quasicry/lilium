@@ -947,6 +947,69 @@ export const DICT: Record<string, Entry> = {
     "fr": "Vider les favoris",
     "de": "Lesezeichen leeren"
   },
+  "dict.bookmarks.export": {
+    "zh": "导出 MD",
+    "zh-TW": "匯出 MD",
+    "en": "Export MD",
+    "ja": "MD を書き出す",
+    "ko": "MD 내보내기",
+    "fr": "Exporter MD",
+    "de": "MD exportieren"
+  },
+  "dict.bookmarks.exportEmpty": {
+    "zh": "没有书签可导出",
+    "zh-TW": "沒有書籤可匯出",
+    "en": "No bookmarks to export",
+    "ja": "書き出すブックマークがありません",
+    "ko": "내보낼 북마크가 없습니다",
+    "fr": "Aucun favori à exporter",
+    "de": "Keine Lesezeichen zum Exportieren"
+  },
+  "dict.bookmarks.exportDate": {
+    "zh": "导出时间",
+    "zh-TW": "匯出時間",
+    "en": "Exported",
+    "ja": "書き出し日時",
+    "ko": "내보낸 시간",
+    "fr": "Exporté le",
+    "de": "Exportiert am"
+  },
+  "dict.bookmarks.exportMiss": {
+    "zh": "（词条未找到：{word}）",
+    "zh-TW": "（詞條未找到：{word}）",
+    "en": "(Entry not found: {word})",
+    "ja": "（詞条が見つかりません：{word}）",
+    "ko": "(항목을 찾을 수 없음: {word})",
+    "fr": "(Entrée introuvable : {word})",
+    "de": "(Eintrag nicht gefunden: {word})"
+  },
+  "dict.bookmarks.exportDone": {
+    "zh": "书签已导出到 lilium/Shares/",
+    "zh-TW": "書籤已匯出到 lilium/Shares/",
+    "en": "Bookmarks exported to lilium/Shares/",
+    "ja": "ブックマークを lilium/Shares/ に書き出しました",
+    "ko": "북마크를 lilium/Shares/에 내보냈습니다",
+    "fr": "Favoris exportés vers lilium/Shares/",
+    "de": "Lesezeichen nach lilium/Shares/ exportiert"
+  },
+  "dict.bookmarks.exportPartial": {
+    "zh": "已导出 {ok}/{total} 条（其余词条未找到）",
+    "zh-TW": "已匯出 {ok}/{total} 條（其餘詞條未找到）",
+    "en": "Exported {ok}/{total} entries (others not found)",
+    "ja": "{ok}/{total} 件を書き出しました（他は見つかりません）",
+    "ko": "{ok}/{total}개 내보냈습니다(나머지는 찾을 수 없음)",
+    "fr": "{ok}/{total} entrées exportées (autres introuvables)",
+    "de": "{ok}/{total} Einträge exportiert (Rest nicht gefunden)"
+  },
+  "dict.bookmarks.exportFile": {
+    "zh": "书签",
+    "zh-TW": "書籤",
+    "en": "bookmarks",
+    "ja": "ブックマーク",
+    "ko": "북마크",
+    "fr": "favoris",
+    "de": "lesezeichen"
+  },
   "dict.history.title": {
     "zh": "查询历史",
     "zh-TW": "查詢歷史",
