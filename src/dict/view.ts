@@ -18,7 +18,7 @@ import { rewriteResourceRefs } from './mdd-assets';
 import { annotateVariants } from './variant-annotate';
 import { liNotice } from '../ui-hig';
 import { unsafeRegexReason } from './fulltext';
-import { ItemView, WorkspaceLeaf, debounce, Menu, normalizePath, type EventRef } from 'obsidian';
+import { ItemView, WorkspaceLeaf, debounce, Menu, normalizePath, Platform, type EventRef } from 'obsidian';
 import { inlineStyles } from './inline-style';
 import { LILIUM_ICON_ID } from '../brand-lilium-icon';
 import { attachVvFit } from './viewport-fit';
@@ -1052,24 +1052,33 @@ export class LiDictView extends ItemView {
             .then(() => liNotice(this.plugin.T('dict.copyDone')))
             .catch(() => liNotice(this.plugin.T('dict.copyFail')));
         });
-        // 原位發音併入後的守衛：詞條 HTML 含 sound:// 引用、但不是可點連結形態
-        //（純文字引用/變體寫法——rewrite 管線只對 <a href="sound://…"> 標 data-li-snd，
-        // 此情境正文無任何發音入口）——行動列放一顆 ▶ 兜底（複製右側），點擊走與
-        // 正文連結同源的宿主側管線；正常詞典（連結形態）不出現此鈕。
+        // 原位發音併入後的兜底：①移動端（Capacitor WebView）srcdoc iframe 內 click/touch
+        // 透傳不可靠（B41a-f 前科；實測原位播放連播放器都插不出）——有 sound:// 即放 ▶ 鈕，
+        // 宿主 DOM 點擊平台無關（與撤除的標題 ▶ 同管線）；②桌面端僅「非連結形態」（純文字
+        // 引用——rewrite 管線只對 <a href="sound://…"> 標 data-li-snd）兜底。多發音檔每檔一顆（去重）。
         {
           const htmlHasSnd = /sound:\/[^"'\s>]+\.(?:mp3|wav|ogg|m4a|aac|flac|spx)/i.test(hit.html);
           const sndIsLink = /<a\b[^>]*href=["']sound:\/\//i.test(hit.html);
-          if (htmlHasSnd && !sndIsLink) {
+          if (htmlHasSnd && (!sndIsLink || Platform.isMobile)) {
+            const seenSnd = new Set<string>();
+            const sndFiles: string[] = [];
+            const sndRe = /href=["']sound:\/\/([^"']+\.(?:mp3|wav|ogg|m4a|aac|flac|spx))["']/gi;
+            let sm: RegExpExecArray | null;
+            while ((sm = sndRe.exec(hit.html))) {
+              try {
+                const f = decodeURIComponent(sm[1]);
+                if (!seenSnd.has(f)) { seenSnd.add(f); sndFiles.push(f); }
+              } catch { /* 保留原字面 */ }
+            }
+            for (const sndFile of sndFiles) {
             const fbBtn = actions.createEl('button', { cls: 'li-mini-btn', text: '\u25B6' });
-            fbBtn.setAttribute('aria-label', 'play audio');
+            fbBtn.setAttribute('aria-label', 'play audio ' + sndFile);
+            fbBtn.title = sndFile;
             // eslint-disable-next-line @typescript-eslint/no-misused-promises -- fire-and-forget 事件回調（UI 事件無人 await 返回值），行為保持——審計批次三。
             fbBtn.addEventListener('click', async () => {
               if (fbBtn.disabled) return;
               fbBtn.disabled = true;
               try {
-                const m = /href=["']sound:\/\/([^"']+\.(?:mp3|wav|ogg|m4a|aac|flac|spx))["']/i.exec(hit.html);
-                if (!m) return;
-                const sndFile = decodeURIComponent(m[1]);
                 let asset = this.plugin.service.resolveAsset(sndFile);
                 if (!asset) {
                   const p = await this.probeAssetFilePublic(sndFile.split(/[\\/]/).pop() || '');
@@ -1095,6 +1104,7 @@ export class LiDictView extends ItemView {
                 fbBtn.disabled = false;
               }
             });
+            }
           }
         }
         // 目錄入口宿主按鈕（行動列，與複製/發音兜底同列；原詞頭行遷入）。iframe 外
