@@ -17,7 +17,7 @@ import { rewriteResourceRefs } from './mdd-assets';
 import { annotateVariants } from './variant-annotate';
 import { liNotice } from '../ui-hig';
 import { unsafeRegexReason } from './fulltext';
-import { ItemView, WorkspaceLeaf, debounce, Menu, normalizePath, TFile, type EventRef } from 'obsidian';
+import { ItemView, WorkspaceLeaf, debounce, Menu, normalizePath, type EventRef } from 'obsidian';
 import { inlineStyles } from './inline-style';
 import { LILIUM_ICON_ID } from '../brand-lilium-icon';
 import { attachVvFit } from './viewport-fit';
@@ -881,16 +881,12 @@ export class LiDictView extends ItemView {
       // 樣式渲染分支：每 hit 先過 copyStyledHtml（inline CSS＋vault 圖片路徑）再組筆記（inline HTML 於 Obsidian 編輯/閱讀皆存活）
       const styled = await Promise.all(hits.map(async (h) => ({ dictName: h.dictName, keyText: h.keyText, html: normalizeEntryBlocks(await this.copyStyledHtml(h, (h as { dictId?: string }).dictId, 'data')) })));
       const note = buildLookupNote({ word, hits: styled, htmlToMarkdown: identityHtml });
-      // B30：筆記存 lilium/筆記（安裝時預建資料夾樹）
+      // B30：筆記存 lilium/筆記（安裝時預建資料夾樹）；檔名含時間戳（與 ↓MD 匯出
+      // mdFileName 同慣例）——同詞多次匯出各存一檔，不覆蓋舊筆記。
       const folder = 'lilium/筆記';
       await (this.plugin as unknown as { ensureFolder(p: string): Promise<void> }).ensureFolder(folder);
-      const file = `${folder}/${word.replace(/[/:*?"<>|]/g, '_')}.md`;
-      const existing = this.plugin.app.vault.getAbstractFileByPath(normalizePath(file));
-      if (existing instanceof TFile) {
-        await this.plugin.app.vault.modify(existing, note);
-      } else {
-        await this.plugin.app.vault.create(normalizePath(file), note);
-      }
+      const file = `${folder}/${word.replace(/[/:*?"<>|]/g, '_')}-${fileTimestamp()}.md`;
+      await this.plugin.app.vault.create(normalizePath(file), note);
       liNotice(this.plugin.T('dict.note.saved', { file }));
     });
     // note-builder.buildFlashcardLines 保留（導出 API 面，向後相容）。
