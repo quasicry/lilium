@@ -656,6 +656,62 @@ test("observeWritingModeChanges：el 為 null → 回傳空 disposer", () => {
   d();
 });
 
+/* ────────────────────────────────────────────────────────────
+ * 【B1】content bounds 夾逼：彈窗水平位置嚴格夾進正文欄
+ * ──────────────────────────────────────────────────────────── */
+console.log("\n【B1】content bounds 夾逼");
+
+test("橫排：行尾詞彈窗右溢 → 夾回正文欄右緣", () => {
+  // 詞在 x=1000，正文欄右緣 900（側欄佔右側），彈窗 300 寬
+  const a = anchor(1000, 100, 1040, 140);
+  a.contentBounds = { left: 100, right: 900 };
+  const p = computePopupPlacement(a, 300, 80, W, H);
+  assert.ok(p.left + 300 <= 900, `right edge ${p.left + 300} > 900`);
+  assert.ok(p.left >= 100, `left ${p.left} < 100`);
+});
+
+test("橫排：行首詞彈窗左溢 → 夾回正文欄左緣", () => {
+  const a = anchor(20, 100, 60, 140);
+  a.contentBounds = { left: 100, right: 900 };
+  const p = computePopupPlacement(a, 300, 80, W, H);
+  assert.ok(p.left >= 100, `left ${p.left} < 100`);
+});
+
+test("橫排：詞在欄內 → 位置不被夾逼改動（零干擾）", () => {
+  const a = anchor(400, 100, 440, 140);
+  a.contentBounds = { left: 100, right: 900 };
+  const noB = computePopupPlacement({ rect: a.rect, axis: "horizontal", columnOrder: "rl" }, 300, 80, W, H);
+  const withB = computePopupPlacement(a, 300, 80, W, H);
+  assert.strictEqual(withB.left, noB.left);
+});
+
+test("橫排：欄比彈窗窄 → 欄內居中", () => {
+  const a = anchor(300, 100, 340, 140);
+  a.contentBounds = { left: 200, right: 420 };
+  const p = computePopupPlacement(a, 300, 80, W, H);
+  // 欄寬 220 < 300：居中——中心 ≈ 310，left ≈ 160（視口 clamp 會再收）
+  assert.ok(p.left > 100 && p.left < 220, `left ${p.left}`);
+});
+
+test("直排：換列側結果同樣夾進正文欄", () => {
+  // vertical-rl 側放左邊：詞列在 x=950，左側空間足夠但左緣 -400 超出欄左界 500
+  const a = anchor(950, 100, 970, 500, "vertical", "rl");
+  a.contentBounds = { left: 500, right: 1000 };
+  const p = computePopupPlacement(a, 300, 80, W, H);
+  assert.ok(p.left >= 500, `left ${p.left} < 500`);
+  assert.strictEqual(p.placement, "left");
+});
+
+test("contentBounds 無效（right<=left / NaN）→ 忽略，行為與未傳一致", () => {
+  const a1 = anchor(400, 100, 440, 140);
+  a1.contentBounds = { left: 900, right: 100 };
+  const a2 = anchor(400, 100, 440, 140);
+  a2.contentBounds = { left: NaN, right: NaN };
+  const base = computePopupPlacement({ rect: a1.rect, axis: "horizontal", columnOrder: "rl" }, 300, 80, W, H);
+  assert.strictEqual(computePopupPlacement(a1, 300, 80, W, H).left, base.left);
+  assert.strictEqual(computePopupPlacement(a2, 300, 80, W, H).left, base.left);
+});
+
 /* ──────────────────────────────────────────────────────────── */
 console.log(`\n${"─".repeat(56)}`);
 console.log(`直排座標服務：${passed} 通過，${failed} 失敗`);

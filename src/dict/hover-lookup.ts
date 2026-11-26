@@ -258,10 +258,31 @@ export class HoverLookupController {
    *   - 直排↔橫排切換後自動重新定位（body 類 / CSS 變數 / resize 監聽）
    * `POPUP_OFFSET` 常數已由 vertical-anchor.ts 的 POPUP_GAP 承接，此處不再使用。
    */
+  /**
+   * B1 content bounds 偵測：找當前筆記「可讀文本欄」的視口座標水平邊界，
+   * 供彈窗水平夾逼（不壓側欄/邊距）。偵測策略（從錨點元素向上找最近的可讀容器）：
+   *   1. Obsidian 正文容器候選：.cm-scroller（編輯態）/.markdown-preview-view（閱讀態）
+   *   2. 候選不可用（popout/測試環境）→ null（不夾逼，維持原視口 clamp）
+   * 只取水平邊界；垂直方向彈窗本就貼詞定位，無需夾逼。
+   */
+  private detectContentBounds(): { left: number; right: number } | null {
+    try {
+      const el = this.anchorEl;
+      if (!el || !el.isConnected) return null;
+      const scroller = el.closest<HTMLElement>(".cm-scroller, .markdown-preview-view");
+      if (!scroller) return null;
+      const r = scroller.getBoundingClientRect();
+      if (!Number.isFinite(r.left) || !Number.isFinite(r.right) || r.right - r.left < 40) return null;
+      return { left: r.left, right: r.right };
+    } catch {
+      return null;
+    }
+  }
+
   private position(): void {
     if (!this.popupEl || !this.anchorRect) return;
     // 錨點失效（切換佈局後 DOM 重建、元素被移除）→ 隱藏而非錯位顯示
-    if (!applyPopupPosition(this.popupEl, this.anchorRect, this.anchorEl)) {
+    if (!applyPopupPosition(this.popupEl, this.anchorRect, this.anchorEl, this.detectContentBounds() ?? undefined)) {
       this.hide();
     }
   }

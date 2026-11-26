@@ -58,6 +58,13 @@ export interface ReadingAnchor {
   axis: LayoutAxis;
   /** 直排列序；橫排時為 rl（無意義，僅為型別完整） */
   columnOrder: ColumnOrder;
+  /**
+   * 正文欄水平邊界（B1 content bounds 夾逼；可選）。
+   * 來源：呼叫方偵測的「可讀文本欄」左/右緣（視口座標）。給定時彈窗水平位置
+   * 嚴格夾進 [left, right]（寬度不足時改為欄內居中），不再壓到側欄/邊距；
+   * 未給定時維持原視口 clamp 行為（canonical 默認零變化）。
+   */
+  contentBounds?: { left: number; right: number };
 }
 
 /** 彈窗擺放結果 */
@@ -122,6 +129,19 @@ export function computePopupPlacement(
   const clampX = (x: number) => Math.min(Math.max(x, m), Math.max(m, W - w - m));
   const clampY = (y: number) => Math.min(Math.max(y, m), Math.max(m, H - h - m));
 
+  // B1 content bounds 夾逼：給定正文欄邊界時，水平座標先夾進欄內
+  // （欄寬不足時改為欄內居中），再走各分支的視口 clamp 作最後安全網。
+  // 純函式共用——直排/橫排分支的水平結果一律經此收斂。
+  const bounds = anchor.contentBounds;
+  const bl = bounds && Number.isFinite(bounds.left) ? Math.max(bounds.left, m) : 0;
+  const br = bounds && Number.isFinite(bounds.right) ? Math.min(bounds.right, W - m) : 0;
+  const boundsValid = bounds !== undefined && br - bl > 0;
+  const clampToBounds = (x: number): number => {
+    if (!boundsValid) return x;
+    if (br - bl < w) return bl + (br - bl - w) / 2; // 欄比彈窗窄：欄內居中（允許微溢，視口 clamp 兜底）
+    return Math.min(Math.max(x, bl), br - w);
+  };
+
   if (axis === "vertical") {
     // 垂直對齊錨點頂部，並限制在視口內
     const top = clampY(r.top);
@@ -135,20 +155,20 @@ export function computePopupPlacement(
     const secondary = forwardIsLeft ? rightSide : leftSide;
 
     if (primary >= m && primary + w <= W - m) {
-      return { left: primary, top, placement: forwardIsLeft ? "left" : "right" };
+      return { left: clampToBounds(primary), top, placement: forwardIsLeft ? "left" : "right" };
     }
     if (secondary >= m && secondary + w <= W - m) {
-      return { left: secondary, top, placement: forwardIsLeft ? "right" : "left" };
+      return { left: clampToBounds(secondary), top, placement: forwardIsLeft ? "right" : "left" };
     }
     // 兩側皆不足：水平置中
-    return { left: clampX((W - w) / 2), top, placement: "center" };
+    return { left: clampToBounds(clampX((W - w) / 2)), top, placement: "center" };
   }
 
   // 橫排：沿用 position() 的水平策略（右緣溢出時右對齊到錨點右緣），
   // 再鉗進視口；下方優先，不足翻上
   let left = r.left;
   if (left + w > W - m) left = Math.max(m, r.right - w);
-  left = clampX(left);
+  left = clampToBounds(clampX(left));
 
   const below = r.bottom + POPUP_GAP;
   if (below + h <= H - m) return { left, top: clampY(below), placement: "below" };
@@ -200,7 +220,8 @@ export function columnOrderFromWritingMode(wm: string | undefined | null): Colum
 export function applyPopupPosition(
   popupEl: HTMLElement | null | undefined,
   anchorRect: { left: number; top: number; right: number; bottom: number } | null | undefined,
-  anchorEl?: HTMLElement | null
+  anchorEl?: HTMLElement | null,
+  contentBounds?: { left: number; right: number }
 ): PopupPlacement | null {
   if (!popupEl || typeof popupEl !== "object" || !anchorRect) return null;
 
@@ -225,6 +246,7 @@ export function applyPopupPosition(
       columnOrder: "rl",
     };
   })();
+  if (contentBounds) anchor.contentBounds = contentBounds;
 
   // 2. 量測彈窗
   let pw = 300, ph = 80;
