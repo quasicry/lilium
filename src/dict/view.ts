@@ -1071,7 +1071,7 @@ export class LiDictView extends ItemView {
               } catch { /* 保留原字面 */ }
             }
             for (const sndFile of sndFiles) {
-            const fbBtn = actions.createEl('button', { cls: 'li-mini-btn', text: '\u25B6' });
+            const fbBtn = actions.createEl('button', { cls: 'li-mdx-play-btn', text: '\u25B6' });
             fbBtn.setAttribute('aria-label', 'play audio ' + sndFile);
             fbBtn.title = sndFile;
             // eslint-disable-next-line @typescript-eslint/no-misused-promises -- fire-and-forget 事件回調（UI 事件無人 await 返回值），行為保持——審計批次三。
