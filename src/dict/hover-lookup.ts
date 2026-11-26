@@ -76,6 +76,12 @@ export class HoverLookupController {
   private drag: { offX: number; offY: number } | null = null;
   /** 拖拽後記憶的彈窗視口位置；pinned 顯示期間 position() 讓位給它 */
   private draggedPos: { x: number; y: number } | null = null;
+  /**
+   * 多彈窗並存：pin 過的彈窗在新查詢時「脫管」為獨立殘留窗——DOM 保留（事件
+   * 已掛在元素上）、不隨後續懸停 hide、由 Esc 統一清除。方案裁定：
+   * 點彈窗外不關閉任何 pin 窗；關閉只有兩個途徑＝Esc、detach（插件卸載）。
+   */
+  private detached: Array<{ el: HTMLElement }> = [];
   private hoverTimer: number | null = null;
   private leaveTimer: number | null = null;
   private currentWord = '';
@@ -93,7 +99,7 @@ export class HoverLookupController {
     const onMouseMove = (e: MouseEvent) => this.handleMouseMove(e);
     const onMouseDown = (e: MouseEvent) => this.handleMouseDown(e);
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') this.hide();
+      if (e.key === 'Escape') this.hideAll();
     };
     doc.addEventListener('mousemove', onMouseMove, true);
     doc.addEventListener('mousedown', onMouseDown, true);
@@ -108,7 +114,7 @@ export class HoverLookupController {
     if (this.layoutWatcher) { this.layoutWatcher(); this.layoutWatcher = null; }
     for (const off of this.listeners) off();
     this.listeners = [];
-    this.hide();
+    this.hideAll();
     this.doc = null;
   }
 
@@ -166,6 +172,18 @@ export class HoverLookupController {
     if (!hit) return;
     if (hit.word.length > this.opts.maxWordLength) return;
     if (hit.word === this.currentWord && this.popupEl) return; // same word, keep popup
+    // 多彈窗並存：主窗已 pin（用戶點過彈窗）→ 脫管為殘留窗，主窗讓位給新查詢
+    if (this.pinned && this.popupEl) {
+      this.detached.push({ el: this.popupEl });
+      this.popupEl = null;
+      this.bodyEl = null;
+      this.anchorRect = null;
+      this.anchorEl = null;
+      this.pinned = false;
+      this.draggedPos = null;
+      this.layoutWatcher?.();
+      this.layoutWatcher = null;
+    }
     this.currentWord = hit.word;
     this.anchorRect = hit.rect;
     this.anchorEl = hit.element ?? null;
@@ -210,11 +228,13 @@ export class HoverLookupController {
 
   private handleMouseDown(e: MouseEvent): void {
     if (!this.popupEl) return;
-    if (this.popupEl.contains(e.target as Node)) {
+    if (this.popupEl && this.popupEl.contains(e.target as Node)) {
       this.pinned = true; // click inside popup pins it
       return;
     }
-    if (!this.modifierHeld(e)) this.hide();
+    // 多彈窗並存裁定：點彈窗外不關閉（pin 窗/殘留窗都留）；關閉只靠 Esc。
+    // modifierHeld 檢查撤除——trigger 鍵僅用於「觸發懸停查詢」，不再兼關閉。
+    void this.modifierHeld;
   }
 
   private ensurePopup(): HTMLElement {
@@ -362,6 +382,13 @@ export class HoverLookupController {
     if (!applyPopupPosition(this.popupEl, this.anchorRect, this.anchorEl, this.detectContentBounds() ?? undefined)) {
       this.hide();
     }
+  }
+
+  /** Esc 統一關閉：殘留窗全部＋主窗 */
+  hideAll(): void {
+    for (const d of this.detached) d.el.remove();
+    this.detached = [];
+    this.hide();
   }
 
   hide(): void {

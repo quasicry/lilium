@@ -429,6 +429,25 @@ console.log("[④b 摩尼文方案 — L2/11-123R 記法往返]");
   ok(store.get().x === 100 && store.get().y === 80, "hover-drag ⑧ popupPosStore get/set 往返");
 }
 
+// ─── 【hover-multi】多彈窗並存＋Esc 統一關閉＋點外不關 ───
+{
+  const fs2 = await import("node:fs");
+  const src = fs2.readFileSync(path.join(ROOT, "src/dict/hover-lookup.ts"), "utf8");
+  ok(src.includes("private detached: Array"), "hover-multi ① 脫管殘留窗集合存在");
+  ok(src.includes("this.detached.push({ el: this.popupEl })"),
+    "hover-multi ② 新查詢時 pin 窗脫管而非覆蓋");
+  ok(!/if \(!this\.modifierHeld\(e\)\) this\.hide\(\);/.test(src),
+    "hover-multi ③ 點彈窗外不再觸發 hide（關閉只靠 Esc）");
+  ok(src.includes("hideAll(): void"), "hover-multi ④ hideAll 統一關閉入口存在");
+  ok(src.includes("if (e.key === 'Escape') this.hideAll();"),
+    "hover-multi ⑤ Esc 走 hideAll（殘留窗＋主窗全清）");
+  ok(src.includes("this.hideAll();\n    this.doc = null;"),
+    "hover-multi ⑥ detach（插件卸載）走 hideAll");
+  // pin 語義保留：點彈窗內仍 pin
+  ok(src.includes("this.pinned = true; // click inside popup pins it"),
+    "hover-multi ⑦ 點彈窗內 pin 語義保留");
+}
+
 console.log(`\n結果: ${pass} 通过, ${fail} 失败`);
 if (fail > 0) {
   console.log("失敗清單（前 20）：");
