@@ -2,7 +2,7 @@
 // Copyright (C) 2026 quasicry
 
 // 生成 src/vendor/noto-fonts.generated.ts：把 Noto Sans Mongolian + Noto Serif Old Uyghur
-// + Noto Naskh Arabic + Noto Serif Hebrew + Noto Sans Sinhala
+// + Noto Naskh Arabic + Noto Sans Sinhala
 // + Noto Sans Devanagari + Noto Serif Tibetan 字體 base64 內嵌。
 // （彝文 / 傣文 / 高棉 / 緬甸 / 泰文 字體已於 v2.2.0 移除）
 // 七套字體均為 SIL Open Font License 1.1，可自由再分發。
@@ -12,7 +12,6 @@
 //   - Noto Sans Mongolian（含滿文 Unicode 區段 U+1800–U+18AF）— 覆蓋蒙古文/滿文/錫伯文
 //   - Noto Serif Old Uyghur（U+10F70–U+10FAF）— 覆蓋回鶻文
 //   - Noto Naskh Arabic（U+0600–U+06FF 等）— 覆蓋阿拉伯文（含波斯語、烏爾都語）
-//   - Noto Serif Hebrew（U+0590–U+05FF）— 覆蓋希伯來文
 //   - Noto Sans Sinhala（U+0D80–U+0DFF）— 覆蓋僧伽羅文
 //
 // 用途：插件首次運行時落盤到 vault 內 .lilium/fonts/，用戶無需手動下載，
@@ -40,13 +39,6 @@ const FONTS = [
     id: "noto-naskh-arabic",
     scripts: ["arabic"],
     note: "SIL OFL 1.1。阿拉伯文（U+0600–U+06FF、U+0750–U+08FF、呈现形 U+FB50–U+FDFD / U+FE70–U+FEFC）。",
-  },
-  {
-    fileName: "NotoSerifHebrew-Regular.ttf",
-    family: "Noto Serif Hebrew",
-    id: "noto-serif-hebrew",
-    scripts: ["hebrew"],
-    note: "SIL OFL 1.1。希伯来文（U+0590–U+05FF，含元音点与呈现形 U+FB1D–U+FB4F）。",
   },
   {
     fileName: "NotoSerifOldUyghur-Regular.ttf",

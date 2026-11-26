@@ -68,7 +68,6 @@ const REAL_EXPECT = [
   ["NotoSansMongolian-Regular.ttf", "Noto Sans Mongolian", "NotoSansMongolian-Regular"],
   ["NotoSansSiddham-Regular.ttf", "Noto Sans Siddham", "NotoSansSiddham-Regular"],
   ["NotoSansSinhala-Regular.ttf", "Noto Sans Sinhala", "NotoSansSinhala-Regular"],
-  ["NotoSerifHebrew-Regular.ttf", "Noto Serif Hebrew", "NotoSerifHebrew-Regular"],
   ["NotoSerifOldUyghur-Regular.ttf", "Noto Serif Old Uyghur", "NotoSerifOldUyghur-Regular"],
   ["NotoSerifTibetan-Regular.ttf", "Noto Serif Tibetan", "NotoSerifTibetan-Regular"],
 ];

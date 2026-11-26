@@ -39,7 +39,6 @@ SCRIPT_RANGES = {
     "olduyghur":  "U+10F70-10FAF",                       # 回鶻
     "manichaean": "U+10AC0-10AFF",                       # 摩尼文
     "arabic":     "U+0600-06FF,U+0750-077F,U+0870-089F,U+FB50-FDFF,U+FE70-FEFF",
-    "hebrew":     "U+0590-05FF,U+FB1D-FB4F",
     "sinhala":    "U+0D80-0DFF",
     "devanagari": "U+0900-097F,U+A8E0-A8FF,U+1CD0-1CFF",  # 梵 / 巴利 / 蘭札(DU)
     "tibetan":    "U+0F00-0FFF",
@@ -50,7 +49,6 @@ SCRIPT_RANGES = {
 FONTS = [
     ("NotoSansMongolian-Regular.ttf",   "mongolian"),
     ("NotoNaskhArabic-Regular.ttf",     "arabic"),
-    ("NotoSerifHebrew-Regular.ttf",     "hebrew"),
     ("NotoSerifOldUyghur-Regular.ttf",  "olduyghur"),
     ("NotoSansManichaean-Regular.ttf",  "manichaean"),
     ("NotoSansSinhala-Regular.ttf",     "sinhala"),

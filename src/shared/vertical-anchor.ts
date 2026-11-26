@@ -291,7 +291,7 @@ export function applyPopupPosition(
  * 判定順序（越靠前越優先）：
  *   1. 元素自身向上遍歷 ≤16 層的 computed writing-mode
  *   2. inline style writing-mode（computed 不可用時）
- *   3. li 專屬：`body.li-editor-horizontal-active` / `li-editor-vertical-active`
+ *   3. lilium 專屬：`body.li-editor-horizontal-active` / `li-editor-vertical-active`
  *      + CSS 變數 `--li-editor-writing-mode`
  *   4. 矩形形狀啟發式（窄高 → 直排）
  */
@@ -454,7 +454,7 @@ function liBodyLayout(el: HTMLElement): { axis: LayoutAxis; columnOrder: ColumnO
 /**
  * 錨點是否已失效。
  *
- * **切換直排／橫排後最常見的問題**：li 會重建編輯器 DOM，詞元素被移除，
+ * **切換直排／橫排後最常見的問題**：lilium 會重建編輯器 DOM，詞元素被移除，
  * 此時 `getBoundingClientRect()` 回傳全零，彈窗會飛到視口左上角。
  * 呼叫方應在 `true` 時隱藏彈窗而非重新定位。
  *

@@ -244,7 +244,7 @@ export const SCRIPTS: Record<ScriptId, ScriptProfile> = {
     lineBreak: "auto",
     wordBreak: "normal",
     centerPunctuation: false,
-    fontStack: ["Noto Serif Hebrew", "Noto Sans Hebrew", "Noto Serif", "Times New Roman", "serif"],
+    fontStack: ["Noto Sans Hebrew", "Noto Serif", "Times New Roman", "serif"],
     autoTcy: false,
     note: {
       zh: "希伯來文爲 RTL 文字，同樣採用橫排 + 從右向左（dir=rtl）。",

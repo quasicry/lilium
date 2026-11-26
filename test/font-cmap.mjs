@@ -95,7 +95,6 @@ const REAL_FONTS = [
   "NotoSansMongolian-Regular.ttf",
   "NotoSansSiddham-Regular.ttf",
   "NotoSansSinhala-Regular.ttf",
-  "NotoSerifHebrew-Regular.ttf",
   "NotoSerifOldUyghur-Regular.ttf",
   "NotoSerifTibetan-Regular.ttf",
 ];
@@ -212,8 +211,6 @@ test("[3] NU 完全沒有天城體碼位（兩版 cmap 不相交的硬證據）"
 test("[4] 跨文種不得誤判支援", () => {
   const nobo = [
     ["NotoNaskhArabic-Regular.ttf", 0x0915, "阿拉伯字型不該有天城體"],
-    ["NotoSerifHebrew-Regular.ttf", 0x0627, "希伯來字型不該有阿拉伯字母"],
-    ["NotoSerifHebrew-Regular.ttf", 0x0915, "希伯來字型不該有天城體"],
     ["NotoSansMongolian-Regular.ttf", 0x0d9a, "蒙古字型不該有僧伽羅字母"],
     ["NithyaRanjanaDU-Regular.otf", 0x0627, "蘭札不該有阿拉伯字母"],
   ];
@@ -227,7 +224,6 @@ test("[4] 每款字體都覆蓋自己對應的語言樣本字", () => {
     ["NotoSansMongolian-Regular.ttf", "mongolian"],
     ["NotoSerifOldUyghur-Regular.ttf", "olduyghur"],
     ["NotoNaskhArabic-Regular.ttf", "arabic"],
-    ["NotoSerifHebrew-Regular.ttf", "hebrew"],
     ["NotoSerifTibetan-Regular.ttf", "tibetan"],
     ["NotoSansDevanagari-Regular.ttf", "sanskrit"],
     ["NotoSansSinhala-Regular.ttf", "sinhala"],
