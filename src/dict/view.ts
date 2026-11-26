@@ -1078,6 +1078,7 @@ export class LiDictView extends ItemView {
             fbBtn.addEventListener('click', async () => {
               if (fbBtn.disabled) return;
               fbBtn.disabled = true;
+              fbBtn.setText('\u25AE\u25AE'); // 播放中形狀（與原標題 ▶ 同款回饋）
               try {
                 let asset = this.plugin.service.resolveAsset(sndFile);
                 if (!asset) {
@@ -1097,11 +1098,12 @@ export class LiDictView extends ItemView {
                   mime = ext === 'wav' ? 'audio/wav' : ext === 'mp3' ? 'audio/mpeg' : ext === 'm4a' ? 'audio/mp4' : ext === 'aac' ? 'audio/aac' : ext === 'flac' ? 'audio/flac' : 'audio/ogg';
                 }
                 const url = URL.createObjectURL(new Blob([bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength)], { type: mime }));
-                const restore = () => { fbBtn.disabled = false; };
+                const restore = () => { fbBtn.disabled = false; fbBtn.setText('\u25B6'); };
                 void playAudioSession(url, restore).catch(() => { try { URL.revokeObjectURL(url); } catch { /* 已 revoke */ } restore(); });
               } catch {
                 liNotice(this.plugin.T('dict.audio.missing', { word: hit.keyText }));
                 fbBtn.disabled = false;
+                fbBtn.setText('\u25B6');
               }
             });
             }
