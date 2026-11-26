@@ -1588,7 +1588,17 @@ body.li-editor-vertical-active .li-native-page .MJX-TEX {
   .li-root .li-manage-row .li-mini-btn,
   .li-root .li-group-head .li-mini-btn { min-width: 44px; justify-content: center; }
   /* TOC 鈕豁免 44px；r7 已鏈接文字化，此豁免保留防父級通案回灌 */
-  .li-root .li-toc-entry-btn--mini { min-width: 0; min-height: 0; padding: 0; }
+  .li-root .li-toc-entry-btn--mini {
+    min-width: 0;
+    min-height: 0;
+    padding: 0;
+    /* 行動列內去框：li-mini-btn 的背景/邊線在同權重競爭，於此後定義覆蓋 */
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    color: var(--text-muted);
+  }
+  .li-root .li-toc-entry-btn--mini:hover { background: transparent; color: var(--text-normal); }
   .li-root .li-loaded-name { padding: 10px 0; }
 }
 
