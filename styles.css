@@ -1566,7 +1566,19 @@ body.li-editor-vertical-active .li-native-page .MJX-TEX {
   font-size: var(--font-ui-smaller, 12px);
 }
 .li-hover-body { line-height: 1.6; }
-.li-hover-pin-hint { margin-top: 4px; font-size: 11px; color: var(--text-faint); }
+.li-hover-pin-hint {
+  margin-top: 4px;
+  font-size: 11px;
+  color: var(--text-faint);
+}
+
+/* topBar 拖把（方案 A）：pinHint 兼任——cursor/touch 供拖拽，pinned 彈窗自訂位置 */
+.li-hover-pin-hint.li-hover-drag-handle {
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+}
+.li-hover-pin-hint.li-hover-drag-handle.is-dragging { cursor: grabbing; }
 
 /* ---------------------------------------------------------------- 觸屏 / 窄屏 */
 @media (pointer: coarse) {

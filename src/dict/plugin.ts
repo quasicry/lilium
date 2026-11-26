@@ -136,6 +136,8 @@ export interface LiDictSettings {
   inlineSuggest: boolean;
   /** r59 ⑥：行內建議觸發詞（須以空格結尾；init 從此注入 InlineDictSuggest） */
   inlineSuggestTrigger: string;
+  /** 懸停彈窗 pinned 記憶位置（方案 A：全彈窗共用；undefined＝未拖拽過） */
+  hoverPopupPos?: { x: number; y: number };
   /**
    * show external source links under results
    * 設定頁不再提供開關，但欄位保留以相容舊設定；
@@ -207,6 +209,7 @@ export const DEFAULT_SETTINGS: LiDictSettings = {
   fuzzyFallback: true,
   inlineSuggest: true,
   inlineSuggestTrigger: 'lilium ',
+  hoverPopupPos: undefined,
   showExternalLinks: true,
   lemmaFallback: true,
   selectionCleaning: true,
@@ -273,6 +276,11 @@ export class DictFeature {
     localeProvider: () => this.currentSegLocale,
     // r54 排查修復：固定提示走 i18n（原硬編碼簡中繞過七語言）
     pinHintProvider: () => this.T('dict.hover.pinHint'),
+    // 方案 A：pinned 彈窗記憶位置（拖拽 topBar 後記憶；跨詞共用一點）
+    popupPosStore: {
+      get: () => this.settings.hoverPopupPos,
+      set: (pos) => { this.settings.hoverPopupPos = pos; void this.saveSettings(); },
+    },
     onLookup: (word, popup) => {
       // 批次丁（UI 執行緒效能）：拆兩段——精確＋變體同步（快路徑，確定性映射成本低）；
       // miss 時模糊/lemma 全鏈（可能凍結數百 ms）移 idle/setTimeout 異步補充。

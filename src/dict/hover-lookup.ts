@@ -35,6 +35,15 @@ export interface HoverLookupOptions {
   onLookup: (word: string, popup: HoverPopupHandle) => void;
   /** 排查修復：固定提示文案（i18n 由呼叫端注入——本檔禁硬編碼語言）。 */
   pinHintProvider?: () => string;
+  /**
+   * pinned 彈窗記憶位置（方案 A：全彈窗共用一個記憶點）。
+   * get：拖拽後的記憶位置；set：拖拽結束寫回。undefined＝尚無記憶（貼詞定位）。
+   * 存取由呼叫端（plugin settings）承擔持久化；本檔不直接碰 data.json。
+   */
+  popupPosStore?: {
+    get(): { x: number; y: number } | undefined;
+    set(pos: { x: number; y: number }): void;
+  };
 }
 
 export interface HoverPopupHandle {
@@ -63,6 +72,10 @@ export class HoverLookupController {
   /** lilium: 直排↔橫排切換監聽的取消函式 */
   private layoutWatcher: (() => void) | null = null;
   private pinned = false;
+  /** 拖拽中狀態（pointermove/up 掛 doc capture，pointerup 後清） */
+  private drag: { offX: number; offY: number } | null = null;
+  /** 拖拽後記憶的彈窗視口位置；pinned 顯示期間 position() 讓位給它 */
+  private draggedPos: { x: number; y: number } | null = null;
   private hoverTimer: number | null = null;
   private leaveTimer: number | null = null;
   private currentWord = '';
@@ -215,6 +228,10 @@ export class HoverLookupController {
       pinHint.className = 'li-hover-pin-hint';
       // 排查修復：文案走 i18n（pinHintProvider 注入），不再硬編碼簡中。
       pinHint.textContent = this.opts.pinHintProvider?.() ?? '點擊彈窗固定 · esc 關閉';
+      // topBar 拖把（方案 A）：pinHint 兼任——pinned 彈窗可拖拽自訂位置，
+      // 記憶於 popupPosStore（跨詞共用）。pointerdown 排除按鈕（現無按鈕，規則防未來）。
+      pinHint.addClass('li-hover-drag-handle');
+      this.attachDrag(pinHint, doc);
       this.popupEl.appendChild(this.bodyEl);
       this.popupEl.appendChild(pinHint);
       doc.body.appendChild(this.popupEl);
@@ -227,6 +244,10 @@ export class HoverLookupController {
 
   private showPopup(): void {
     const el = this.ensurePopup();
+    // 方案 A：曾拖拽過（記憶位置存在）→ 本次彈出先落在記憶點（pinned 生效後
+    // position() 讓位）。未拖拽過＝undefined，維持貼詞定位（canonical 零變化）。
+    const memo = this.opts.popupPosStore?.get();
+    if (memo) this.draggedPos = { x: memo.x, y: memo.y };
     el.addClass('li-u-invisible');
     el.classList.add('is-visible');
   }
@@ -279,8 +300,64 @@ export class HoverLookupController {
     }
   }
 
+  /**
+   * topBar 拖把拖拽（方案 A）：pointerdown 於把手（按鈕除外）啟動，
+   * pointer capture 全程追蹤；pointermove 直改 fixed left/top 並記錄視口位置，
+   * pointerup 寫回 popupPosStore（A 裁定：全彈窗共用一個記憶點）。
+   * 移動端 Pointer Events 一手覆蓋（touch-action: none 於 CSS）。
+   */
+  private attachDrag(handle: HTMLElement, _doc: Document): void {
+    handle.addEventListener('pointerdown', (e: PointerEvent) => {
+      if (!this.popupEl) return;
+      // pointerdown 排除按鈕：把手內未來若加鈕，點鈕不啟動拖拽
+      const t = e.target as HTMLElement;
+      if (t.closest('button, a, input, [role="button"]')) return;
+      const r = this.popupEl.getBoundingClientRect();
+      this.drag = { offX: e.clientX - r.left, offY: e.clientY - r.top };
+      handle.addClass('is-dragging');
+      try { handle.setPointerCapture(e.pointerId); } catch { /* 容錯：capture 失敗仍可拖 */ }
+      e.preventDefault();
+    });
+    handle.addEventListener('pointermove', (e: PointerEvent) => {
+      if (!this.drag || !this.popupEl) return;
+      // 視口夾逼（防拖出屏外）：留 24px 可抓邊
+      const vw = (this.doc?.defaultView ?? window).innerWidth;
+      const vh = (this.doc?.defaultView ?? window).innerHeight;
+      const x = Math.min(Math.max(e.clientX - this.drag.offX, 8), vw - 32);
+      const y = Math.min(Math.max(e.clientY - this.drag.offY, 8), vh - 24);
+      this.popupEl.style.left = `${x}px`;
+      this.popupEl.style.top = `${y}px`;
+      this.popupEl.style.right = 'auto';
+      this.popupEl.style.bottom = 'auto';
+      this.draggedPos = { x, y };
+    });
+    const endDrag = (e: PointerEvent) => {
+      if (!this.drag) return;
+      this.drag = null;
+      handle.removeClass('is-dragging');
+      try { handle.releasePointerCapture(e.pointerId); } catch { /* 已釋放 */ }
+      // 記憶（方案 A 裁定）：寫回呼叫端 settings（不 pin 也記，下次 pinned 用）
+      if (this.draggedPos) this.opts.popupPosStore?.set(this.draggedPos);
+    };
+    handle.addEventListener('pointerup', endDrag);
+    handle.addEventListener('pointercancel', endDrag);
+  }
+
   private position(): void {
     if (!this.popupEl || !this.anchorRect) return;
+    // 方案 A：拖拽過的 pinned 彈窗保持自訂位置（不隨內容更新被拉回貼詞）；
+    // 記憶位置套用前做視口夾逼（螢幕變更防出界）。首次拖拽前行為逐字不變。
+    if (this.pinned && this.draggedPos) {
+      const vw = (this.doc?.defaultView ?? window).innerWidth;
+      const vh = (this.doc?.defaultView ?? window).innerHeight;
+      const x = Math.min(Math.max(this.draggedPos.x, 8), Math.max(vw - 32, 8));
+      const y = Math.min(Math.max(this.draggedPos.y, 8), Math.max(vh - 24, 8));
+      this.popupEl.style.left = `${x}px`;
+      this.popupEl.style.top = `${y}px`;
+      this.popupEl.style.right = 'auto';
+      this.popupEl.style.bottom = 'auto';
+      return;
+    }
     // 錨點失效（切換佈局後 DOM 重建、元素被移除）→ 隱藏而非錯位顯示
     if (!applyPopupPosition(this.popupEl, this.anchorRect, this.anchorEl, this.detectContentBounds() ?? undefined)) {
       this.hide();
@@ -302,6 +379,8 @@ export class HoverLookupController {
     this.bodyEl = null;
     this.anchorRect = null;
     this.pinned = false;
+    this.drag = null;
+    this.draggedPos = null;
     this.currentWord = '';
   }
 

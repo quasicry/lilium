@@ -401,6 +401,34 @@ console.log("[④b 摩尼文方案 — L2/11-123R 記法往返]");
   ok(!hasActiveAudio() && restored === 1, "B3 ⑤ stopAll 幂等（重複調用無副作用）");
 }
 
+// ─── 【hover-drag】懸停彈窗 pinned 記憶位置＋topBar 拖把（方案 A）───
+{
+  ok(typeof lib.HoverLookupController === "function", "hover-drag ① HoverLookupController 可導出");
+  // 模擬 popupPosStore（get/set 行為契約：拖拽結束寫回、下次 pinned 讀取）
+  const store = { pos: undefined, get() { return this.pos; }, set(p) { this.pos = p; } };
+  const ctrl = new lib.HoverLookupController({
+    enabled: true, trigger: 'ctrl', maxWordLength: 40,
+    onLookup: () => {},
+    popupPosStore: { get: () => store.get(), set: (p) => store.set(p) },
+  });
+  ok(typeof ctrl.attach === "function" && typeof ctrl.detach === "function",
+    "hover-drag ② controller attach/detect API 完整");
+  // 源碼契約斷言：拖把掛在 pinHint（pointerdown 排除按鈕）、記憶寫回 store、pinned 讓位
+  const fs2 = await import("node:fs");
+  const src = fs2.readFileSync(path.join(ROOT, "src/dict/hover-lookup.ts"), "utf8");
+  ok(src.includes("attachDrag") && src.includes("setPointerCapture"),
+    "hover-drag ③ topBar 拖把 pointer capture 接線存在");
+  ok(src.includes("closest('button, a, input, [role=\"button\"]')"),
+    "hover-drag ④ pointerdown 排除按鈕/連結");
+  ok(src.includes("popupPosStore?.set"), "hover-drag ⑤ 拖拽結束寫回 popupPosStore");
+  ok(src.includes("this.pinned && this.draggedPos"),
+    "hover-drag ⑥ pinned＋記憶位置時 position() 讓位（非 pinned 貼詞不變）");
+  ok(src.includes("popupPosStore?.get()"), "hover-drag ⑦ 彈出時讀記憶位置");
+  // store 契約：set 後 get 回同值（plugin 端 saveSettings 持久化另行接線）
+  store.set({ x: 100, y: 80 });
+  ok(store.get().x === 100 && store.get().y === 80, "hover-drag ⑧ popupPosStore get/set 往返");
+}
+
 console.log(`\n結果: ${pass} 通过, ${fail} 失败`);
 if (fail > 0) {
   console.log("失敗清單（前 20）：");

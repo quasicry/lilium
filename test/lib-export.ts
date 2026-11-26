@@ -36,3 +36,5 @@ export * from "../src/font-gsub";
 export * from "../src/font-vmetrics";
 export { BUNDLED_NOTO_FONT_FILES } from "../src/vendor/noto-fonts.generated";
 export { BUNDLED_SIDDHAM_LANTSA_FONT_FILES } from "../src/vendor/siddham-lantsa.generated";
+
+export { HoverLookupController } from "../src/dict/hover-lookup";
