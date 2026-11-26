@@ -1042,27 +1042,6 @@ export class LiDictView extends ItemView {
             }
           }
         });
-        // 目錄入口宿主按鈕（移動端修復）。移動端 WebView（Capacitor）對
-        // srcdoc iframe 內 body click 事件透傳不可靠（B41a-f 同類前科）→ iframe 內
-        // 「總目錄」鏈接點了無反應，TOC 彈窗走不到。此按鈕在 iframe 外（宿主 DOM），
-        // 平台無關。檢測：詞條 HTML 含 entry:// 鏈接且鏈接文本含「總目錄/目錄」。
-        {
-          const tocMatch = hit.html.match(/<a\s+href="entry:\/\/([^"]+)"[^>]*>([^<]{0,8}目錄[^<]{0,4})<\/a>/i);
-          if (tocMatch) {
-            let tocWord = tocMatch[1].replace(/^(entry:\/\/)+/i, '').trim();
-            try { tocWord = decodeURIComponent(tocWord); } catch { /* 保留原字面 */ }
-            const tocLabel = (tocMatch[2] || '').trim() || '總目錄';
-            const tocBtn = headRow.createEl('button', {
-              cls: 'li-mini-btn li-toc-entry-btn li-toc-entry-btn--mini',
-              text: 'TOC', // 文案固定 TOC（原顯示鏈接原文如「總目錄」，過大；目標詞移入 aria-label）
-              attr: { 'aria-label': `${tocLabel}（${tocWord}）`, title: `${tocLabel}（${tocWord}）` },
-            });
-            tocBtn.addEventListener('click', (e) => {
-              e.stopPropagation(); // 不觸發 headRow 折疊
-              this.doLookup(tocWord, { tocDictId: hit.dictId }); // 只開本典 TOC（目標若是目錄頁 → isTocLikeHtml 偵測開彈窗）
-            });
-          }
-        }
         const actions = card.createDiv({ cls: 'li-actions' });
         const copyBtn = actions.createEl('button', { cls: 'li-mini-btn', text: this.plugin.T('dict.copy') });
         copyBtn.addEventListener('click', () => {
@@ -1115,6 +1094,26 @@ export class LiDictView extends ItemView {
                 liNotice(this.plugin.T('dict.audio.missing', { word: hit.keyText }));
                 fbBtn.disabled = false;
               }
+            });
+          }
+        }
+        // 目錄入口宿主按鈕（行動列，與複製/發音兜底同列；原詞頭行遷入）。iframe 外
+        // 宿主 DOM＝平台無關（移動端 WebView 對 srcdoc iframe 內 click 透傳不可靠，
+        // B41a-f 同類前科）。檢測：詞條 HTML 含 entry:// 鏈接且鏈接文本含「總目錄/目錄」。
+        {
+          const tocMatch = hit.html.match(/<a\s+href="entry:\/\/([^"]+)"[^>]*>([^<]{0,8}目錄[^<]{0,4})<\/a>/i);
+          if (tocMatch) {
+            let tocWord = tocMatch[1].replace(/^(entry:\/\/)+/i, '').trim();
+            try { tocWord = decodeURIComponent(tocWord); } catch { /* 保留原字面 */ }
+            const tocLabel = (tocMatch[2] || '').trim() || '總目錄';
+            const tocBtn = actions.createEl('button', {
+              cls: 'li-mini-btn li-toc-entry-btn li-toc-entry-btn--mini',
+              text: 'TOC', // 文案固定 TOC（原顯示鏈接原文如「總目錄」，過大；目標詞移入 aria-label）
+              attr: { 'aria-label': `${tocLabel}（${tocWord}）`, title: `${tocLabel}（${tocWord}）` },
+            });
+            tocBtn.addEventListener('click', (e) => {
+              e.stopPropagation(); // 不觸發 headRow 折疊
+              this.doLookup(tocWord, { tocDictId: hit.dictId }); // 只開本典 TOC（目標若是目錄頁 → isTocLikeHtml 偵測開彈窗）
             });
           }
         }
