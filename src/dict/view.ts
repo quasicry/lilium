@@ -162,6 +162,8 @@ export class LiDictView extends ItemView {
     for (const ro of this.frameRos.values()) ro.disconnect();
     this.frameRos.clear();
     this.frameLoadHandlers.clear(); // V-F4：load handler 記錄隨 frame 一併清空
+    // 移動端發音熱點覆蓋層隨面板生命週期一併摘除
+    for (const f of Array.from(this.frameHotspots.keys())) this.removeAudioHotspots(f);
     this.lastResults = [];
     this.pendingFrames = [];
     // 卡頓修復（legacy flat 分幀填充）：面板關閉後不再為舊 DOM 續排 fill 幀。
@@ -1400,11 +1402,120 @@ export class LiDictView extends ItemView {
    * 時先移除舊 handler 再掛新的，避免 listener 逐次累積重複執行。 */
   private frameLoadHandlers = new Map<HTMLIFrameElement, () => void>();
 
+  /** 移動端發音熱點槽：iframe → 連結/按鈕對 */
+  private frameHotspots = new Map<HTMLIFrameElement, Array<{ a: HTMLAnchorElement; btn: HTMLElement }>>();
+  private frameHotspotRos = new Map<HTMLIFrameElement, ResizeObserver>();
+
+  /**
+   * 移動端專用：iframe 內發音連結（data-li-snd）正上方疊宿主透明按鈕——
+   * Capacitor WebView 對 srcdoc iframe 內 touch/click 透傳不可靠（B41a-f，
+   * iframe 內委託監聽＋touchend 假 click 實測仍漏＝原位播放器插不出），點擊
+   * 落在宿主 DOM 平台無關；座標取自同源 contentDocument 讀取（inlineFrameAssets
+   * 同路徑已長期實證）。桌面不掛載（原位行為逐字不變）。
+   */
+  private mountAudioHotspots(iframe: HTMLIFrameElement, body: HTMLElement, keyText: string): void {
+    this.removeAudioHotspots(iframe); // 重入安全：loadHandler 300ms 保險補跑會二次進入
+    const links = Array.from(body.querySelectorAll<HTMLAnchorElement>('a[data-li-snd]'));
+    if (!links.length) return;
+    const card = iframe.parentElement;
+    if (!card) return;
+    const pairs: Array<{ a: HTMLAnchorElement; btn: HTMLElement }> = [];
+    for (const a of links) {
+      const sndPath = a.getAttribute('data-li-snd') || '';
+      if (!sndPath) continue;
+      const btn = card.createEl('button', { cls: 'li-audio-hotspot' });
+      btn.setAttribute('aria-label', 'play audio ' + sndPath);
+      btn.title = sndPath;
+      // eslint-disable-next-line @typescript-eslint/no-misused-promises -- fire-and-forget 事件回調（UI 事件無人 await 返回值），行為保持——審計批次三。
+      btn.addEventListener('click', () => this.playHotspotAudio(btn, sndPath, keyText));
+      pairs.push({ a, btn });
+    }
+    if (!pairs.length) return;
+    this.frameHotspots.set(iframe, pairs);
+    // 跟隨內容重排：資源內聯/字體載入後連結位移（與 fitFrame 的 body RO 同源信號）
+    const ro = new ResizeObserver(() => this.syncAudioHotspots(iframe));
+    ro.observe(body);
+    this.frameHotspotRos.set(iframe, ro);
+    this.syncAudioHotspots(iframe);
+  }
+
+  /** 熱點座標同步：iframe 內連結 rect（同源讀取）＋ iframe 於 card 內偏移 → 透明按鈕覆蓋 */
+  private syncAudioHotspots(iframe: HTMLIFrameElement): void {
+    const pairs = this.frameHotspots.get(iframe);
+    if (!pairs?.length) return;
+    try {
+      const card = iframe.parentElement;
+      if (!card) return;
+      const cr = card.getBoundingClientRect();
+      const ir = iframe.getBoundingClientRect();
+      const offX = ir.left - cr.left;
+      const offY = ir.top - cr.top;
+      for (const { a, btn } of pairs) {
+        const r = a.getBoundingClientRect();
+        // 最小可點面積 24px（觸控目標下限），不足時以連結中心對稱擴展
+        const w = Math.max(r.width, 24);
+        const h = Math.max(r.height, 24);
+        btn.style.left = `${Math.round(offX + r.left + r.width / 2 - w / 2)}px`;
+        btn.style.top = `${Math.round(offY + r.top + r.height / 2 - h / 2)}px`;
+        btn.style.width = `${Math.round(w)}px`;
+        btn.style.height = `${Math.round(h)}px`;
+      }
+    } catch { /* iframe 已分離 */ }
+  }
+
+  /** 熱點摘除（含 RO）——fillFrame 重入/onClose/已分離掃描共用 */
+  private removeAudioHotspots(iframe: HTMLIFrameElement): void {
+    const ro = this.frameHotspotRos.get(iframe);
+    if (ro) { ro.disconnect(); this.frameHotspotRos.delete(iframe); }
+    const pairs = this.frameHotspots.get(iframe);
+    if (pairs) {
+      for (const p of pairs) p.btn.remove();
+      this.frameHotspots.delete(iframe);
+    }
+  }
+
+  /** 熱點播放：與行動列 ▶ 同源管線（resolveAsset→readBinary→spx 解碼→一次性播放） */
+  private async playHotspotAudio(btn: HTMLElement, sndPath: string, keyText: string): Promise<void> {
+    if (btn.classList.contains('is-active')) return;
+    btn.classList.add('is-active');
+    try {
+      let asset = this.plugin.service.resolveAsset(decodeURIComponent(sndPath));
+      if (!asset) {
+        // 壓平命名兜底：資產根按 basename 探實檔（同行動列 ▶ 體例）
+        const p = await this.probeAssetFilePublic(decodeURIComponent(sndPath).split(/[\\/]/).pop() || '');
+        if (p) asset = { mddKey: sndPath, vaultPath: p, kind: 'audio', size: 0 };
+      }
+      if (!asset) { liNotice(this.plugin.T('dict.audio.missing', { word: keyText })); btn.classList.remove('is-active'); return; }
+      const buf = await this.plugin.app.vault.adapter.readBinary(asset.vaultPath);
+      let bytes = new Uint8Array(buf);
+      let mime = 'audio/ogg';
+      if (/\.spx$/i.test(asset.vaultPath)) {
+        const { wav } = await decodeSpeexToWav(bytes);
+        bytes = new Uint8Array(wav);
+        mime = 'audio/wav';
+      } else {
+        const ext = (asset.vaultPath.split('.').pop() || 'ogg').toLowerCase();
+        mime = ext === 'wav' ? 'audio/wav' : ext === 'mp3' ? 'audio/mpeg' : ext === 'm4a' ? 'audio/mp4' : ext === 'aac' ? 'audio/aac' : ext === 'flac' ? 'audio/flac' : 'audio/ogg';
+      }
+      const url = URL.createObjectURL(new Blob([bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength)], { type: mime }));
+      const restore = () => { btn.classList.remove('is-active'); };
+      void playAudioSession(url, restore).catch(() => { try { URL.revokeObjectURL(url); } catch { /* 已 revoke */ } restore(); });
+    } catch {
+      liNotice(this.plugin.T('dict.audio.missing', { word: keyText }));
+      btn.classList.remove('is-active');
+    }
+  }
+
   private fillFrame(frame: HTMLIFrameElement, html: string, keyText: string, dictId?: string): void {
     // B8/V-F1：舊 iframe 被面板重建拋棄時，其 body 上的 ResizeObserver 仍持有引用——
     // 只斷開本 frame 自己的舊 observer（per-frame 槽），不再波及他幀；
     // 已分離 frame 的殘留 RO 一併清掃。
     this.detachFrameRo(frame);
+    // 熱點槽：本 frame 舊熱點摘除＋已分離 frame 殘留掃描（doLookup 重渲染不累積）
+    this.removeAudioHotspots(frame);
+    for (const f of Array.from(this.frameHotspots.keys())) {
+      if (!f.isConnected) this.removeAudioHotspots(f);
+    }
     // V-F4：同 frame 重填前先移除上一次掛的 load handler（否則逐次累積）。
     const prevLoad = this.frameLoadHandlers.get(frame);
     if (prevLoad) {
@@ -1784,6 +1895,10 @@ export class LiDictView extends ItemView {
           // 先派發（旗標此刻未置位，handler 正常執行），再置旗標吞掉瀏覽器後續原生合成 click 防雙發
           if (target) { const handled = target.dispatchEvent(fake); if (fake.defaultPrevented) { ev.preventDefault(); liTouchHandled = true; window.setTimeout(() => { liTouchHandled = false; }, 500); } void handled; }
         }, { passive: false });
+        // 移動端發音熱點覆蓋層：Capacitor WebView 對 srcdoc iframe 內 touch/click 透傳
+        // 不可靠（B41a-f）——iframe 內每個發音連結正上方疊宿主透明按鈕，點擊落在宿主
+        // DOM＝平台無關，走行動列 ▶ 同源管線一次性播放。桌面不掛載（原位行為逐字不變）。
+        if (Platform.isMobile) this.mountAudioHotspots(iframe, body, keyText);
       } catch {
         /* cross-origin */
       }

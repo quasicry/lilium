@@ -448,6 +448,32 @@ console.log("[④b 摩尼文方案 — L2/11-123R 記法往返]");
     "hover-multi ⑦ 點彈窗內 pin 語義保留");
 }
 
+// ─── 【audio-hotspot】移動端發音熱點覆蓋層 ───
+{
+  const fs2 = await import("node:fs");
+  const src = fs2.readFileSync(path.join(ROOT, "src/dict/view.ts"), "utf8");
+  const css = fs2.readFileSync(path.join(ROOT, "styles.css"), "utf8");
+  ok(src.includes("private frameHotspots = new Map<HTMLIFrameElement"), "audio-hotspot ① 熱點槽存在");
+  ok(src.includes("if (Platform.isMobile) this.mountAudioHotspots(iframe, body, keyText);"),
+    "audio-hotspot ② 僅移動端掛載（桌面原位行為逐字不變）");
+  ok(src.includes("private mountAudioHotspots(iframe: HTMLIFrameElement"),
+    "audio-hotspot ③ mount 為類方法（private）");
+  ok(src.includes("a[data-li-snd]"), "audio-hotspot ④ 熱點錨＝data-li-snd 發音連結");
+  ok(src.includes("this.playHotspotAudio(btn, sndPath, keyText)"),
+    "audio-hotspot ⑤ 點擊走宿主管線（與行動列 ▶ 同源）");
+  ok(src.includes("this.removeAudioHotspots(frame);"),
+    "audio-hotspot ⑥ fillFrame 重入摘舊熱點");
+  ok(src.includes("for (const f of Array.from(this.frameHotspots.keys())) this.removeAudioHotspots(f);"),
+    "audio-hotspot ⑦ onClose 全清（面板生命週期）");
+  ok(src.includes("const ro = new ResizeObserver(() => this.syncAudioHotspots(iframe));"),
+    "audio-hotspot ⑧ 內容重排跟隨（RO 同源信號）");
+  ok(src.includes("Math.max(r.width, 24)") && src.includes("Math.max(r.height, 24)"),
+    "audio-hotspot ⑨ 最小可點面積 24px（觸控目標下限）");
+  ok(css.includes(".li-root .li-audio-hotspot") && css.includes(".li-root .li-card { position: relative; }"),
+    "audio-hotspot ⑩ 覆蓋層樣式（透明按鈕＋card 定位基準）");
+  ok(css.includes(".li-audio-hotspot.is-active"), "audio-hotspot ⑪ 播放中視覺回饋");
+}
+
 console.log(`\n結果: ${pass} 通过, ${fail} 失败`);
 if (fail > 0) {
   console.log("失敗清單（前 20）：");

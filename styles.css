@@ -1105,6 +1105,22 @@ body.li-editor-vertical-active .li-native-page .MJX-TEX {
   background: var(--background-primary);
 }
 .li-root .li-frame { display: block; width: 100%; border: 0; background: transparent; }
+/* 移動端發音熱點覆蓋層：宿主透明按鈕疊在 iframe 內發音連結正上方（.li-card 定位基準）——
+   Capacitor WebView 對 srcdoc iframe 內 touch/click 透傳不可靠（B41a-f），點擊落宿主 DOM
+   平台無關。桌面無此元素（Platform.isMobile 才掛載）。 */
+.li-root .li-card { position: relative; }
+.li-root .li-audio-hotspot {
+  position: absolute;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  box-shadow: none;
+  cursor: pointer;
+  z-index: 5;
+  -webkit-tap-highlight-color: transparent;
+}
+.li-root .li-audio-hotspot.is-active { opacity: 0.35; background: var(--background-modifier-hover); }
 .li-root .li-actions {
   display: flex;
   gap: 4px;
