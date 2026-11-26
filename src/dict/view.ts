@@ -1045,7 +1045,7 @@ export class LiDictView extends ItemView {
           }
         });
         const actions = card.createDiv({ cls: 'li-actions' });
-        const copyBtn = actions.createEl('button', { cls: 'li-mini-btn', text: this.plugin.T('dict.copy') });
+        const copyBtn = actions.createEl('button', { cls: 'li-mini-btn li-bm-plain-btn', text: this.plugin.T('dict.copy') });
         copyBtn.addEventListener('click', () => {
           const api = typeof navigator !== 'undefined' ? navigator.clipboard : undefined;
           if (!api?.writeText) { liNotice(this.plugin.T('dict.copyFail')); return; }
@@ -1163,7 +1163,7 @@ export class LiDictView extends ItemView {
           flatQueue.push({ frame, hit });
         }
         const actions = card.createDiv({ cls: 'li-actions' });
-        const copyBtn = actions.createEl('button', { cls: 'li-mini-btn', text: this.plugin.T('dict.copy') });
+        const copyBtn = actions.createEl('button', { cls: 'li-mini-btn li-bm-plain-btn', text: this.plugin.T('dict.copy') });
         copyBtn.addEventListener('click', () => {
           const api = typeof navigator !== 'undefined' ? navigator.clipboard : undefined;
           if (!api?.writeText) { liNotice(this.plugin.T('dict.copyFail')); return; }

@@ -1082,8 +1082,8 @@ body.li-editor-vertical-active .li-native-page .MJX-TEX {
   white-space: nowrap;
 }
 .li-root .li-mini-btn:hover { background: var(--background-modifier-hover); color: var(--text-normal); }
-/* 書籤面板「匯出 MD／清空書籤」無框文字化（同 ▶/TOC 無框體例）：透明背景＋無邊框
-   ＋主題連結色字體，hover 轉正常色。僅此二鈕（.li-bm-plain-btn），li-mini-btn 本體不動。 */
+/* 無框文字化按鈕（同 ▶/TOC 無框體例）：透明背景＋無邊框＋主題連結色字體，hover 轉
+   正常色。適用：書籤面板「匯出 MD／清空書籤」＋詞條卡片「複製」；li-mini-btn 本體不動。 */
 .li-root .li-bm-plain-btn {
   border: 0;
   background: transparent;
