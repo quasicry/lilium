@@ -12,7 +12,7 @@
  * ALEPH 通常僅右連 BETH/BHETH（偶 GIMEL），斷連以 U+200C ZWNJ（透傳保留，見 VS_VARIANTS 段註釋）、
  * 詞形圖形延伸可用 U+0640 ARABIC TATWEEL（透傳保留）、標點語義（10AF2 大單位/節末、10AF3 小單位/
  * 半節末、10AF4 句內子單位、10AF0/10AF1/10AF5 標題題注起訖、10AF6 行填充省略號）。
- * Unicode 18.0 復核（2026 精讀）：本區塊 18.0 無新增碼位；StandardizedVariants-18.0.0 之
+ * Unicode 18.0 復核（2026）：本區塊 18.0 無新增碼位；StandardizedVariants-18.0.0 之
  * Manichaean 五條 VS-1（10AC5/10AC6/10AD6/10AD7/10AE1 FE00，isolate 限定、10AD6 另列 final）
  * 與本方案 VS_VARIANTS 一致——無碼位層變更。
  *

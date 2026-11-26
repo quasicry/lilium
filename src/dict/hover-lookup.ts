@@ -169,7 +169,7 @@ export class HoverLookupController {
         this.position();
       });
     }
-    // r59 批次乙：死代碼刪除——158 行已賦值，此處重複賦值無效果
+    // 158 行已賦值，此處重複賦值無效果
     this.showPopup();
     const token = ++this.lookupToken;
     this.opts.onLookup(hit.word, {
@@ -213,8 +213,8 @@ export class HoverLookupController {
       this.bodyEl.className = 'li-hover-body';
       const pinHint = docCreateEl(doc, "div");
       pinHint.className = 'li-hover-pin-hint';
-      // r54 排查修復：文案走 i18n（pinHintProvider 注入），不再硬編碼簡中。
-      pinHint.textContent = this.opts.pinHintProvider?.() ?? '点击弹窗固定 · esc 关闭';
+      // 排查修復：文案走 i18n（pinHintProvider 注入），不再硬編碼簡中。
+      pinHint.textContent = this.opts.pinHintProvider?.() ?? '點擊彈窗固定 · esc 關閉';
       this.popupEl.appendChild(this.bodyEl);
       this.popupEl.appendChild(pinHint);
       doc.body.appendChild(this.popupEl);
@@ -238,7 +238,7 @@ export class HoverLookupController {
       // 本彈窗內容不掛任何 inline 事件）。
       // 唯一 innerHTML 作用於**未掛載的 template**，非活文檔注入；html 僅來自
       // renderHits（動態文本全 esc()）/本檔字面模板（setError 已轉義），setBody
-      // 回調唯一外部入口為 plugin.ts renderHits 管線——審計 v2.9.148。
+      // 回調唯一外部入口為 plugin.ts renderHits 管線——審計。
        
       const parsed = new (this.doc || document).defaultView!.DOMParser().parseFromString(html, "text/html");
       const tpl = parsed.body; // 離屏解析（DOMParser 文檔永不掛載），等價 template 離屏解析
@@ -326,7 +326,7 @@ export class HoverLookupController {
         .replace(/&nbsp;/g, ' ')
         .replace(/\s+/g, ' ')
         .trim();
-      // r54 排查修復：碼位級截斷（Array.from）——原 UTF-16 code unit slice 可切在
+      // 排查修復：碼位級截斷（Array.from）——原 UTF-16 code unit slice 可切在
       // 代理對中間出孤立代理（SMP 文種字形顯示 �）。
       const cps = Array.from(text);
       const text2 = (cps.length > 220 ? cps.slice(0, 220).join('') : text);

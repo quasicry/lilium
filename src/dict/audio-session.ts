@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Copyright (C) 2026 quasicry
 /**
- * 辭典音頻播放會話——生命週期紀律中樞（B3）。
+ * 辭典音頻播放會話——生命週期紀律中樞。
  *
  * ## 為什麼需要
  *
