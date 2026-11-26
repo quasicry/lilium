@@ -929,7 +929,7 @@ export function renderTranslitPanel(body: HTMLElement, _view: LiDictView, plugin
     // P 類（維吾爾 n+g+h 隔音撇號寫法）僅「原生 → 羅馬字」方向＋
     // 維吾爾方案啓用——ULY 輸出含 g'h（rokkin'g'ham 型）時提供詞典規範備選。
     const usedScheme = getScheme(st.usedSchemeId);
-    const enableVocalic = !!usedScheme && (usedScheme.id === "sanskrit-iso15919" || usedScheme.group === "pali");
+    const enableVocalic = !!usedScheme && usedScheme.group === "pali";
     st.amb = st.toNative
       ? (detectRomanToNativeAmbiguities(st.out, { enableVocalic }).concat(
           // M 類：蒙古文方案下的三類兩讀（lh/ng/Galik 同形）——

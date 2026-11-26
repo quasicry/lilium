@@ -73,47 +73,11 @@ const RECORDED = {
       transform: (ref) => ref.replace(/~/g, "\u1E41"), // ~ → ṁ
     },
   ],
-  "sanskrit-itrans": [
-    {
-      cat: "itrans-final-virama",
-      note: "ITRANS 詞尾死輔音：sanscript 丟 virama，本引擎保留「.h」",
-      transform: (ref) => ref + ".h",
-    },
-  ],
-  "sanskrit-wx": [
-    {
-      cat: "wx-spec-deviation",
-      note: "WX 規範偏差（sanscript 的 WX 表不合規）：ळ l̤→lY、ऎ è→eV、avagraha '→Z（依 Bharati/Chaitanya/Sangal 1996）",
-      selfConsistent: true,
-      transform: (ref) => ref
-        .replace(/l\u0324/g, "lY")   // ळ：sanscript l̤a → lY
-        .replace(/\u00E8/g, "eV")     // ऎ：sanscript è → eV
-        .replace(/'/g, "Z"),         // avagraha：sanscript ' → Z（規範）
-    },
-  ],
-  "sanskrit-slp1": [
-    {
-      cat: "slp1-llha",
-      note: "SLP1 ळ्ह：sanscript 漏 h 成「|a」（| 非 SLP1 字元），本引擎「Lha」",
-      selfConsistent: true,
-      transform: (ref) => ref.replace(/\|a/g, "Lha"),
-    },
-  ],
-  "sanskrit-velthuis": [
-    {
-      cat: "velthuis-spec-deviation",
-      note: "Velthuis 規範偏差（sanscript 的 Velthuis 表不合規）：candrabindu ~m→/、ॠ .rr→.R、ॡ .ll→.L（依 INRIA devnag 手冊：'/' transcribes a candrabindu'、'.R/.L' 爲 ॠ/ॡ）。不強制 selfConsistent：Velthuis 本就無法表達輔音叢（क्हँ 摺疊爲 खँ），此類合字＋隨鼻符案例在 sanscript 與本引擎同樣無法往返，屬方案層限制，非本引擎缺陷。",
-      transform: (ref) => ref
-        .replace(/~m/g, "/")       // candrabindu：sanscript ~m → /（規範）
-        .replace(/\.rr/g, ".R")    // ॠ：sanscript .rr → .R
-        .replace(/\.ll/g, ".L"),   // ॡ：sanscript .ll → .L
-    },
-  ],
 };
 
 /* ---- 主對比 ---- */
 const schemes = lib.listSchemes().filter((s) => s.id.startsWith("sanskrit-"));
-assert.ok(schemes.length === 8, `應有 8 套梵文方案，實得 ${schemes.length}`);
+assert.ok(schemes.length === 1, `應有 1 套梵文方案（其餘遷出 lilium資料），實得 ${schemes.length}`);
 
 const storeDir = (() => {
   const i = process.argv.indexOf("--store");
@@ -232,4 +196,4 @@ if (grandNewBugs > 0) {
   console.log("\n  若確認為新的慣例差異，請於 RECORDED 補上精確變換後再跑。");
   process.exit(1);
 }
-console.log(`\n✅ 8 套梵文方案對齊權威參考：無未記錄分歧（${sum("nMatch")} 完全一致 / ${sum("nRecorded")} 慣例差異 / ${sum("nSanscriptBug")} 參考方故障）`);
+console.log(`\n✅ 梵文方案對齊權威參考：無未記錄分歧（${sum("nMatch")} 完全一致 / ${sum("nRecorded")} 慣例差異 / ${sum("nSanscriptBug")} 參考方故障）`);

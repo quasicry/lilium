@@ -37,11 +37,11 @@ const lib = await import(path.join(TMP, "lib.mjs"));
 
 const ROMAN = { "IAST": true, "ISO": true };
 const MAP = {
-  "Brahmi": "brahmi-iast", "TamilBrahmi": "brahmi-iast", "Siddham": "siddham-hk",
+  "Brahmi": "brahmi-iast", "TamilBrahmi": "brahmi-iast", "Siddham": "siddham-iast",
   "Marchen": "marchen", "Soyombo": "soyombo", "ZanabazarSquare": "zanabazar",
   "PhagsPa": "phagspa-poppe", "Tibetan": "tibetan-wylie", "Sinhala": "sinhala-iso15919",
   "Kharoshthi": "gandhari-iast", "Mongolian": "mongolian",
-  "IAST": "sanskrit-iast", "ISO": "sanskrit-iso15919",
+  "IAST": "sanskrit-iast", "ISO": "sanskrit-iast",
 };
 
 const DIR = path.join(ROOT, "test", "data", "script-matrix", "texts");

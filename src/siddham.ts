@@ -44,11 +44,6 @@ import {
   type IndicOptions,
   iastToDevanagari,
   devanagariToIast,
-  iastToHk,
-  hkToIast,
-  itransToDevanagari,
-  devanagariToItrans,
-  buildItransCharTable,
   looksLikeIast,
 } from "./indic";
 
@@ -277,19 +272,6 @@ rows.push({ native: cp(0x115dc), roman: "ru", note: "ra+u 須用 warbler 形（1
 
 /* ---------------- 註冊到 TRANSLIT_REGISTRY ---------------- */
 const siddhamCharTable = buildSiddhamCharTable();
-// HK / ITRANS 檢字表不再共用 IAST 表（否則 roman 列是 IAST 拼寫，對該方案錯誤）。
-// 悉曇字形不變，僅重映射 roman 列：HK 過 iastToHk。
-const siddhamCharTableHk = siddhamCharTable.map((e) => ({ ...e, roman: iastToHk(e.roman) }));
-// ITRANS：改從權威的 buildItransCharTable（正確的 ITRANS 裸 token）出發，把天城體字形轉成悉曇體；
-// 悉曇體不表記 ॐ / ऽ / ळ 等字形（siddhamCharTable 亦不含），故過濾掉無悉曇對應的少數列。
-const isSiddhamStr = (s: string): boolean =>
-  [...s].every((c) => { const cp = c.codePointAt(0)!; return cp >= 0x11580 && cp <= 0x115ff; });
-// 檢字表審計誠實化：native＝引擎實跑輸出（iastToSiddham∘itransToDevanagari）——
-// 舊表叢集列（kSh/j~na/GY/dny）為無 virama 連寫展示、單輔音列缺詞尾 virama，
-// 表列即虛構引擎能力（ḹ 教訓）；（合字）/空輸出列過濾。
-const siddhamCharTableItrans = buildItransCharTable()
-  .map((e) => ({ ...e, native: iastToSiddham(itransToDevanagari(e.roman)) }))
-  .filter((e) => isSiddhamStr(e.native) && e.native !== "");
 const asIndic = (o?: TransliterationOptions): IndicOptions => (o as IndicOptions) ?? {};
 
 const siddhamIast: TransliterationScheme = {
@@ -318,75 +300,5 @@ const siddhamIast: TransliterationScheme = {
   charTable: siddhamCharTable,
 };
 
-const siddhamHk: TransliterationScheme = {
-  id: "siddham-hk",
-
-  // f2-A：\uXXXX esc 標註 token 掃描層原子化（\ 是詞界 trigger，逐詞掃描切碎標註實錘）
-  escAnnotationToken: true,
-  label: {
-    zh: "悉曇体 HK（ASCII 備選）",
-    "zh-TW": "悉曇體 HK（ASCII 備選）",
-    ko: "시드담 HK(ASCII)",
-    en: "Siddham (Harvard-Kyoto)",
-    ja: "悉曇 HK",
-  fr: "Siddham (Harvard-Kyoto)", de: "Siddham (Harvard-Kyoto)", },
-  group: "siddham",
-  primary: false,
-  hiddenFromPicker: true, // 只收選擇面不收引擎（功能保留）
-  altOf: "siddham-iast",
-  description: "Harvard-Kyoto：IAST 的純 ASCII 替代（一對一），鍵入悉曇體（T/Th/D/Dh/N 爲捲舌）。",
-  romanToNative: (i, o) => iastToSiddham(hkToIast(i), asIndic(o)),
-  nativeToRoman: (i, o) => iastToHk(siddhamToIast(i, asIndic(o))),
-  looksLikeNative: looksLikeSiddham,
-  looksLikeRoman: (t) => /[A-Z]/.test(t) && !looksLikeSiddham(t),
-  convert: (i, o) =>
-    looksLikeSiddham(i) ? iastToHk(siddhamToIast(i, asIndic(o))) : iastToSiddham(hkToIast(i), asIndic(o)),
-  charTable: siddhamCharTableHk,
-};
-
-/** ITRANS 專屬「像羅馬字」偵測（與 HK 大寫方案區隔；不含悉曇碼位） */
-function looksLikeItransForSiddham(text: string): boolean {
-  return /RRi|RRI|LLi|LLI|kSh|j~na|dny|~N|~n|Ch|Th|Dh|Sh|\.h|\.N|\.a/.test(text) && !looksLikeSiddham(text);
-}
-
-const siddhamItrans: TransliterationScheme = {
-  id: "siddham-itrans",
-
-  // f2-A：\uXXXX esc 標註 token 掃描層原子化（\ 是詞界 trigger，逐詞掃描切碎標註實錘）
-  escAnnotationToken: true,
-  label: {
-    zh: "悉曇体 ITRANS（鍵盤輸入）",
-    "zh-TW": "悉曇體 ITRANS（鍵盤輸入）",
-    en: "Siddham (ITRANS)",
-    ja: "悉曇 ITRANS", ko: "시드담 ITRANS(입력용)",
-  fr: "Siddham (ITRANS)", de: "Siddham (ITRANS)", },
-  group: "siddham",
-  primary: false,
-  hiddenFromPicker: true, // 不再提供給用戶選擇（功能保留）
-  altOf: "siddham-iast",
-  description:
-    "ITRANS 5.30：梵咒鍵盤輸入事實標準（ASCII）。OM maNi padme huM 風格鍵入悉曇真言；T/Th/D/Dh/N 爲捲舌、sh/Sh 爲 ś/ṣ、kSh（क्ष）、M/H/.N/.h/OM。",
-  romanToNative: (i, o) => iastToSiddham(itransToDevanagari(i), asIndic(o)),
-  nativeToRoman: (i, _o) => devanagariToItrans(siddhamToDevanagari(i)),
-  looksLikeNative: looksLikeSiddham,
-  looksLikeRoman: looksLikeItransForSiddham,
-  convert: (i, o) =>
-    looksLikeSiddham(i) ? devanagariToItrans(siddhamToDevanagari(i)) : iastToSiddham(itransToDevanagari(i), asIndic(o)),
-  charTable: siddhamCharTableItrans,
-  // 檢字表審計：ITRANS 鍵含 ASCII 詞界 trigger 字符（~ . 及複合鍵 kSh/j~na/GY/dny），
-  // 面板長文掃描會拆散透傳——charTable 同源動態生成原子 token（^…$ 自我錨定）。
-  romanTokenRe: new RegExp(
-    "^(?:" +
-      siddhamCharTableItrans
-        .map((r) => r.roman)
-        .filter((r) => /[^A-Za-z\u00C0-\u024F]/.test(r))
-        .sort((a, b) => b.length - a.length)
-        .map((r) => r.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"))
-        .join("|") +
-      ")$"
-  ),
-};
 
 registerScheme(siddhamIast);
-registerScheme(siddhamHk);
-registerScheme(siddhamItrans);

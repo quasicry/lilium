@@ -33,7 +33,7 @@ const { SS_SCHEME, buildCorpus } = await import(path.join(ROOT, "test", "_sanskr
 const norm = (s) => s.normalize("NFC");
 
 const schemes = listSchemes().filter((s) => s.id.startsWith("sanskrit-"));
-const order = ["sanskrit-iast","sanskrit-iso15919","sanskrit-hk","sanskrit-itrans","sanskrit-velthuis","sanskrit-wx","sanskrit-kolkata","sanskrit-slp1"];
+const order = ["sanskrit-iast"];
 schemes.sort((a, b) => (order.indexOf(a.id) + 1 || 99) - (order.indexOf(b.id) + 1 || 99));
 
 const outDir = process.argv[2] || process.env.ROMAN_DUMP || path.join(TMP, "cross");

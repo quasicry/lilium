@@ -40,7 +40,7 @@ const hex = (s) => [...s].map((c) => c.codePointAt(0).toString(16)).join(" ");
 /* ---------- 1. 出向體例：⟨U+XXXX⟩、零 \u 殘留 ---------- */
 const OUT_SCHEMES = [
   "zanabazar", "soyombo", "mongolian", "brahmi-iast", "siddham-iast",
-  "sanskrit-iast", "sanskrit-iso15919", "pali-iso15919",
+  "sanskrit-iast", "pali-iso15919",
 ];
 const FENCE = "("; // 區塊外標點（ASCII 開括號＝方案 trigger 詞界字元）
 for (const id of OUT_SCHEMES) {
@@ -74,7 +74,6 @@ for (const id of OUT_SCHEMES) {
 const MIXED = [
   ["zanabazar", () => getScheme("zanabazar").romanToNative("ka") + "A" + getScheme("zanabazar").romanToNative("ra")],
   ["soyombo", () => getScheme("soyombo").romanToNative("ka") + "A" + getScheme("soyombo").romanToNative("ra")],
-  ["sanskrit-iso15919", () => "कAक(क"],
   ["mongolian", () => "ᠮᠣᠩᠭᠣᠯ😀😀᠀ᠨ"],
   ["siddham-iast", () => "𑖀A𑖁"],
 ];

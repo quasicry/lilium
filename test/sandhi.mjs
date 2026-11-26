@@ -133,7 +133,7 @@ console.log(`\n结果: ${canonical.length - failed + lib.SANDHI_DEMOS.length - d
   let aFailed = 0;
   console.log("\n=== 確認定稿連寫鎖定（套用後 virama 連寫、重掃歧義下降）===");
   for (const c of ambCases) {
-    const native = lib.transliterateText(c.roman, "sanskrit-hk", true);
+    const native = lib.transliterateText(c.roman, "sanskrit-iast", true);
     if (!native.ok || !native.text) { console.error(`  ✗ ${c.roman}: 轉寫失敗`); aFailed++; continue; }
     const ambs2 = lib.detectRomanToNativeAmbiguities(native.text);
     if (!ambs2.length) { console.error(`  ✗ ${c.roman}: 未偵測到歧義`); aFailed++; continue; }

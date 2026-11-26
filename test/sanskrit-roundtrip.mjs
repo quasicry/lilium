@@ -72,16 +72,11 @@ const VERSES = [
 const CASE_PAIRS = {
   // HK 大小寫：長元音 A/I/U、聲化 R、捲舌 T/D/N、鼻音 G/J、噝音 S/z、
   // anusvāra M、visarga H。（注意 l/L 不是有效 HK token：聲化 ḷ 作 lR）
-  "sanskrit-hk": [["a","A"],["i","I"],["u","U"],["r","R"],["t","T"],["d","D"],["n","N"],["g","G"],["j","J"],["s","S"],["s","z"],["m","M"],["h","H"]],
   // ITRANS 的大寫具語義者：捲舌 T/D/N、長元音 A/I/U、ळ L、anusvāra M、
   // visarga H、-ce 送氣（Ch/Th/Dh/Sh）、鼻音 ~N/ñ。
   // 注意：k/K、g/G、j/J、p/P、b/B 在 ITRANS 中**無區別**（送氣寫 kh/gh/jh/ph/bh，
   // 大寫 K/G/J/P/B 不是有效 token）——故不列入探針，免生假失敗。
-  "sanskrit-itrans": [["t","T"],["d","D"],["n","N"],["l","L"],["m","M"],["h","H"],["a","A"],["i","I"],["u","U"],["ch","Ch"],["th","Th"],["dh","Dh"],["sh","Sh"],["~n","~N"]],
-  "sanskrit-wx": [["k","K"],["g","G"],["c","C"],["j","J"],["t","T"],["w","W"],["x","X"],["d","D"],["n","N"],["p","P"],["b","B"],["s","S"],["s","R"],["l","L"],["i","I"],["u","U"],["a","A"],["e","E"],["o","O"],["q","Q"]],
-  "sanskrit-slp1": [["k","K"],["g","G"],["c","C"],["j","J"],["w","W"],["t","T"],["d","D"],["q","Q"],["n","N"],["p","P"],["b","B"],["l","L"],["s","S"],["s","z"],["f","F"],["x","X"],["i","I"],["u","U"],["a","A"],["e","E"],["o","O"]],
 };
-const CASE_INSENSITIVE_BY_DESIGN = new Set(["sanskrit-iast","sanskrit-iso15919","sanskrit-velthuis","sanskrit-kolkata"]);
 
 /* ---- 已知「表示歧義」（非實作 bug，僅記錄、不計缺陷） ----
  * A 類：C + virāma + ह(0x0939)。梵文字母本身不以此方式書寫「不送氣音+ha」合字
@@ -95,7 +90,6 @@ const CASE_INSENSITIVE_BY_DESIGN = new Set(["sanskrit-iast","sanskrit-iso15919",
  */
 function knownAmbiguous(id, str) {
   if (/[\u0915-\u0939]\u094d\u0939/.test(str)) return true; // A 類
-  if (id === "sanskrit-hk" && /^\u0932[\u0943\u0944]$/.test(str)) return true; // B 類
   return false;
 }
 
@@ -118,7 +112,6 @@ function corpusFor(scheme) {
 
 /* ---- 主測試 ---- */
 const schemes = lib.listSchemes().filter((s) => s.id.startsWith("sanskrit-"));
-const order = ["sanskrit-iast","sanskrit-iso15919","sanskrit-hk","sanskrit-itrans","sanskrit-velthuis","sanskrit-wx","sanskrit-kolkata","sanskrit-slp1"];
 schemes.sort((a, b) => (order.indexOf(a.id) + 1 || 99) - (order.indexOf(b.id) + 1 || 99));
 
 let totalBugs = 0;

@@ -18,13 +18,6 @@ const norm = (s) => s.normalize("NFC");
 /** 方案 id → sanscript 方案名（權威參考映射） */
 export const SS_SCHEME = {
   "sanskrit-iast": "iast",
-  "sanskrit-iso15919": "iso",
-  "sanskrit-hk": "hk",
-  "sanskrit-itrans": "itrans",
-  "sanskrit-velthuis": "velthuis",
-  "sanskrit-wx": "wx",
-  "sanskrit-kolkata": "kolkata_v2",
-  "sanskrit-slp1": "slp1",
 };
 
 const VOWELS = [0x0905,0x0906,0x0907,0x0908,0x0909,0x090a,0x090b,0x090c,0x090d,0x090e,0x090f,0x0910,0x0913,0x0914,0x0960,0x0961];

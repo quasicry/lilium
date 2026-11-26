@@ -4,7 +4,7 @@
 /* 悉曇體（Siddham）轉寫方案測試。
  *
  * 驗證：
- *  - siddham-iast / siddham-hk / siddham-itrans 三方案已註冊（group=siddham）；
+ *  - siddham-iast 已註冊（group=siddham）；
  *  - IAST ⇄ 悉曇體 無損往返（梵咒真言：namo / maṇipadme / buddha / oṃ 等）；
  *  - HK / ITRANS（純 ASCII 鍵盤輸入）⇄ 悉曇體 往返；
  *  - 輔音合字（virama U+115BF）正確生成；
@@ -45,12 +45,10 @@ const test = (name, fn) => {
   catch (e) { failed++; console.error(`  ✗ ${name}\n    ${e.message}`); }
 };
 
-test("悉曇體三方案已註冊（group=siddham）", () => {
+test("悉曇方案已註冊（group=siddham）", () => {
   const ids = listSchemes().filter((s) => s.group === "siddham").map((s) => s.id).sort();
-  assert.deepStrictEqual(ids, ["siddham-hk", "siddham-iast", "siddham-itrans"]);
+  assert.deepStrictEqual(ids, ["siddham-iast"]);
   assert.strictEqual(getScheme("siddham-iast").primary, true);
-  assert.strictEqual(getScheme("siddham-hk").altOf, "siddham-iast");
-  assert.strictEqual(getScheme("siddham-itrans").altOf, "siddham-iast");
 });
 
 test("IAST → 悉曇體 輸出悉曇碼位（U+11580–U+115FF）", () => {
@@ -92,14 +90,6 @@ test("HK（純 ASCII）⇄ 悉曇體 往返", () => {
   const native = iastToSiddham(hkToIastLocal(hk));
   const back = iastToHkRound(native);
   assert.strictEqual(back, hk, `HK 往返不符：回 "${back}"`);
-});
-
-test("ITRANS（鍵盤輸入）⇄ 悉曇體 往返", () => {
-  const itr = "oM maNi padme huM";
-  const scheme = getScheme("siddham-itrans");
-  const native = scheme.romanToNative(itr);
-  const back = scheme.nativeToRoman(native);
-  assert.strictEqual(back, itr, `ITRANS 往返不符：回 "${back}"`);
 });
 
 test("looksLikeNative / looksLikeRoman 方向判定", () => {

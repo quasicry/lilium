@@ -154,7 +154,7 @@ test("brahmic：僧伽羅文 roman→native→roman 無損往返（含巴利閉�
 /* ---------- 天城體 ↔ 巴利 / 梵文（ISO 15919 / IAST / 佛經轉寫糾偏） ----------
  * 這段測試在「巴利/梵文↔天城體」重寫後補齊——此前 indic.ts 零覆蓋，曾使
  * emitConsonant 指針錯誤引發的 OOM 崩潰長期未被發現。 */
-const IDIC = ["sanskrit-iast", "sanskrit-iso15919", "pali-iast", "pali-iso15919", "sanskrit-hk"];
+const IDIC = ["sanskrit-iast", "pali-iast", "pali-iso15919"];
 test("indic：五套方案已註冊（sanskrit/pali × IAST/ISO15919 + HK）", () => {
   for (const id of IDIC) {
     const s = lib.getScheme(id);
@@ -165,7 +165,6 @@ test("indic：五套方案已註冊（sanskrit/pali × IAST/ISO15919 + HK）", (
 test("indic：pali-iast 主方案標記與 altOf 關係", () => {
   assert.equal(lib.getScheme("pali-iast").primary, true);
   assert.equal(lib.getScheme("pali-iso15919").altOf, "pali-iast");
-  assert.equal(lib.getScheme("sanskrit-hk").altOf, "sanskrit-iast");
 });
 
 /* 巴利 → 天城體：閉音節 / niggahita / sandhi 必須正確 */
@@ -205,27 +204,10 @@ test("indic：巴利 niggahita 往返閉環（A-P1：回轉一律 ṃ，巴利 P
 // A3：死輔音（virama）＋組合符／獨立母音——入向切詞不得切斷 virama 歸屬
 test("indic A3：死輔音＋後隨符號/母音往返（virama 不丟、不反序）", () => {
   const cp = (n) => String.fromCodePoint(n);
-  const hex = (s) => [...s].map((c) => c.codePointAt(0).toString(16)).join(" ");
-  // ISO：म् + candrabindu（mm̐）→ म् + ँ（舊版丟 virama 變 मँ）
-  const iso = lib.getScheme("sanskrit-iso15919");
-  const mVirCandra = cp(0x092e) + cp(0x094d) + cp(0x0901);
-  assert.equal(iso.romanToNative(iso.nativeToRoman(mVirCandra)), mVirCandra);
-  // IAST 同型（m + anusvāra 死輔音尾）
+  // IAST（m + anusvāra 死輔音尾）
   const iast = lib.getScheme("sanskrit-iast");
   const mVirAnus = cp(0x092e) + cp(0x094d) + cp(0x0902);
   assert.equal(iast.romanToNative(iast.nativeToRoman(mVirAnus)), mVirAnus);
-  // ISO：र् + ृ（r̥ matra 無基字宿主）→ 出向原樣保留、入向還原
-  const rVirRc = cp(0x0930) + cp(0x094d) + cp(0x0943);
-  assert.equal(iso.romanToNative(iso.nativeToRoman(rVirRc)), rVirRc);
-  // HK：RRR（ṝṛ）→ 順序不反轉（舊版 ॠऋ 實錘）
-  const hk = lib.getScheme("sanskrit-hk");
-  const RR = cp(0x0960) + cp(0x090b);
-  assert.equal(hk.romanToNative("RRR"), RR);
-  assert.equal(hk.nativeToRoman(RR), "RRR");
-  // Velthuis：aaaा（aa + a + ā matra 殘碼）往返
-  const v = lib.getScheme("sanskrit-velthuis");
-  const aaa = cp(0x0906) + cp(0x0905) + cp(0x093e);
-  assert.equal(v.romanToNative(v.nativeToRoman(aaa)), aaa);
 });
 
 /* 梵文 → 天城體：聲化元音 / 送氣 / 捲舌 / visarga / candrabindu */
@@ -256,25 +238,6 @@ test("indic：梵文 ṛ / ḷ 爲聲化元音（IAST 模式 ऋ / ऌ，非 ख
   // 注意：IAST 的 ḷ 在梵文中是聲化元音 ऌ；巴利/德拉維達的 ḷ 才是捲舌邊音 ळ
 });
 
-/* ISO 15919 與 IAST 的差異必須顯現 */
-test("indic：ISO 15919 模式與 IAST 模式輸出差異（ḷ→ळ vs ḷ→ऌ；ṃ→ṁ vs ṃ→ं）", () => {
-  const cpsOf = (t, m) => [...lib.getScheme(m === "iso" ? "sanskrit-iso15919" : "sanskrit-iast").romanToNative(t)]
-    .map((c) => c.codePointAt(0));
-  // IAST 的 ḷ 是聲化元音（ऌ U+90C 一系）；ISO 的 ḷ 是捲舌邊音 ळ（U+0933）
-  assert.ok(cpsOf("ḷ", "iso").includes(0x933), "ISO ḷ 應產生 ळ（捲舌邊音 U+0933）");
-  assert.ok(!cpsOf("ḷ", "iast").includes(0x933), "IAST ḷ 不應是 ळ（應爲聲化元音）");
-  // IAST ṃ → ं（anusvara U+902）；ISO ṃ → ṁ（上點 U+1E43，ISO 用獨立字母）
-  assert.ok(cpsOf("kaṃ", "iast").includes(0x902), "IAST kaṃ → ं anusvara");
-  assert.ok(cpsOf("kaṃ", "iso").includes(0x1E43), "ISO kaṃ → ṁ（上點字母）");
-});
-
-/* Harvard-Kyoto（純 ASCII 備選）無損往返 */
-test("indic：HK 方案 roman→native→roman 無損（T/Th/D/Dh 捲舌、ṣ/ś 咝音）", () => {
-  const s = lib.getScheme("sanskrit-hk");
-  for (const w of ["rAma", "kRSNa", "zAnti", "saMskRta", "agni", "daNDaH"]) {
-    assert.equal(s.nativeToRoman(s.romanToNative(w)), w, `HK ${w} 往返失敗`);
-  }
-});
 test("brahmic：字體內嵌 BUNDLED_NOTO_FONT_FILES 含僧伽羅字體且爲合法 TTF", () => {
   const ids = new Set(lib.BUNDLED_NOTO_FONT_FILES.map((f) => f.id));
   for (const id of ["noto-sans-sinhala"]) {
@@ -1314,7 +1277,7 @@ test(`IAST 面板通路：純數字/句讀管線詞全轉（passGate 放行）`,
  * 旗標制：listPickerSchemes 不含、listSchemes 全集保留（引擎在）、主方案不藏。
  */
 test(`隱藏：下拉不含梵/巴利/僧伽羅 ISO 15919＋悉曇 HK，主方案保留`, () => {
-  const hiddenIds = ["sanskrit-iso15919", "pali-iso15919", "sinhala-iso15919", "siddham-hk"];
+  const hiddenIds = ["pali-iso15919", "sinhala-iso15919"];
   const picker = lib.listPickerSchemes().map((s) => s.id);
   for (const id of hiddenIds) assert.ok(!picker.includes(id), `${id} 未隱藏`);
   const all = lib.listSchemes().map((s) => s.id);
@@ -2199,32 +2162,6 @@ test("蘭札字體映射：天城碼位文本棧尾含 Nithya Ranjana DU 且排�
   const src = fs.readFileSync(path.join(ROOT, "src/bundled-fonts.ts"), "utf8");
   assert.ok(!src.includes("0x11d40"), "舊 11D40 映射已移除");
   assert.ok(src.includes('[0x0900, 0x097f, "Nithya Ranjana DU"]'), "映射對準天城碼位");
-});
-
-/* ---------- ITRANS 5.30 官方同碼位多拼鍵補收（B1 w 案同型） ----------
- * 官方表：च＝ch c、छ＝chh Ch C、श＝sh S、ष＝Sh shh、क्ष＝ksh kSh。
- * 舊表漏收 c/C/S/chh/shh/ksh 致按官方文檔輸入透傳（ca→cअ 實錘）。
- * 入向補收；出向 REV 維持 ch/Ch/sh/Sh/kSh 統一形（與 B1 出向統一 v 同理）。
- */
-test("ITRANS 官方多拼鍵：c C S chh shh ksh 不再透傳且出向統一形不變", () => {
-  const s = lib.listSchemes().find((x) => x.id === "sanskrit-itrans");
-  const cases = [
-    ["ca", "च"], ["ca.ha", "चअ"], ["Ca", "छ"], ["chha", "छ"],
-    ["Sa", "श"], ["shha", "ष"], ["ksha", "क्ष"],
-  ];
-  for (const [w, exp] of cases) {
-    const r = lib.transliterateLongText(w, s, true);
-    assert.ok(r.text.startsWith(exp), w + " -> " + JSON.stringify(r.text) + " 應含 " + exp);
-  }
-  // 出向統一形不變
-  assert.equal(s.nativeToRoman("च", {}), "cha", "出向 च 統一 cha");
-  assert.equal(s.nativeToRoman("छ", {}), "Cha", "出向 छ 統一 Cha");
-  assert.equal(s.nativeToRoman("श", {}), "sha", "出向 श 統一 sha");
-  assert.equal(s.nativeToRoman("ष", {}), "Sha", "出向 ष 統一 Sha");
-  // 既有鍵零變化
-  assert.equal(lib.transliterateLongText("ch", s, true).text, "च", "ch 零變化");
-  assert.equal(lib.transliterateLongText("Sh", s, true).text, "ष", "Sh 零變化");
-  assert.equal(lib.transliterateLongText("kSh", s, true).text, "क्ष", "kSh 零變化");
 });
 
 /* ---------- 僧伽羅語專有字母（n2737 SLS 1134 §3.1/3.2 全收） ----------

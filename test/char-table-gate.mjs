@@ -15,7 +15,6 @@
  *      —— 防止 clean_dead_css.py 清掉的 39 個死選擇器被重新加回。
  *
  *   C. 逐方案 roman 列正確：
- *      - *-hk 方案（sanskrit-hk / siddham-hk）的 roman 不得含 IAST 變音符；
  *      - siddham-* 方案的 native 必須全為悉曇碼位（U+11580–U+115FF）。
  *
  *   D. 檢字表無重複列：每個方案的 charTable 不得有完全相同的 (native, roman) 重複列。
@@ -153,7 +152,6 @@ check("至少檢查到一個帶檢字表的方案", checked > 0, `實際 ${check
     check(`${id} ${label} 實列覆蓋`, miss === 0, `${miss} 碼位缺列`);
   };
   digitRows("sanskrit-iast", 0x0966, 0x096f, "天城數字 ०-९");
-  digitRows("sanskrit-itrans", 0x0966, 0x096f, "天城數字 ०-९");
   digitRows("pali-iast", 0x0966, 0x096f, "天城數字 ०-९");
   digitRows("mongolian", 0x1810, 0x1819, "蒙文數字 ᠐-᠙");
   digitRows("mongolian", 0x1800, 0x180a, "蒙文標點");

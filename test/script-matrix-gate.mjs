@@ -49,7 +49,7 @@ const lib = await import(path.join(TMP, "lib.mjs"));
 
 const NATIVE = {
   "brahmi.txt": "brahmi-iast", "tamilbrahmi.txt": "brahmi-iast",
-  "siddham.txt": "siddham-hk", "marchen.txt": "marchen",
+  "siddham.txt": "siddham-iast", "marchen.txt": "marchen",
   "soyombo.txt": "soyombo", "zanabazarsquare.txt": "zanabazar",
   "phagspa.txt": "phagspa-poppe", "tibetan.txt": "tibetan-wylie",
   "tibetanloc.txt": "tibetan-wylie", "sinhala.txt": "sinhala-iso15919",
