@@ -67,7 +67,12 @@ export function rewriteResourceRefs(
       .replace(/^\//, '');
     const resolved = resolver(cleaned);
     if (!resolved) return m;
-    return `${attr}="${toAppUrl(resolved.vaultPath)}"`;
+    // 原位發音根治：音頻連結保留原始資源路徑在 data-li-snd——宿主側點擊分支
+    // 直呼與標題 ▶ 同源的管線（resolveAsset→readBinary→spx 解碼→blob 播放），
+    // 不再依賴 app:// href 正則還原 vault 路徑（Obsidian 1.14+ requestUrl 對
+    // app:// 拋錯、vault 佈局正則時好時壞——歷史「點了沒反應」根因）。
+    const isAudio = /\.(mp3|wav|ogg|m4a|aac|flac|spx)$/i.test(cleaned);
+    return `${attr}="${toAppUrl(resolved.vaultPath)}"${isAudio ? ` data-li-snd="${cleaned}"` : ''}`;
   });
 
   // inline style url(...)

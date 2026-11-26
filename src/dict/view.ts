@@ -1610,9 +1610,12 @@ export class LiDictView extends ItemView {
             e.preventDefault();
             const href = a.getAttribute('href') || '';
             if (/^https?:/i.test(href)) window.open(href);
-            // 發音連結（sound:// 改寫後的 app:// 音頻；P2-3 擴 data: URL 內聯音頻）——
-            // 點擊在連結原位插入 <audio controls> 播放器（可暫停/重播，非一次性 Audio()）。
-            else if (/^data:audio\//i.test(href) || (/^app:\/\//i.test(href) && /\.(mp3|wav|ogg|m4a|aac|flac|spx)$/i.test(href.split('?')[0]))) {
+            // 發音連結——根治：改寫層（rewriteResourceRefs）已在音頻連結上標
+            // data-li-snd="原始資源路徑"，宿主側直呼與標題 ▶ 同源管線
+            //（resolveAsset→readBinary→spx 解碼→blob→audio-session 單活躍播放面）。
+            // 廢除 app:// href 正則還原鏈（requestUrl 對 app:// 拋錯＋vault 佈局
+            // 正則時好時壞＝歷史「點了沒反應」根因）；data:audio 分支保留。
+            else if (a.getAttribute('data-li-snd') || /^data:audio\//i.test(href) || (/^(app:\/\/|sound:\/\/)/i.test(href) && /\.(mp3|wav|ogg|m4a|aac|flac|spx)$/i.test(href.split('?')[0]))) {
               e.stopImmediatePropagation();
               try {
                 // A3：Blob URL 洩漏防範——同連結重複點擊時，先 revoke 前次建立的 URL
@@ -1632,14 +1635,24 @@ export class LiDictView extends ItemView {
                   a.insertAdjacentElement('afterend', audio);
                   return;
                 }
+                // 根治主路徑：data-li-snd 攜原始資源路徑——宿主側管線直取（與標題 ▶ 同源），
+                // 免去 app:// requestUrl 拋錯＋vault 佈局正則還原兩層不可靠中間步。
+                const sndPath = a.getAttribute('data-li-snd');
                 let blob: Blob;
-                try {
-                  const res = await requestUrl(href); // B7：app:// 宿主側抓取改 obsidian requestUrl（srcdoc iframe 內 fetch 不可靠）
-                  if (res.status >= 400) throw new Error('HTTP ' + res.status);
-                  blob = new Blob([res.arrayBuffer], { type: res.headers['content-type'] || '' });
-                } catch (eReq) {
-                  // Fallback：Obsidian 1.14+ requestUrl 對 app:// 立即拋錯——解 href 的 vault 相對路徑走 adapter.readBinary。
-                  // href 形態 app://<id>/home/…/<vault>/<path>?…——取 vault 根之後的相對路徑（decodeURIComponent 還原中文）。
+                if (sndPath) {
+                  let asset = this.plugin.service.resolveAsset(decodeURIComponent(sndPath));
+                  if (!asset) {
+                    // 壓平命名兜底：資產根按 basename 探實檔（同標題 ▶ 體例）
+                    const p = await this.probeAssetFilePublic(decodeURIComponent(sndPath).split(/[\\/]/).pop() || '');
+                    if (p) asset = { mddKey: sndPath, vaultPath: p, kind: 'audio', size: 0 };
+                  }
+                  if (!asset) throw new Error('asset not found: ' + sndPath);
+                  const buf = await this.plugin.app.vault.adapter.readBinary(asset.vaultPath);
+                  const vp = asset.vaultPath;
+                  const ext = vp.split('.').pop()?.toLowerCase() || 'ogg';
+                  blob = new Blob([buf], { type: ext === 'wav' ? 'audio/wav' : ext === 'mp3' ? 'audio/mpeg' : ext === 'm4a' ? 'audio/mp4' : ext === 'aac' ? 'audio/aac' : ext === 'flac' ? 'audio/flac' : 'audio/ogg' });
+                } else {
+                  // 遺留路徑：無 data-li-snd 的舊渲染結果（app:// href）——正則還原兜底（行為同前）
                   let rel = '';
                   try {
                     const m = href.match(/\/Vaults\/[^/]+\/(.+?)(?:\?|$)/) || href.match(/app:\/\/[^/]+\/(?:[^/]+\/)*?lilium-test\/(.+?)(?:\?|$)/);
@@ -1657,12 +1670,14 @@ export class LiDictView extends ItemView {
                       }
                     } catch { /* 兜底失敗走原拋錯 */ }
                   }
-                  if (!rel) throw eReq;
+                  if (!rel) throw new Error('unresolvable audio href: ' + href);
                   const buf = await this.plugin.app.vault.adapter.readBinary(rel);
                   blob = new Blob([buf], { type: rel.endsWith('.wav') ? 'audio/wav' : rel.endsWith('.mp3') ? 'audio/mpeg' : 'audio/ogg' });
                 }
                 // .spx（Ogg Speex）瀏覽器不解碼——vendor libspeex wasm 轉 WAV 再播
-                if (/.spx$/i.test(href.split('?')[0])) {
+                // .spx 判斷用實檔路徑（data-li-snd 主路徑＝asset.vaultPath 尾段；遺留＝href）
+                const spxSrc = sndPath ? decodeURIComponent(sndPath) : href.split('?')[0];
+                if (/\.spx$/i.test(spxSrc)) {
                   const bytes = new Uint8Array(await blob.arrayBuffer());
                   
                   // 統一內嵌路線：wasm 內嵌進 main.js（base64）——

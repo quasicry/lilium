@@ -347,6 +347,23 @@ console.log("[④b 摩尼文方案 — L2/11-123R 記法往返]");
   console.log(`  ③d UWB 引文錨: ${uOk}/${sample.length} 映射成功（語料全量 ${rows.length} 行）`);
 }
 
+// ─── 【B3b】原位發音改寫（rewriteResourceRefs 音頻連結標 data-li-snd）───
+{
+  const { rewriteResourceRefs } = lib;
+  const toAppUrl = (p) => "app://" + p;
+  const resolver = (p) => (p.startsWith("audio/") ? { vaultPath: p } : null);
+  const html1 = '<a href="sound://audio/pron.spx">▸</a>';
+  const out1 = rewriteResourceRefs(html1, resolver, toAppUrl);
+  ok(/app:/.test(out1), "①a 音頻 href 改寫 app://", out1);
+  ok(/data-li-snd="audio\/pron\.spx"/.test(out1), "①b data-li-snd 保留原始路徑", out1);
+  const out2 = rewriteResourceRefs('<img src="img/tke.png">', (p) => ({ vaultPath: "img/" + p }), toAppUrl);
+  ok(/app:/.test(out2) && !/data-li-snd/.test(out2), "② 圖片改寫不帶 data-li-snd", out2);
+  const out3 = rewriteResourceRefs(html1, () => null, toAppUrl);
+  ok(out3 === html1, "③ 未命中原樣回坫", out3);
+  const out4 = rewriteResourceRefs('<a href="sound://audio/A.MP3">x</a>', resolver, toAppUrl);
+  ok(/data-li-snd/.test(out4), "④ 大寫副檔名判為音頻", out4);
+}
+
 // ─── 【B3】音頻生命週期紀律（audio-session 單活躍播放面＋stopAll 回收）───
 {
   const { playAudioSession, registerAudioPlayer, stopAll, hasActiveAudio } = lib;
