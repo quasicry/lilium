@@ -25,6 +25,7 @@ export * from "../src/subjoin-line-height";
 export * from "../src/dict/store";
 export { LANGS, DICT } from "../src/i18n";
 export { dictScopeId, isolateCSS } from "../src/dict/css-isolate";
+export { playAudioSession, registerAudioPlayer, stopAll, hasActiveAudio } from "../src/dict/audio-session";
 export * from "../src/font-metrics";
 export * from "../src/font-name";
 export * from "../src/sandhi";

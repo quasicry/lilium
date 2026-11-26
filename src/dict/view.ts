@@ -12,6 +12,7 @@
 import { ASSET_FOLDER } from './loader';
 import { docCreateEl } from '../dom-win';
 import { decodeSpeexToWav } from './speex-decoder';
+import { playAudioSession, registerAudioPlayer, stopAll } from './audio-session';
 import { paliToSanskrit, looksLikePali, restoreRanjanaCodes, normalizeBuddhistChinese } from './buddhist';
 import { rewriteResourceRefs } from './mdd-assets';
 import { annotateVariants } from './variant-annotate';
@@ -167,6 +168,9 @@ export class LiDictView extends ItemView {
     this.flatFillCancelled = true;
     // B11：面板關閉即清轉寫面板的模組級會話狀態（大文本不跨生命週期駐留）。
     resetTranslitSessionState();
+    // B3 音頻生命週期：關閉視圖停播＋回收全部 blob URL（原位播放器 DOM 隨
+    // iframe doc 銷毀，blob URL 則須顯式 revoke——WeakMap 時代不可枚舉永不回收）。
+    stopAll();
   }
 
   /** 卡頓修復：legacy flat 路徑（collapsible=false 或單命中）分幀 fill 的取消旗標。 */
@@ -759,6 +763,9 @@ export class LiDictView extends ItemView {
   private doLookup(word: string, opts?: { tocDictId?: string }): void {
     if (!word || !word.trim()) return;
     word = word.trim();
+    // B3 音頻生命週期：切詞即停——舊詞的發音（▶鈕一次性 Audio／iframe 原位播放器）
+    // 不得跨查詢繼續響（疊音），其 blob URL 一併回收。
+    stopAll();
     // 從歷史/書籤等非查詢面板跳轉時，panel/subTab 切成 lookup 但
     // renderShell 不跑 → header 搜尋列還是 history 變體（搜尋框「隱藏」）。
     // 面板來的 doLookup 不像 lookupWord 先 renderShell，此處補齊：只有真的
@@ -1106,11 +1113,14 @@ export class LiDictView extends ItemView {
                   mime = ext === 'wav' ? 'audio/wav' : ext === 'mp3' ? 'audio/mpeg' : ext === 'm4a' ? 'audio/mp4' : ext === 'aac' ? 'audio/aac' : ext === 'flac' ? 'audio/flac' : 'audio/ogg';
                 }
                 const url = URL.createObjectURL(new Blob([bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength) as ArrayBuffer], { type: mime }));
-                const audio = new Audio(url);
-                audio.onended = () => { URL.revokeObjectURL(url); restore(); };
-                audio.onerror = () => { URL.revokeObjectURL(url); restore(); liNotice(this.plugin.T('dict.audio.missing', { word: hit.keyText })); };
-                await audio.play();
-                // play() resolve 後若 audio 已 ended（極短音頻競態），onended 已復原；未 ended 則保持 ▮▮。
+                // B3 音頻生命週期：改走 audio-session——單活躍播放面（連點不同詞不再疊音）、
+                // 切詞/關視圖 stopAll 統一停播＋revoke；結束/出錯/被打斷都復原 ▶。
+                void playAudioSession(url, restore)
+                  .catch((err) => {
+                    try { URL.revokeObjectURL(url); } catch { /* 已 revoke */ }
+                    restore();
+                    liNotice(this.plugin.T('dict.audio.missing', { word: hit.keyText }) + ' [' + (err instanceof Error ? err.message : String(err)) + ']');
+                  });
               } catch (err) {
                 liNotice(this.plugin.T('dict.audio.missing', { word: hit.keyText }) + ' [' + (err instanceof Error ? err.message : String(err)) + ']');
                 restore();
@@ -1671,6 +1681,9 @@ export class LiDictView extends ItemView {
                 audioEl.className = 'li-inline-audio';
                 audioEl.classList.add('li-audio-clip'); // iframe doc 元素無 Obsidian addClass 原型擴充，改原生 classList
                 a.insertAdjacentElement('afterend', audioEl);
+                // B3 音頻生命週期：登記進 audio-session——單活躍紀律（新播放器開啟前
+                // 停掉 ▶鈕的一次性播放），視圖關閉/切詞時 stopAll 統一 pause＋revoke。
+                registerAudioPlayer(audioEl, objUrl);
                 // V-F12：play() 可能被瀏覽器拒絕（自動播放政策、資源載入失敗等），
                 // fire-and-forget 下拒絕會成 unhandled rejection；發不出聲不該打斷閱讀，靜默吞掉即可。
                 void audioEl.play().catch(() => {});

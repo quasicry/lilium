@@ -67,6 +67,22 @@ const lib = await (async () => {
 })();
 
 // ---- 透傳防杜工具 ----
+// B3 音頻生命週期測試面：Node 無 Audio/URL.createObjectURL——stub 最小媒體 API
+// （記錄建量，供 playAudioSession/stopAll 斷言 revoke/pause 紀律）。
+const audioStubStats = { created: 0, paused: 0 };
+globalThis.Audio = class {
+  constructor() { audioStubStats.created++; this.paused = false; }
+  pause() { this.paused = true; audioStubStats.paused++; }
+  play() { return Promise.resolve(); }
+};
+let blobUrlSeq = 0;
+const revokedUrls = new Set();
+const liveUrls = new Set();
+if (typeof globalThis.URL.createObjectURL !== "function" || true) {
+  globalThis.URL.createObjectURL = () => `blob:stub-${++blobUrlSeq}`;
+  globalThis.URL.revokeObjectURL = (u) => { revokedUrls.add(u); liveUrls.delete(u); };
+}
+const trackBlob = () => { const u = globalThis.URL.createObjectURL(new Blob()); liveUrls.add(u); return u; };
 function hasLatin(s) { return /[A-Za-z]/.test(s); }
 function hasCodepoints(s, ranges) {
   return [...s].some((ch) => {
@@ -329,6 +345,43 @@ console.log("[④b 摩尼文方案 — L2/11-123R 記法往返]");
   fail += sample.length - uOk;
   pass += uOk;
   console.log(`  ③d UWB 引文錨: ${uOk}/${sample.length} 映射成功（語料全量 ${rows.length} 行）`);
+}
+
+// ─── 【B3】音頻生命週期紀律（audio-session 單活躍播放面＋stopAll 回收）───
+{
+  const { playAudioSession, registerAudioPlayer, stopAll, hasActiveAudio } = lib;
+  // ① playAudioSession：登記為活躍
+  const url1 = trackBlob();
+  void playAudioSession(url1);
+  ok(hasActiveAudio(), "B3 ① playAudioSession 後有活躍播放");
+  // ② 再播一個：單活躍——舊播放面被頂掉（pause）且其 URL 回收
+  const url2 = trackBlob();
+  const p2 = playAudioSession(url2);
+  ok(!revokedUrls.has(url2) && liveUrls.has(url2), "B3 ② 新播放 URL 存活");
+  ok(revokedUrls.has(url1), "B3 ② 舊播放 URL 已 revoke（單活躍頂掉）");
+  await p2;
+  // ③ stopAll：停播＋回收當前 URL＋清活躍
+  stopAll();
+  ok(!hasActiveAudio(), "B3 ③ stopAll 後無活躍播放");
+  ok(revokedUrls.has(url2), "B3 ③ stopAll 回收當前 blob URL");
+  ok(audioStubStats.paused >= 2, "B3 ③ pause 被調用（stopAll 停聲）");
+  // ④ iframe 原位播放器登記：stopAll 停聲＋revoke blob
+  const fakeEl = new Audio();
+  const url3 = trackBlob();
+  registerAudioPlayer(fakeEl, url3);
+  ok(hasActiveAudio(), "B3 ④ registerAudioPlayer 後有活躍");
+  stopAll();
+  ok(fakeEl.paused === true, "B3 ④ 原位播放器被 stopAll 暫停");
+  ok(revokedUrls.has(url3), "B3 ④ 原位播放器 blob URL 回收");
+  // ⑤ onEnded 復原回調：結束與被打斷都觸發
+  let restored = 0;
+  const url4 = trackBlob();
+  const p4 = playAudioSession(url4, () => restored++);
+  stopAll();
+  await p4;
+  ok(restored === 1, "B3 ⑤ stopAll 打斷時復原回調觸發一次");
+  stopAll(); // 幂等
+  ok(!hasActiveAudio() && restored === 1, "B3 ⑤ stopAll 幂等（重複調用無副作用）");
 }
 
 console.log(`\n結果: ${pass} 通过, ${fail} 失败`);
