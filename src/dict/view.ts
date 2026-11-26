@@ -1089,12 +1089,6 @@ export class LiDictView extends ItemView {
             .then(() => liNotice(this.plugin.T('dict.copyDone')))
             .catch(() => liNotice(this.plugin.T('dict.copyFail')));
         });
-        const mdBtn = actions.createEl('button', { cls: 'li-mini-btn', text: '↓ md' });
-        mdBtn.addEventListener('click', () => {
-          this.exportHitMarkdown(hit)
-            .then(() => liNotice(this.plugin.T('dict.mdSaved')))
-            .catch(() => liNotice(this.plugin.T('dict.mdSaveFail')));
-        });
         (frame).dataset.hitIndex = String(hitIndex);
         blockIndex++;
       } else {
@@ -1132,12 +1126,6 @@ export class LiDictView extends ItemView {
             .then((styled) => api.writeText(styled))
             .then(() => liNotice(this.plugin.T('dict.copyDone')))
             .catch(() => liNotice(this.plugin.T('dict.copyFail')));
-        });
-        const mdBtn = actions.createEl('button', { cls: 'li-mini-btn', text: '↓ md' });
-        mdBtn.addEventListener('click', () => {
-          this.exportHitMarkdown(hit)
-            .then(() => liNotice(this.plugin.T('dict.mdSaved')))
-            .catch(() => liNotice(this.plugin.T('dict.mdSaveFail')));
         });
         (frame).dataset.hitIndex = String(hitIndex);
       }
