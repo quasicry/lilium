@@ -1063,71 +1063,6 @@ export class LiDictView extends ItemView {
             });
           }
         }
-        // 發音宿主按鈕（移動端修復）：詞條 HTML 含 sound:// 音頻鏈接時，標題列放純三角形 ▶
-        // 無背景框按鈕，點擊宿主側取音頻直接播（iframe 內事件在移動端 WebView 不可靠——
-        // B41a-f 前科同配方：宿主 DOM 平台無關；宿主 Audio.play 不經 iframe 事件鏈）。
-        // 多發音檔：每個 sound:// 鏈接各一顆 ▶（按檔名去重），失敗/缺檔任何路徑皆復原 ▶。
-        {
-          const seenSnd = new Set<string>();
-          const sndFiles: string[] = [];
-          const sndRe = /<a\b[^>]*href="sound:\/\/([^"]+\.(?:mp3|wav|ogg|m4a|aac|flac|spx))"[^>]*>/gi;
-          let sm: RegExpExecArray | null;
-          while ((sm = sndRe.exec(hit.html))) {
-            try {
-              const f = decodeURIComponent(sm[1]);
-              if (!seenSnd.has(f)) { seenSnd.add(f); sndFiles.push(f); }
-            } catch { /* 保留原字面 */ }
-          }
-          for (const sndFile of sndFiles) {
-            const playBtn = headRow.createEl('button', {
-              cls: 'li-mdx-play-btn',
-              text: '▶',
-              attr: { 'aria-label': `play audio ${sndFile}`, title: sndFile },
-            });
-            // 復原收口：任何失敗路徑（缺檔/讀取錯/解碼錯/play 拒絕）統一走 restore
-            let playing = false;
-            const restore = () => { playing = false; playBtn.setText('▶'); };
-            // eslint-disable-next-line @typescript-eslint/no-misused-promises -- fire-and-forget 事件回調（UI 事件無人 await 返回值），行為保持——審計批次三。
-            playBtn.addEventListener('click', async (e) => {
-              e.stopPropagation(); // 不觸發 headRow 折疊
-              if (playing) return;
-              playing = true;
-              playBtn.setText('▮▮');
-              try {
-                let asset = this.plugin.service.resolveAsset(sndFile);
-                if (!asset) {
-                  // 壓平命名兜底：資產根按 basename 探實檔
-                  const p = await this.probeAssetFilePublic(sndFile.split(/[\\/]/).pop() || '');
-                  if (p) asset = { mddKey: sndFile, vaultPath: p, kind: 'audio', size: 0 };
-                }
-                if (!asset) { liNotice(this.plugin.T('dict.audio.missing', { word: hit.keyText })); restore(); return; }
-                const buf = await this.plugin.app.vault.adapter.readBinary(asset.vaultPath);
-                let bytes: Uint8Array = new Uint8Array(buf);
-                let mime = 'audio/ogg';
-                if (/\.spx$/i.test(asset.vaultPath)) {
-                  const { wav } = await decodeSpeexToWav(bytes);
-                  bytes = new Uint8Array(wav);
-                  mime = 'audio/wav';
-                } else {
-                  const ext = (asset.vaultPath.split('.').pop() || 'ogg').toLowerCase();
-                  mime = ext === 'wav' ? 'audio/wav' : ext === 'mp3' ? 'audio/mpeg' : ext === 'm4a' ? 'audio/mp4' : ext === 'aac' ? 'audio/aac' : ext === 'flac' ? 'audio/flac' : 'audio/ogg';
-                }
-                const url = URL.createObjectURL(new Blob([bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength) as ArrayBuffer], { type: mime }));
-                // B3 音頻生命週期：改走 audio-session——單活躍播放面（連點不同詞不再疊音）、
-                // 切詞/關視圖 stopAll 統一停播＋revoke；結束/出錯/被打斷都復原 ▶。
-                void playAudioSession(url, restore)
-                  .catch((err) => {
-                    try { URL.revokeObjectURL(url); } catch { /* 已 revoke */ }
-                    restore();
-                    liNotice(this.plugin.T('dict.audio.missing', { word: hit.keyText }) + ' [' + (err instanceof Error ? err.message : String(err)) + ']');
-                  });
-              } catch (err) {
-                liNotice(this.plugin.T('dict.audio.missing', { word: hit.keyText }) + ' [' + (err instanceof Error ? err.message : String(err)) + ']');
-                restore();
-              }
-            });
-          }
-        }
         const actions = card.createDiv({ cls: 'li-actions' });
         const copyBtn = actions.createEl('button', { cls: 'li-mini-btn', text: this.plugin.T('dict.copy') });
         copyBtn.addEventListener('click', () => {
@@ -1138,6 +1073,51 @@ export class LiDictView extends ItemView {
             .then(() => liNotice(this.plugin.T('dict.copyDone')))
             .catch(() => liNotice(this.plugin.T('dict.copyFail')));
         });
+        // 原位發音併入後的守衛：詞條 HTML 含 sound:// 引用、但不是可點連結形態
+        //（純文字引用/變體寫法——rewrite 管線只對 <a href="sound://…"> 標 data-li-snd，
+        // 此情境正文無任何發音入口）——行動列放一顆 ▶ 兜底（複製右側），點擊走與
+        // 正文連結同源的宿主側管線；正常詞典（連結形態）不出現此鈕。
+        {
+          const htmlHasSnd = /sound:\/[^"'\s>]+\.(?:mp3|wav|ogg|m4a|aac|flac|spx)/i.test(hit.html);
+          const sndIsLink = /<a\b[^>]*href=["']sound:\/\//i.test(hit.html);
+          if (htmlHasSnd && !sndIsLink) {
+            const fbBtn = actions.createEl('button', { cls: 'li-mini-btn', text: '\u25B6' });
+            fbBtn.setAttribute('aria-label', 'play audio');
+            // eslint-disable-next-line @typescript-eslint/no-misused-promises -- fire-and-forget 事件回調（UI 事件無人 await 返回值），行為保持——審計批次三。
+            fbBtn.addEventListener('click', async () => {
+              if (fbBtn.disabled) return;
+              fbBtn.disabled = true;
+              try {
+                const m = /href=["']sound:\/\/([^"']+\.(?:mp3|wav|ogg|m4a|aac|flac|spx))["']/i.exec(hit.html);
+                if (!m) return;
+                const sndFile = decodeURIComponent(m[1]);
+                let asset = this.plugin.service.resolveAsset(sndFile);
+                if (!asset) {
+                  const p = await this.probeAssetFilePublic(sndFile.split(/[\\/]/).pop() || '');
+                  if (p) asset = { mddKey: sndFile, vaultPath: p, kind: 'audio', size: 0 };
+                }
+                if (!asset) { liNotice(this.plugin.T('dict.audio.missing', { word: hit.keyText })); return; }
+                const buf = await this.plugin.app.vault.adapter.readBinary(asset.vaultPath);
+                let bytes = new Uint8Array(buf);
+                let mime = 'audio/ogg';
+                if (/\.spx$/i.test(asset.vaultPath)) {
+                  const { wav } = await decodeSpeexToWav(bytes);
+                  bytes = new Uint8Array(wav);
+                  mime = 'audio/wav';
+                } else {
+                  const ext = (asset.vaultPath.split('.').pop() || 'ogg').toLowerCase();
+                  mime = ext === 'wav' ? 'audio/wav' : ext === 'mp3' ? 'audio/mpeg' : ext === 'm4a' ? 'audio/mp4' : ext === 'aac' ? 'audio/aac' : ext === 'flac' ? 'audio/flac' : 'audio/ogg';
+                }
+                const url = URL.createObjectURL(new Blob([bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength)], { type: mime }));
+                const restore = () => { fbBtn.disabled = false; };
+                void playAudioSession(url, restore).catch(() => { try { URL.revokeObjectURL(url); } catch { /* 已 revoke */ } restore(); });
+              } catch {
+                liNotice(this.plugin.T('dict.audio.missing', { word: hit.keyText }));
+                fbBtn.disabled = false;
+              }
+            });
+          }
+        }
         (frame).dataset.hitIndex = String(hitIndex);
         blockIndex++;
       } else {

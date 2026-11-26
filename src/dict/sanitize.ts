@@ -25,6 +25,8 @@ const ALLOWED_ATTRS = new Set([
   'class', 'id', 'style', 'dir', 'lang', 'align', 'valign', 'border', 'cellpadding',
   'cellspacing', 'bgcolor', 'color', 'face', 'size', 'start', 'type', 'target',
   'coords', 'shape', 'span', 'loading', 'decoding',
+  // 原位發音根治：音頻連結攜原始資源路徑（宿主側點擊直呼管線，免 app:// 正則還原）
+  'data-li-snd',
 ]);
 
 const URL_ATTRS = new Set(['href', 'src', 'srcset', 'background']);

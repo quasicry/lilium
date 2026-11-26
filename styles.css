@@ -2218,18 +2218,3 @@ body.li-editor-vertical-active .li-native-page .MJX-TEX {
   padding-bottom: var(--keyboard-height, 0px);
 }
 
-/* 發音宿主按鈕：純三角形，無背景框（移動端詞條標題列直發音） */
-.li-root .li-mdx-play-btn {
-  background: transparent;
-  border: none;
-  box-shadow: none;
-  padding: 0 2px;
-  margin-left: 4px;
-  color: var(--text-muted);
-  font-size: 0.85em;
-  line-height: 1;
-  cursor: pointer;
-  min-width: unset;
-  min-height: unset;
-}
-.li-root .li-mdx-play-btn:hover { background: transparent; color: var(--text-normal); }
