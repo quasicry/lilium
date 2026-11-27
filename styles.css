@@ -948,6 +948,18 @@ body.li-editor-vertical-active .li-native-page .MJX-TEX {
   }
 }
 
+/* 子分頁切換過渡（查詢/歷史/書籤/管理）：renderShell 全量重建後，li-body 掛
+ * li-panel-enter 觸發進場動畫——淡入＋小幅位移，方向由 --li-panel-x 承載
+ * （switchPanel 按子分頁順序寫 ±16px，跨頂層頁籤＝0＝純淡入）。
+ * 時長吃 --li-dur-*：prefers-reduced-motion 壓 0.01ms 時自動歸零（同翻頁動效體例）。 */
+@keyframes li-panel-in {
+  from { opacity: 0; transform: translate3d(var(--li-panel-x, 0px), 0, 0); }
+  to { opacity: 1; transform: none; }
+}
+.li-root .li-body.li-panel-enter {
+  animation: li-panel-in var(--li-dur-2, 200ms) ease-out both;
+}
+
 /* ---------------------------------------------------------------- 搜尋 */
 /* 查詢頁搜尋按鈕（與管理頁全文搜尋按鈕同款 mod-cta li-ft-btn）同行排布 */
 .li-root .li-search-row { position: relative; display: flex; align-items: center; gap: 6px; padding: 4px 0 6px; }

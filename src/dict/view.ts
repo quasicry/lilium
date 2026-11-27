@@ -349,6 +349,13 @@ export class LiDictView extends ItemView {
     }
 
     const body = root.createDiv({ cls: 'li-body' });
+    // 子分頁切換過渡：進場動畫（淡入＋方向位移）。switchPanel 已按順序寫 panelX；
+    // 初次渲染／同頁重建（doLookup 等）panelX=0＝純淡入，體感與無方向一致。
+    // 動畫類掛上即生效（元素新建＝動畫每次重建都會跑一次），不需手動移除。
+    if (this.panelX !== 0) {
+      body.addClass('li-panel-enter');
+      body.setCssProps({ '--li-panel-x': `${this.panelX}px` });
+    }
     // S2 樣板：面板渲染改走 panels.ts 的 build(host, ctx)；
     // S2 續篇：bookmarks/history 亦已抽取；corpus/collation 因狀態耦合深暫留 view.ts。
     // W9-F：辭典 為分組父頁籤，其下掛二級子分頁；leaf 由 activeTop() 推導。
@@ -435,7 +442,16 @@ export class LiDictView extends ItemView {
     this.sortHeaderSlots(h);
   }
 
+  /** 子分頁過渡動畫的水平位移方向（--li-panel-x）：按子分頁順序前進＝-16px、後退＝16px、跨頂層＝0。 */
+  private panelX = 0;
+
   private switchPanel(panel: Panel): void {
+    // 方向感：子分頁順序 lookup→history→bookmarks→manage，前進左滑、後退右滑；
+    // 跨頂層（dict↔translit）不帶方向，純淡入。
+    const ORDER: Panel[] = ['lookup', 'history', 'bookmarks', 'manage'];
+    const oi = ORDER.indexOf(this.panel);
+    const ni = ORDER.indexOf(panel);
+    this.panelX = oi >= 0 && ni >= 0 ? (ni > oi ? -16 : ni < oi ? 16 : 0) : 0;
     if (this.isDictChild(panel)) this.subTab = panel;
     this.panel = panel;
     this.renderShell();
