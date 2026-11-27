@@ -273,9 +273,9 @@ export function renderTranslitPanel(body: HTMLElement, _view: LiDictView, plugin
     // ② 書寫規範：羅馬字輸入恆橫排 LTR；原生輸入跟隨文種
     if (!st.toNative || !scheme) {
       // 原生→羅馬：輸入的是原生文字。方案選了就跟隨方案文種；自動識別（未選方案）
-      // 按輸入文本碼位自探文種（detectScript 權威表）——粘貼蒙古文/維吾爾文等直排
-      // 文種時輸入框即時跟隨書寫規範，不必等轉寫（實錘：恆橫排兜底＝直排文種
-      // 輸入框橫排顯示、粘貼體驗破損）。自探不出（拉丁/漢字）→ 橫排 LTR 兜底。
+      // 按輸入文本碼位自探文種（detectScript 權威表）——粘貼蒙古文等直排文種即時
+      // 直排、維吾爾文等 RTL 文種即時 rtl，不必等轉寫（實錘：恆橫排 LTR 兜底＝
+      // 直排/RTL 文種輸入框顯示錯向，粘貼體驗破損）。自探不出（拉丁/漢字）→ 橫排 LTR 兜底。
       let ws: { mode: string; dir: string; orientation: string };
       if (!st.toNative && scheme) {
         ws = groupWritingStyle(scheme.group);
