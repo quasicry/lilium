@@ -38,7 +38,7 @@ export interface HoverLookupOptions {
   /** 排查修復：固定提示文案（i18n 由呼叫端注入——本檔禁硬編碼語言）。 */
   pinHintProvider?: () => string;
   /**
-   * pinned 彈窗記憶位置（方案 A：全彈窗共用一個記憶點）。
+   * pinned 彈窗記憶位置（全彈窗共用一個記憶點）。
    * get：拖拽後的記憶位置；set：拖拽結束寫回。undefined＝尚無記憶（貼詞定位）。
    * 存取由呼叫端（plugin settings）承擔持久化；本檔不直接碰 data.json。
    */
@@ -262,7 +262,7 @@ export class HoverLookupController {
       pinHint.className = 'li-hover-pin-hint';
       // 排查修復：文案走 i18n（pinHintProvider 注入），不再硬編碼簡中。
       pinHint.textContent = this.opts.pinHintProvider?.() ?? '點擊彈窗固定 · esc 關閉';
-      // topBar 拖把（方案 A）：pinHint 兼任——pinned 彈窗可拖拽自訂位置，
+      // topBar 拖把：pinHint 兼任——pinned 彈窗可拖拽自訂位置，
       // 記憶於 popupPosStore（跨詞共用）。pointerdown 排除按鈕（現無按鈕，規則防未來）。
       pinHint.addClass('li-hover-drag-handle');
       this.attachDrag(pinHint, doc);
