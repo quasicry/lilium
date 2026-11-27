@@ -1092,7 +1092,14 @@ export class DictFeature {
             continue;
           }
           const buf = await f.arrayBuffer();
-          await adapter.writeBinary(target, buf);
+          // 與 assetWriter.writeBinary 同理：入 vault 索引後 rescan 的 getFiles()
+          // 才能立即看到（adapter 直寫靠 FSWatcher 補索引，移動端有遲滯）。
+          const existingT = this.plugin.app.vault.getAbstractFileByPath(target);
+          if (existingT instanceof TFile) {
+            await this.plugin.app.vault.modifyBinary(existingT, buf);
+          } else {
+            await this.plugin.app.vault.createBinary(target, buf);
+          }
           if (existed) report.overwritten++;
           report.imported.push(target);
         } catch (e) {
@@ -1201,7 +1208,7 @@ export class DictFeature {
     failed: Array<{ name: string; error: string }>,
   ): Promise<void> {
     /* 磁盤緩存鍵提前（TEI 序列化緩存同用；原在 mdx 段宣告，TEI 段先用） */
-    const folderKey0 = Array.from(folder.path).map((c) => /[a-zA-Z0-9._-]/.test(c) ? c : c.codePointAt(0)!.toString(36)).join('').slice(-48);
+    const folderKey0 = this.scanFolderKey(folder.path);
     const mdxFiles = new Map<string, { mdx?: TFile; mdd?: TFile }>();
     /** standalone css/js/fonts keyed by base name — attached to dict with same base */
     const companions = new Map<string, { css?: TFile; js: TFile[]; fonts: TFile[]; images?: TFile[] }>();
@@ -1488,7 +1495,19 @@ export class DictFeature {
     const writer = this.assetWriter();
     const dictId = dict.meta.id;
     const assets = (dict.meta.assets ||= []);
+    // 掃描緩存命中（同一 dict 實例重掃）會重入本函數——按 mddKey 去重：
+    // sig 未變才走緩存路徑＝檔案內容未變，已登記資產跳過（不重寫盤、不重複 push），
+    // 否則每次啟動/重掃 assets 線性增長、fillFrame 產生重複 <link>/@font-face。
+    const seen = new Set(assets.map((a) => `${a.kind}:${a.mddKey}`));
+    const pushAsset = (a: ExtractedAsset): void => {
+      const key = `${a.kind}:${a.mddKey}`;
+      if (seen.has(key)) return;
+      seen.add(key);
+      assets.push(a);
+    };
     if (comp.css) {
+      const key = `css:${comp.css.name}`;
+      if (seen.has(key)) { /* 已登記，跳過重寫 */ } else {
       const raw = await this.plugin.app.vault.read(comp.css);
       // ：導入時即做作用域隔離（選擇器加 #li-dict-<id> 前綴），渲染期
       // 正文包進同 id 的包裹元素（view.ts fillFrame）即可命中。隔離失敗不得
@@ -1501,15 +1520,18 @@ export class DictFeature {
       }
       const path = `${ASSET_FOLDER}/${dictId}/${comp.css.name}`;
       await writer.writeText(path, text);
-      assets.push({ mddKey: comp.css.name, vaultPath: path, kind: 'css', size: text.length });
+      pushAsset({ mddKey: comp.css.name, vaultPath: path, kind: 'css', size: text.length });
+      }
     }
     for (const js of comp.js) {
+      if (seen.has(`js:${js.name}`)) continue;
       const text = await this.plugin.app.vault.read(js);
       const path = `${ASSET_FOLDER}/${dictId}/${js.name}`;
       await writer.writeText(path, text);
-      assets.push({ mddKey: js.name, vaultPath: path, kind: 'js', size: text.length });
+      pushAsset({ mddKey: js.name, vaultPath: path, kind: 'js', size: text.length });
     }
     for (const font of comp.fonts) {
+      if (seen.has(`font:${font.name}`)) continue;
       const data = new Uint8Array(await this.plugin.app.vault.readBinary(font));
       const path = `${ASSET_FOLDER}/${dictId}/${font.name}`;
       await writer.writeBinary(path, data);
@@ -1519,18 +1541,19 @@ export class DictFeature {
       // 永遠對不上 → 字體進 iframe 卻從未被應用（document.fonts status=unloaded）。
       // 兜底：解析失敗（WOFF2/bad container/無 name 表）留空，渲染期回退 lilium-<mddKey> 名。
       try {
-         
-        
+
+
         const resolved = await resolveFontName(data);
         if (resolved.info.family) asset.fontFamily = resolved.info.family;
       } catch { /* 解析失敗留空，渲染期回退 UD 名 */ }
-      assets.push(asset);
+      pushAsset(asset);
     }
     for (const img of comp.images || []) {
+      if (seen.has(`image:${img.name}`)) continue;
       const data = new Uint8Array(await this.plugin.app.vault.readBinary(img));
       const path = `${ASSET_FOLDER}/${dictId}/${img.name}`;
       await writer.writeBinary(path, data);
-      assets.push({ mddKey: img.name, vaultPath: path, kind: 'image', size: data.length });
+      pushAsset({ mddKey: img.name, vaultPath: path, kind: 'image', size: data.length });
     }
   }
 
@@ -1641,6 +1664,11 @@ export class DictFeature {
    * 子資料夾 → 清 `dictIdIndex` → `service.remove` + `removeOverride`。
    * 任一步失敗都**明確回報並保留辭典條目**（絕不「刪不掉卻說已移除」）。
    */
+  /** 掃描緩存鍵的資料夾成分：非 [a-zA-Z0-9._-] 字元轉 base36，取末 48（同掃描期 folderKey0 體例）。 */
+  private scanFolderKey(path: string): string {
+    return Array.from(path).map((c) => /[a-zA-Z0-9._-]/.test(c) ? c : c.codePointAt(0)!.toString(36)).join('').slice(-48);
+  }
+
   async deleteDictionary(id: string): Promise<void> {
     const d = this.service.get(id);
     if (!d) return;
@@ -1686,7 +1714,22 @@ export class DictFeature {
       for (const k of Object.keys(idx)) if (idx[k] === id) delete idx[k];
     }
     this.service.remove(id);
-    this.scanCacheMap.delete(id);
+    // 掃描緩存鍵是 `mdx-<folderKey>-<base>`／`tei-lex0-<folderKey>-<base>`（鍵型非 id）——
+    // 按 meta.dir＋meta.files 重算並刪除，否則殘留鍵指向已刪實例（下次掃描復用廢棄 dict）。
+    // dir 是執行期欄位（不入 data.json）：本會話內刪除必有值；無值時逐鍵比對 dict.id 清掃兜底。
+    const folderKey = d.meta.dir ? this.scanFolderKey(d.meta.dir) : null;
+    const bases = new Set<string>();
+    for (const f of d.meta.files || []) {
+      bases.add(f.replace(/\.(mdx|mdd)$/i, ''));
+      bases.add(dictBaseName(f));
+    }
+    for (const k of [...this.scanCacheMap.keys()]) {
+      const v = this.scanCacheMap.get(k)!;
+      const keyMatches = folderKey !== null && bases.size > 0
+        && (k.startsWith(`mdx-${folderKey}-`) || k.startsWith(`tei-lex0-${folderKey}-`))
+        && [...bases].some((b) => k.endsWith(`-${b}`) || k.endsWith(`-${b.toLowerCase()}`));
+      if (keyMatches || v.dict?.meta?.id === id) this.scanCacheMap.delete(k);
+    }
     const cf = this.scanCacheFiles.get(id);
     if (cf) {
       this.scanCacheFiles.delete(id);

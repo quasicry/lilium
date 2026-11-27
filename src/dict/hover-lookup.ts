@@ -17,6 +17,8 @@ import { applyPopupPosition, observeWritingModeChanges } from '../shared/vertica
 
 const HOVER_DELAY_MS = 450;
 const LEAVE_GRACE_MS = 200;
+/** 脫管殘留窗上限（FIFO 驅逐最舊）——防長會話 pin 累積。 */
+const DETACHED_POPUP_MAX = 5;
 // lilium: POPUP_OFFSET 已由 vertical-anchor.ts 的 POPUP_GAP(=6) 承接
 
 export type TriggerKey = 'off' | 'ctrl' | 'alt' | 'shift' | 'meta';
@@ -135,8 +137,14 @@ export class HoverLookupController {
 
   private handleMouseMove(e: MouseEvent): void {
     if (!this.opts.enabled) return;
-    // mouse inside our own popup keeps it alive
+    // mouse inside our own popup keeps it alive——並清掃已排程的離開隱藏：
+    // 若先離開詞（排了 LEAVE_GRACE_MS 的 hide）再移入彈窗，此分支若不 clear，
+    // 遲到 hide 會在游標正位於彈窗內時把彈窗關掉。
     if (this.popupEl && (e.target === this.popupEl || this.popupEl.contains(e.target as Node))) {
+      if (this.leaveTimer) {
+        window.clearTimeout(this.leaveTimer);
+        this.leaveTimer = null;
+      }
       return;
     }
     if (this.pinned) return;
@@ -172,9 +180,11 @@ export class HoverLookupController {
     if (!hit) return;
     if (hit.word.length > this.opts.maxWordLength) return;
     if (hit.word === this.currentWord && this.popupEl) return; // same word, keep popup
-    // 多彈窗並存：主窗已 pin（用戶點過彈窗）→ 脫管為殘留窗，主窗讓位給新查詢
+    // 多彈窗並存：主窗已 pin（用戶點過彈窗）→ 脫管為殘留窗，主窗讓位給新查詢。
+    // 殘留窗設上限 FIFO 驅逐：長會話 pin→查→pin→查… 無上限累積 DOM/監聽。
     if (this.pinned && this.popupEl) {
       this.detached.push({ el: this.popupEl });
+      while (this.detached.length > DETACHED_POPUP_MAX) this.detached.shift()?.el.remove();
       this.popupEl = null;
       this.bodyEl = null;
       this.anchorRect = null;
@@ -188,7 +198,11 @@ export class HoverLookupController {
     this.anchorRect = hit.rect;
     this.anchorEl = hit.element ?? null;
     // lilium: 直排↔橫排切換後重新量測並重定位（lilium 兩種排版皆可寫，切換會改變佈局）
-    if (this.anchorEl && !this.layoutWatcher) {
+    // 每次查詢按新 anchorEl 重建 watcher：閉包捕獲建檔時的元素，舊 watcher 觀察的是
+    // 舊詞節點（Obsidian 重建 DOM 後即死節點），新詞彈窗不再隨 writing-mode 切換重定位。
+    if (this.anchorEl) {
+      this.layoutWatcher?.();
+      this.layoutWatcher = null;
       this.layoutWatcher = observeWritingModeChanges(this.anchorEl, (a) => {
         // 切換後詞的位置會變，必須用新矩形而非快取的舊值
         if (a) {

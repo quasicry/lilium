@@ -3391,7 +3391,9 @@ export function t(lang: LangCode, key: string, vars?: Record<string, string | nu
   let str = entry?.[lang] ?? entry?.en ?? key;
   if (vars) {
     for (const [k, v] of Object.entries(vars)) {
-      str = str.replace(new RegExp(`{${k}}`, "g"), String(v));
+      // 函數形式替換：字串形式的替換值會展開 $&/$1 等特殊序列
+      //（vars 含用戶文本如詞頭 "$&" 時結果損壞），函數形式原樣插入。
+      str = str.replace(new RegExp(`{${k}}`, "g"), () => String(v));
     }
   }
   return str;

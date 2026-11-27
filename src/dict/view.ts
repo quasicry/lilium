@@ -167,7 +167,7 @@ export class LiDictView extends ItemView {
     this.lastResults = [];
     this.pendingFrames = [];
     // 卡頓修復（legacy flat 分幀填充）：面板關閉後不再為舊 DOM 續排 fill 幀。
-    this.flatFillCancelled = true;
+    this.flatFillGen++;
     // B11：面板關閉即清轉寫面板的模組級會話狀態（大文本不跨生命週期駐留）。
     resetTranslitSessionState();
     // B3 音頻生命週期：關閉視圖停播＋回收全部 blob URL（原位播放器 DOM 隨
@@ -175,8 +175,10 @@ export class LiDictView extends ItemView {
     stopAll();
   }
 
-  /** 卡頓修復：legacy flat 路徑（collapsible=false 或單命中）分幀 fill 的取消旗標。 */
-  private flatFillCancelled = false;
+  /** 卡頓修復：legacy flat 路徑（collapsible=false 或單命中）分幀 fill 的取消代次。
+   *  新查詢/面板關閉時 ++——fillNext 閉包捕獲自己代次，比對不符即退出（共享單
+   *  cancelled 旗標會被新輪立即復位＝舊隊列取消失效、兩個 fillNext 並發互踩）。 */
+  private flatFillGen = 0;
   private flatFillScheduled = false;
 
   /**
@@ -194,8 +196,9 @@ export class LiDictView extends ItemView {
       requestAnimationFrame: (cb: () => void) => number;
     };
     let idx = 0;
+    const gen = ++this.flatFillGen; // 本輪代次：新查詢/面板關閉再 ++ 即令本輪閉包失效
     const fillNext = (): void => {
-      if (this.flatFillCancelled) { this.flatFillScheduled = false; return; }
+      if (gen !== this.flatFillGen) { this.flatFillScheduled = false; return; }
       if (idx >= items.length) { this.flatFillScheduled = false; return; }
       const { frame, hit } = items[idx++];
       const fr = frame as HTMLIFrameElement & { dataset: Record<string, string> };
@@ -208,8 +211,7 @@ export class LiDictView extends ItemView {
       if (typeof w.requestIdleCallback === 'function') w.requestIdleCallback(() => fillNext());
       else w.requestAnimationFrame(() => fillNext());
     };
-    if (this.flatFillScheduled) this.flatFillCancelled = true; // 前一輪未跑完即被新查詢覆蓋 → 取消舊隊列
-    this.flatFillCancelled = false;
+    // 上一輪未跑完即被新查詢覆蓋：flatFillGen 已 ++＝舊隊列 fillNext 全部短路退出。
     this.flatFillScheduled = true;
     if (typeof w.requestIdleCallback === 'function') w.requestIdleCallback(() => fillNext());
     else w.requestAnimationFrame(() => fillNext());
@@ -531,6 +533,11 @@ export class LiDictView extends ItemView {
   // ------------------------------------------------------------ search area
 
   private renderSearch(h: HTMLElement): void {
+    // 條件焦點：重建前舊搜尋框持有焦點（用戶正在輸入，重繪來自查詢/分頁操作）
+    // → 重建後還原焦點且 preventScroll；初掛載才主動搶焦點（移動端重繪搶焦點
+    // ＝鍵盤亂彈，桌面＝滾動位置跳動，596 行舊「初次掛載才搶」註釋與實際行為不符）。
+    const prevActive = this.containerEl.ownerDocument.activeElement;
+    const hadFocus = !!(prevActive && prevActive.instanceOf?.(HTMLInputElement) && prevActive.classList.contains('li-search'));
     const old = h.querySelector('.li-search-row, .li-ft-row');
     if (old) old.remove();
 
@@ -593,9 +600,13 @@ export class LiDictView extends ItemView {
         suggest.addClass('li-u-hidden');
         input.focus();
       });
-      // preventScroll：初次掛載才搶焦點（面板切換到「查詞」時），且不讓瀏覽器
-      // 為了顯示輸入框去捲動面板——那一下捲動就是位置「跑掉」的體感。
-      window.setTimeout(() => input.focus({ preventScroll: true }), 30);
+      // preventScroll：初掛載（面板切到「查詞」）才主動搶焦點；重繪（舊框已持焦點）
+      // 只還原不搶——不讓瀏覽器為了顯示輸入框去捲動面板（那一下捲動＝位置「跑掉」體感）。
+      window.setTimeout(() => {
+        if (hadFocus || !prevActive || (prevActive.instanceOf?.(HTMLElement) && !prevActive.isConnected)) {
+          input.focus({ preventScroll: true });
+        }
+      }, 30);
     } else if (leaf === 'manage') {
       const ftRow = h.createDiv({ cls: 'li-ft-row' });
       const ftWrap = ftRow.createDiv({ cls: 'li-search-wrap' });
@@ -803,7 +814,13 @@ export class LiDictView extends ItemView {
     if (!articles) {
       this.renderShell();
       // A5：重試必須攜帶 opts（TOC 入口等），否則攔截語義在重試路徑丟失。
-      window.requestAnimationFrame(() => this.doLookup(word, opts));
+      // rAF 回調前可能已插入新查詢——以代次比對防護：seq 變了＝新查詢接管，本次重試作廢
+      // （否則遲到重試會重新 begin() 使自己成為 current，把新結果整個覆蓋回舊詞的）。
+      const retrySeq = this.plugin.lookupSequence.peek();
+      window.requestAnimationFrame(() => {
+        if (this.plugin.lookupSequence.peek() !== retrySeq) return;
+        this.doLookup(word, opts);
+      });
       return;
     }
 
@@ -909,16 +926,23 @@ export class LiDictView extends ItemView {
     });
     // eslint-disable-next-line @typescript-eslint/no-misused-promises -- fire-and-forget 事件回調（UI 事件無人 await 返回值），行為保持——審計批次三。
     noteBtn.addEventListener('click', async () => {
-      // 樣式渲染分支：每 hit 先過 copyStyledHtml（inline CSS＋vault 圖片路徑）再組筆記（inline HTML 於 Obsidian 編輯/閱讀皆存活）
-      const styled = await Promise.all(hits.map(async (h) => ({ dictName: h.dictName, keyText: h.keyText, html: normalizeEntryBlocks(await this.copyStyledHtml(h, (h as { dictId?: string }).dictId, 'data')) })));
-      const note = buildLookupNote({ word, hits: styled, htmlToMarkdown: identityHtml });
-      // B30：筆記存 lilium/筆記（安裝時預建資料夾樹）；檔名含時間戳（與 ↓MD 匯出
-      // mdFileName 同慣例）——同詞多次匯出各存一檔，不覆蓋舊筆記。
-      const folder = 'lilium/筆記';
-      await (this.plugin as unknown as { ensureFolder(p: string): Promise<void> }).ensureFolder(folder);
-      const file = `${folder}/${word.replace(/[/:*?"<>|]/g, '_')}-${fileTimestamp()}.md`;
-      await this.plugin.app.vault.create(normalizePath(file), note);
-      liNotice(this.plugin.T('dict.note.saved', { file }));
+      // A2：copyStyledHtml（詞條 HTML 病態/vault 故障）與 create（同檔名衝突/磁盤滿）
+      // 皆可拋錯——catch 後提示，不留 unhandled rejection（與 MD 匯出同款防護）。
+      try {
+        // 樣式渲染分支：每 hit 先過 copyStyledHtml（inline CSS＋vault 圖片路徑）再組筆記（inline HTML 於 Obsidian 編輯/閱讀皆存活）
+        const styled = await Promise.all(hits.map(async (h) => ({ dictName: h.dictName, keyText: h.keyText, html: normalizeEntryBlocks(await this.copyStyledHtml(h, (h as { dictId?: string }).dictId, 'data')) })));
+        const note = buildLookupNote({ word, hits: styled, htmlToMarkdown: identityHtml });
+        // B30：筆記存 lilium/筆記（安裝時預建資料夾樹）；檔名含時間戳（與 ↓MD 匯出
+        // mdFileName 同慣例）——同詞多次匯出各存一檔，不覆蓋舊筆記。
+        const folder = 'lilium/筆記';
+        await (this.plugin as unknown as { ensureFolder(p: string): Promise<void> }).ensureFolder(folder);
+        const file = `${folder}/${word.replace(/[/:*?"<>|]/g, '_')}-${fileTimestamp()}.md`;
+        await this.plugin.app.vault.create(normalizePath(file), note);
+        liNotice(this.plugin.T('dict.note.saved', { file }));
+      } catch (e) {
+        console.error('[lilium] note gen:', e);
+        liNotice(this.plugin.T('common.operationFailed'), 8000);
+      }
     });
     // note-builder.buildFlashcardLines 保留（導出 API 面，向後相容）。
 
@@ -1548,6 +1572,10 @@ export class LiDictView extends ItemView {
       this.frameLoadHandlers.delete(frame);
     }
     if (!this.assetBasemap) {
+      // basemap 建立期間的重複入列去重：同 frame 再入列（主題切換/重查詢）時
+      // 以新 HTML 頂替舊項——否則 flush 按入列序先寫舊 HTML 再寫新 HTML＝中間態閃爍。
+      const qi = this.pendingFrames.findIndex((pf) => pf.frame === frame);
+      if (qi >= 0) this.pendingFrames.splice(qi, 1);
       this.pendingFrames.push({ frame, html, keyText, dictId });
       void this.ensureAssetBasemap().then(() => this.flushPendingFrames());
       return;
@@ -1593,9 +1621,9 @@ export class LiDictView extends ItemView {
     // 載不到相對路徑，須在 sanitize 前按 basename 匹配詞典 image 資產改寫成 app:// 資源 URL
     //（inlineFrameAssets 隨後統一轉 data: 內聯）。無匹配保留原 src（缺圖）。
     {
-      const dictEarly = this.plugin.service.get(
-        dictId || this.lastResults.find((r) => r.keyText === keyText)?.dictId || '',
-      );
+      // dictId 缺失時不猜測（多典同 keyText 會錯配資產）——只影響 img 改寫，
+      // 正文仍渲染；調用點現全帶 dictId（SearchHit.dictId 必填），此為防禦分支。
+      const dictEarly = dictId ? this.plugin.service.get(dictId) : undefined;
       const imgAssets = (dictEarly?.meta.assets || []).filter((a) => a.kind === 'image');
       if (imgAssets.length > 0) {
         processed = processed.replace(
@@ -1639,10 +1667,9 @@ export class LiDictView extends ItemView {
     processed = styleStripped;
     const safe = sanitizeHtml(processed);
     // companion css for this dict (injected into every frame)
-    // bugfix: 用調用方傳入的 dictId 精確定位辭典，避免同 keyText 跨辭典誤配 CSS
-    const dict = this.plugin.service.get(
-      dictId || this.lastResults.find((r) => r.keyText === keyText)?.dictId || '',
-    );
+    // bugfix: 用調用方傳入的 dictId 精確定位辭典，避免同 keyText 跨辭典誤配 CSS；
+    // dictId 缺失時不猜測（lastResults.find 同 keyText 取第一典＝錯配源），寧可不套專屬資產。
+    const dict = dictId ? this.plugin.service.get(dictId) : undefined;
     const cssAssets = (dict?.meta.assets || []).filter((a) => a.kind === 'css');
     const cssLinks = cssAssets
       .map((a) => `<link rel="stylesheet" href="${toUrl(a.vaultPath)}">`)
@@ -2491,9 +2518,14 @@ class TocModal extends Modal {
       const raw = c.createDiv({ cls: 'li-toc-raw' });
       const fr = raw.createEl('iframe', { cls: 'li-frame' });
       fr.setAttribute('sandbox', 'allow-same-origin');
-      // 彈窗環境無 view 實例的 fillFrame 管線，用最簡 srcdoc（鏈接點擊轉宿主查詢）
-      const html = this.hits[0]?.html || '';
-      const doc = `<!DOCTYPE html><html><head><meta charset="utf-8"><style>${bundledFontFaceCssForFrame(html)}body{margin:8px;font-size:14px;line-height:1.7;color:var(--text-normal);background:transparent;font-family:var(--font-text, sans-serif), ${bundledFontFamilyTail(html)}, sans-serif}a{color:var(--text-accent);text-decoration:none;cursor:pointer}</style></head><body>${html}</body></html>`;
+      // 深度防禦與主卡 fillFrame 同款：srcdoc 仍加 csp 兜底（TOC html 來自詞庫原文）
+      fr.setAttribute('csp', "default-src 'none'; style-src 'unsafe-inline'; img-src data: blob: asset: app://local capacitor: https: http:; font-src data: app://local; media-src data: app://local blob:");
+      // 彈窗環境無 view 實例的 fillFrame 管線，用最簡 srcdoc（鏈接點擊轉宿主查詢）——
+      // html 先過 sanitizeHtml＋抽 <style>（與主路徑同管線；抽取的 CSS 供字體推斷與 head 注入）
+      const rawHtml = this.hits[0]?.html || '';
+      const { html: safeHtml, css: rawCss } = extractStyleBlocks(rawHtml);
+      const html = sanitizeHtml(safeHtml);
+      const doc = `<!DOCTYPE html><html><head><meta charset="utf-8"><style>${bundledFontFaceCssForFrame(rawHtml)}${rawCss}body{margin:8px;font-size:14px;line-height:1.7;color:var(--text-normal);background:transparent;font-family:var(--font-text, sans-serif), ${bundledFontFamilyTail(rawHtml)}, sans-serif}a{color:var(--text-accent);text-decoration:none;cursor:pointer}</style></head><body>${html}</body></html>`;
       fr.srcdoc = doc;
       fr.addEventListener('load', () => {
         try {
@@ -2502,8 +2534,13 @@ class TocModal extends Modal {
           d.querySelectorAll('a[href^="entry://"]').forEach((a) => {
             a.addEventListener('click', (e) => {
               e.preventDefault();
-              const w = (a.getAttribute('href') || '').replace(/^(entry:\/\/)+/i, '').trim();
-              if (w) { this.close(); this.onLookup(w); }
+              const w0 = (a.getAttribute('href') || '').replace(/^(entry:\/\/)+/i, '').trim();
+              if (!w0) return;
+              // URL 編碼的目錄詞頭先解碼（同主面板 loadHandler 體例；解碼失敗保留原字面）
+              let w = w0;
+              try { w = decodeURIComponent(w0); } catch { /* 保留原字面 */ }
+              this.close();
+              this.onLookup(w);
             });
           });
         } catch { /* cross-origin */ }

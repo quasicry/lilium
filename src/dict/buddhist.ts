@@ -88,10 +88,10 @@ export function normalizeBuddhistChinese(text: string): string {
 
 // ------------------------------------------------------------------ 巴利語系
 
-/** 巴利語拉丁轉寫字母集（含長音與下標點） */
-const PALI_LATIN = /[a-zA-ZāīūĀĪŪṅñṇṃṭḍḷṬḌṂṄÑḶāīū]+/g;
+/** 巴利語拉丁轉寫字母集（含長音與下標點；ṝ/ḹ＝長 ṛ/ḷ，漏計會切斷含該字母的詞） */
+const PALI_LATIN = /[a-zA-ZāīūĀĪŪṅñṇṃṭḍḷṝṜḹḸṬḌṂṄÑḶ]+/g;
 /** 巴利文本特徵：長音符 + 下標點輔音出現密度（gu 全局計數） */
-const PALI_CHARS = /[āīūṅñṭḍṇḷṃṬḌṄÑḶṂ]/gu;
+const PALI_CHARS = /[āīūṅñṭḍṇḷṃṝṜḹḸṬḌṄÑḶṂ]/gu;
 
 /** 巴利語 tokenize：拉丁轉寫字元集分詞（詞邊界=非字母） */
 export function tokenizePali(text: string): string[] {

@@ -1,3 +1,62 @@
+## 0.3.11
+
+### 修復
+
+**安全加固**
+
+- **詞條 HTML URL 清洗加固（safeUrl）**：`javascript:`/`vbscript:`/`data:text/html` 危險 scheme 的黑名單判定前先剝除控制字符與空白（C0 區）——瀏覽器解析 URL 時會剝除這些字符，舊實作「jav\tascript:」可繞過黑名單；`srcset` 屬性改為逐候選拆分各自清洗（此前整串判定，混入候選可繞過）。
+- **TEI Lex-0 數字實體注入防護**：詞條解碼 `&#1;` 等數字實體時拒解 U+0001–0008（文檔解析哨兵區），實體字符串保留為字面文本。
+- **分享卡片圖源縱深防禦（share）**：PNG 分享的 `<img>` 圖源統一經 `safeShareImgSrc` 清洗（decode 失敗保留原字面、限定資產目錄、失敗即丟棄不 push），三處收集點同規。
+- **目錄（TOC）iframe 內容同主路徑加固**：詞條「總目錄」入口的 iframe 原始 HTML 兜底路徑補同款 sanitize＋`entry://` 鏈接 decode。
+
+**穩定性**
+
+- **輸出面板填充競態（queueFlatFill）**：共享 cancelled 旗標改為世代 token——關閉面板後舊填充鏈不再污染新面板。
+- **懸停查詢 rAF 重試防護**：重試前快照比對查詢序列，序列已推進則放棄過期重試。
+- **懸停彈窗離場定時器清理**：leaveTimer 在彈窗復用/關閉時清除，不再殘留觸發。
+- **彈窗定位 watcher 生命週期**：每查詢重建 ResizeObserver（舊實作閉包持有死 anchorEl）。
+- **分離彈窗上限**：脫離宿主的彈窗 FIFO 上限 5 個，超限自動回收最舊。
+- **伴隨詞條去重**：attachCompanions 同 id 重複掛載修復。
+- **包導入寫入路徑**：importBundle 二進位寫入改走 `vault.createBinary`/`vault.modifyBinary`（原 adapter 寫入後 vault 索引不可見，rescan 需重啟）。
+- **BK-tree 建樹分幀**：大詞典模糊建議樹分幀構建（進度態 Map 管理、部分樹先搜、查詢不凍結 UI）；字典刪除/清空/失效時同步清理建樹進度。
+- **詞條填充 dictId 不猜測**：fillFrame 的 keyText 兜底去除——多典同 key 時不再錯配專屬資產。
+- **字典刪除快取鍵重算**：deleteDictionary 按 meta.dir＋meta.files 重算 scanCacheMap 鍵（`mdx-<folderKey>-<base>`），刪典後快取正確失效。
+- **pendingFrames 去重**：basemap 建立期間同 frame 重複入列以新 HTML 頂替舊項（主題切換/重查詢不再中間態閃爍）。
+- **筆記導出 catch**：noteBtn 導出鏈任一步失敗（詞條 HTML 病態、vault 故障）改為提示而非 unhandled rejection。
+
+**轉寫引擎**
+
+- **藏文 U+0F0C（ནམ་ལྟེབ）NFKC 保護**：0F0C 帶兼容分解 \<noBreak> 0F0B，入口 NFKC 正規化會把它吞成 tsheg；入口以 PUA 哨兵繞行保護，往返閉環。哨兵碼位同輪修正為 U+F0FF（私用區）——原 0F80 碼位與 deprecated 碼位（U+0F76–0F79）分解產物碰撞，致真 0F80 被誤還原、出向殘留 ༌。
+- **撇號守門字符類擴展**：`translit-run` token 命中守門字符類補齊擴展拉丁區段（U+02B0–02FF/1E00–1EFF/2C60–2C7F，與 HAS_LATIN_LETTER 對齊）——`xṃ'a` 類詞不再被撇號切詞破碎；孤立 `a`（a-chung）路徑不受影響。
+- **尾隨空白透傳收緊（G-T1 配套）**：padSpace 補償僅在尾隨空白恰為單一空格時啟用；≥2 空格/tab/換行原樣透傳。
+- **`<s-ka>` 文檔鍵對齊**：出向規範為 EWTS 單字母 `<s-k>` 型，入向兼容全名形式；檢字表注釋同步。
+- **i18n 插值 `$&` 注入修復**：`t()` 字符串形式替換改函數形式——文案含 `$&`/`$1` 字面時不再被替換語義展開。
+- **轉寫面板異常可見（fail-loud）**：`transliterateText` 拋錯不再吞成假成功；顯式 ok:false＋reason:"exception"＋console.error＋操作失敗提示。
+
+**判定與文種**
+
+- **短假名句判定**：無漢字時 2 個假名即判日文（「はい」級最短寒暄此前掉進漢文兜底）；1 假名維持不判。
+- **漢文簡繁抽樣判別去共享字**：HANS/HANT 抽樣串嚴格互斥（交集 11 字剔除）——共享碼位字兩側同形零證據，入表會雙計數灌水證據。
+- **直排輸入框書寫規範自探**：原生→羅馬方向的自動識別模式下，輸入框按輸入文本碼位自探文種書寫規範（粘貼蒙古文/維吾爾文即時直排，不再恆橫排兜底）。
+- **模式滾動同步 null 續等**：視圖模式偵測返回 null（過渡中）時繼續輪詢等待，不再誤判為「非目標模式」放棄恢復。
+- **巴利語長 ṛ/ḷ 補收**：巴利分詞/密度字符類補 ṝ/Ṝ/ḹ/Ḹ——含該字母的詞不再被切碎漏計。
+- **搜索框條件焦點**：重繪僅還原焦點（preventScroll），初掛載才主動搶焦點——移動端鍵盤亂彈/滾動跳動消除。
+
+**導入與設定**
+
+- **Windows 保留名資料夾擋截**：辭典資料夾名清洗補 CON/PRN/AUX/NUL/COM¹⁻⁹/LPT¹⁻⁹（含「保留名.副檔名」形態）——Windows 建這類資料夾直接失敗。
+- **vw 設定寫入白名單**：主設定僅寫 VWSettings 五鍵——整包複製致 dict 合併鍵重複進 `vw` 命名空間（兩處並存、讀取語義漂移）。
+
+**界面**
+
+- **模態/面板焦點與動畫細節**：TOC 模態 entry:// decode；面板重建後焦點還原不搶捲動。
+
+**測試基建**
+
+- **轉寫引擎修復固化**：native-anchor-roundtrip-gate 補 15 條斷言（0F0C 哨兵保護雙向、padSpace、`<s-ka>`、i18n t()、撇號守門等）至 1,904。
+- **導入流 mock vault 補齊**：`vault.createBinary`/`vault.modifyBinary` 對齊 Obsidian API（17 條導入流斷言回綠）。
+- **lint 基線回位**：0 errors/32 warnings（批修新碼漂移 +4 全數消除）。
+
 ## 0.3.10
 
 ### 修復

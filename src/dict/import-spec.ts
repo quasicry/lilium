@@ -155,6 +155,9 @@ export function sanitizeDictFolderName(raw: string, maxLen = 64): string {
     .replace(/[\\/:*?"<>|]/g, '_')
     .replace(/\s+/g, ' ')
     .trim()
+    // Windows 保留設備名（CON/PRN/AUX/NUL/COM¹⁻⁹/LPT¹⁻⁹）不分大小寫、含「保留名.副檔名」
+    // 形式一律禁用——Windows 上建這類資料夾直接失敗（資料夾名清洗鐵律：三端可用）。
+    .replace(/^(con|prn|aux|nul|com[1-9]|lpt[1-9])(\..*)?$/i, (m) => `_${m}`)
     // 先去掉首尾的點（`...` 這類純點名稱要退化成 untitled），
     // 再折疊中間殘留的 `..`（`../../x` → `.._.._x` → `__x`），
     // 確保資料夾名在任何平台都不會被當成上層路徑。

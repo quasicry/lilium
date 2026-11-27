@@ -19,6 +19,12 @@ export class LookupSequence {
     return token === this.current;
   }
 
+  /** Read the current sequence number without consuming a token
+   *  (used for scheduling guards: compare before/after an async hop). */
+  peek(): number {
+    return this.current;
+  }
+
   /** Invalidate all in-flight lookups. */
   invalidate(): void {
     this.current++;

@@ -152,6 +152,22 @@ ISOLATED_SUB_TO_TOKEN[0x0fbb] = "<s-Y>";
 ISOLATED_SUB_TO_TOKEN[0x0fbc] = "<s-R>";
 const ISOLATED_SUB_TOKEN_TO_CP: Record<string, number> = {};
 for (const [k, v] of Object.entries(ISOLATED_SUB_TO_TOKEN)) ISOLATED_SUB_TOKEN_TO_CP[v] = Number(k);
+// 入向兼容全名鍵 <s-ka>：<s-*> 出向用 EWTS 單字母體例（<s-k>，同 CP_TO_WYLIE），
+// 但檢字表/符號清單示意寫法會出全名形式（<s-ka>）——反查表補全名別名，
+// 規範鍵優先（同名衝突時 Object 賦值順序保證上面單字母鍵先建、不會被覆蓋）。
+// 全名對照：下加字碼位 → 主字母音節全名（ka/kha/ga…，同檢字表 <s-ka…ha> 示意體例）。
+const SUB_FULL_NAME: Record<string, string> = {
+  k: "ka", kh: "kha", g: "ga", ng: "nga", c: "ca", ch: "cha", j: "ja", ny: "nya",
+  T: "ta", Th: "tha", D: "da", N: "na", t: "ta", th: "tha", d: "da", n: "na",
+  p: "pa", ph: "pha", b: "ba", m: "ma", ts: "tsa", tsh: "tsha", dz: "dza", w: "wa",
+  zh: "zha", z: "za", "'": "'a", y: "ya", r: "ra", l: "la", sh: "sha", S: "sha",
+  s: "sa", h: "ha", a: "a",
+};
+for (const [k, v] of Object.entries(ISOLATED_SUB_TO_TOKEN)) {
+  const short = v.slice(3, -1); // <s-X> → X
+  const full = SUB_FULL_NAME[short];
+  if (full) ISOLATED_SUB_TOKEN_TO_CP[`<s-${full}>`] = Number(k);
+}
 
 const ISOLATED_VOWEL_TOKEN_TO_SEQ: Record<string, number[]> = {
   "<v-A>": [0x0f71], "<v-i>": [0x0f72], "<v-u>": [0x0f74],
@@ -961,6 +977,12 @@ export function wylieToTibetan(input: string): string {
 
 /** 藏文 Unicode → Wylie（枚舉根位置，最早合法解析優先） */
 export function tibetanToWylie(input: string, pref: TibAmbigPref = "auto"): string {
+  // U+0F0C（nampar tsik ༌）帶 compat 分解 <noBreak> 0F0B——入口 NFKC 會先把它吞成
+  // tsheg，標點表的 <;> 永遠輪不到。預保護：替換為藏文區未用哨兵碼位繞過 NFKC，
+  // 正規化後還原，再走 TIB_PUNCT 表正常命中 <;>。
+  const NTS_SENTINEL = 0xf0ff; // PUA 碼位——藏文區 0F76-0F79 分解產物含 U+0F80（reversed gi
+  // gu），哨兵若落在藏文區內會與其碰撞（真 0F80 被誤還原成 0F0C＝deprecated 碼位出向殘留 ༌ 實錘）。
+  input = input.replace(/\u0F0C/g, cp(NTS_SENTINEL));
   // NFKC——輸入可能含藏文兼容碼位（U+0F73/0F75/0F81，某些字體/PDF 產生），
   // 分解為組合序（U+0F71+0F72 等）才命中轉寫表的組合序鍵；規範碼位不受影響。
   // deprecated 聲化元音單體（0F76-0F79/0F81）先按 NamesList 規範分解，
@@ -979,7 +1001,8 @@ export function tibetanToWylie(input: string, pref: TibAmbigPref = "auto"): stri
     .replace(/\u0F78/g, cp(0x0fb3) + cp(0x0f80))
     .replace(/\u0F79/g, cp(0x0fb3) + cp(0x0f71) + cp(0x0f80))
     .replace(/\u0F81/g, cp(0x0f71) + cp(0x0f80))
-    .normalize("NFKC");
+    .normalize("NFKC")
+    .replace(new RegExp(String.fromCodePoint(NTS_SENTINEL), "g"), cp(0x0f0c));
   const out: string[] = [];
   let buf = "";
   const flush = () => {
@@ -1959,7 +1982,7 @@ function buildTibetanCharTable(): CharTableEntry[] {
   rows.push({
     native: "—",
     roman: "<s-ka…ha|W|Y|R>",
-    note: "孤立下加字標註：下加字不依附基字時（符號清單輸入）出 <s-*> 顯式 token（真實藏文下加字永遠以疊字連寫 kka 型輸入）；fixed-form 系 <s-W>/<s-Y>/<s-R> 對應 0FBA/0FBB/0FBC",
+    note: "孤立下加字標註：下加字不依附基字時（符號清單輸入）出 <s-*> 顯式 token（真實藏文下加字永遠以疊字連寫 kka 型輸入）；規範鍵為 EWTS 單字母 <s-k> 型，入向兼容全名寫法 <s-ka>；fixed-form 系 <s-W>/<s-Y>/<s-R> 對應 0FBA/0FBB/0FBC",
     section: SECTION_STRUCT,
   });
   return rows;

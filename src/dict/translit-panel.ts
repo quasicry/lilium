@@ -25,12 +25,13 @@ import { detectUyghurHehAmbiguities } from '../uyghur';
 import { phagsPaContextMirror } from '../phagspa';
 import {
   groupFontStack, translitGroupLabel, schemeLabel as schemeDisplayName, renderCharTableInto,
-  groupWritingStyle,
+  groupWritingStyle, SCHEME_GROUP_SCRIPT,
 } from '../translit-ui';
 import {
   transliterateText, MAX_TRANSLIT_CHARS, countTranslitChars,
   type RunResult, type TranslitRunResult,
 } from './translit-run';
+import { detectScript } from '../languages';
 import { sandhiJoin, SANDHI_DEMOS } from '../sandhi';
 import { exportMarkdownToVault, fileTimestamp } from './export';
 
@@ -271,10 +272,19 @@ export function renderTranslitPanel(body: HTMLElement, _view: LiDictView, plugin
     srcArea.setAttribute('placeholder', plugin.T('dict.collation.translit'));
     // ② 書寫規範：羅馬字輸入恆橫排 LTR；原生輸入跟隨文種
     if (!st.toNative || !scheme) {
-      // 原生→羅馬：輸入的是原生文字。方案選了就跟隨方案文種；自動識別無從預知，
-      // 恆為橫排 LTR 兜底（輸出端才有足夠信息跟隨）。
-      const ws = (!st.toNative && scheme) ? groupWritingStyle(scheme.group)
-        : { mode: 'horizontal-tb' as const, dir: 'ltr' as const, orientation: 'mixed' as const };
+      // 原生→羅馬：輸入的是原生文字。方案選了就跟隨方案文種；自動識別（未選方案）
+      // 按輸入文本碼位自探文種（detectScript 權威表）——粘貼蒙古文/維吾爾文等直排
+      // 文種時輸入框即時跟隨書寫規範，不必等轉寫（實錘：恆橫排兜底＝直排文種
+      // 輸入框橫排顯示、粘貼體驗破損）。自探不出（拉丁/漢字）→ 橫排 LTR 兜底。
+      let ws: { mode: string; dir: string; orientation: string };
+      if (!st.toNative && scheme) {
+        ws = groupWritingStyle(scheme.group);
+      } else {
+        const sid = detectScript(srcArea.value);
+        const group = sid ? Object.keys(SCHEME_GROUP_SCRIPT).find((g) => SCHEME_GROUP_SCRIPT[g] === sid) : null;
+        ws = group ? groupWritingStyle(group)
+          : { mode: 'horizontal-tb' as const, dir: 'ltr' as const, orientation: 'mixed' as const };
+      }
       setWriting(srcArea, ws);
       // 原生輸入掛文種字體——疊字文種（Zanabazar U+11A47 / Soyombo U+11A99 顯式
       // SUBJOINER）的 subjoiner 碼位只有文種字體有字形，回落等寬體即豆腐。
@@ -429,6 +439,9 @@ export function renderTranslitPanel(body: HTMLElement, _view: LiDictView, plugin
       // 未選時回落 usedSchemeId（自動識別已有結果的場景）。
       const scheme = getScheme(st.schemeId || st.usedSchemeId);
       applySubjoinLineHeight(srcArea, srcArea.value, scheme ? scheme.group : null);
+      // 自動識別（未選方案）粘貼直排文種：輸入框書寫規範即時自探跟隨（與
+      // applySrcWriting 的自探 fallback 同構——粘貼蒙古文即直排，不等轉寫）
+      if (!st.schemeId && !st.usedSchemeId) applySrcWriting();
     }
   });
   paintCount();
@@ -897,8 +910,9 @@ export function renderTranslitPanel(body: HTMLElement, _view: LiDictView, plugin
         (!st.toNative && st.xApprox && st.xApprox !== 'auto') ? st.xApprox : undefined,
         (st.toNative && st.agBackForm && st.agBackForm !== 'auto') ? st.agBackForm : undefined);
     } catch (e) {
-      res = { ok: true, text: src, stats: null, schemeId: '', ms: 0 };
-      void e;
+      // 異常 fail-loud（原狀 ok:true＋原樣透傳＝異常吞沒假成功，用戶以為轉換成功）。
+      console.error('[lilium] transliterateText 拋錯:', e);
+      res = { ok: false, text: "", stats: null, schemeId: "", ms: 0, reason: "exception" };
     }
     if (!res.ok) {
       if (res.reason === 'too-long') {
@@ -908,6 +922,9 @@ export function renderTranslitPanel(body: HTMLElement, _view: LiDictView, plugin
       } else if (res.reason === 'unknown-scheme') {
         // B6：方案 id 無效不再靜默透傳——明確提示（6000ms，與 too-long 同級）。
         liNotice(plugin.T('dict.collation.translitUnknownScheme'), 6000);
+      } else if (res.reason === 'exception') {
+        // 異常 fail-loud：明確報錯（不再靜默透傳假成功）。
+        liNotice(plugin.T('common.operationFailed'), 6000);
       } else {
         liNotice(plugin.T('dict.collation.translitNeedScheme'), 6000);
       }

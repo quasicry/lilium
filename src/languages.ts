@@ -826,9 +826,10 @@ const DEFAULT_THRESHOLDS: ScriptThresholds = {
 /** 漢文簡繁字形抽樣判別：
  *  兩組「專屬字形差集」抽樣——同一漢字在另一體系中是不同碼位，
  *  故出現哪一側的字形即可作為該側證據。取高頻常用字，避免生僻字誤導。
- *  共用碼位字（如「人」「中」）兩側同形，不在表內＝零證據，正確地不參與判定。 */
-const HANS_ONLY_SAMPLE = "这们说时语门年为发性后无动经进见开问间关联书写点张东车马马上义行动员设变见饭馆飞农钱听说体验状态买卖运输东南西北风当国实际现问题发展经济社会组织业务管理艺术";
-const HANT_ONLY_SAMPLE = "這們說時語門年為發性後無動經進見開問間關聯書寫點張東車馬馬上義行動員設變見飯館飛農錢聽說體驗狀態買賣運輸東南西北風當國實際現問題發展經濟社會組織業務管理藝術";
+ *  兩串嚴格互斥（交集為空斷言）：共用碼位字（如「人」「中」）兩側同形，
+ *  不入表＝零證據，正確地不參與判定（共享字會雙計數灌水證據）。 */
+const HANS_ONLY_SAMPLE = "这们说时语门为发后无动经进见开问间关联书写点张东车马马义动员设变见饭馆飞农钱听说体验状态买卖运输东风当国实际现问题发经济会组织业务艺术";
+const HANT_ONLY_SAMPLE = "這們說時語門為發後無動經進見開問間關聯書寫點張東車馬馬義動員設變見飯館飛農錢聽說體驗狀態買賣運輸東風當國實際現問題發經濟會組織業務藝術";
 
 /** 依簡繁專屬字形抽樣統計，判別漢文文檔應歸 han（簡）還是 hant（繁）。
  *  任何一側無證據（差集字零出現或兩側打平）→ 保持 han（既有行為，零回歸）。
@@ -863,7 +864,10 @@ export function suggestFlow(text: string, thresholds: Partial<ScriptThresholds> 
   if (c.manchu >= t.manchuMin) return "manchu";
   if (c.mongolian >= t.mongolianMin) return "mongolian";
 
-  const kanaOk = c.kana >= t.kanaMin;
+  // 短句保護：無漢字時假名只可能來自日文——2 假名（「はい」「そう」級最短寒暄）
+  // 即足證，不必等 kanaMin=3（實錘：2 假名短句掉進 han 兜底）；1 假名維持不判
+  //（單字符號如「〜」周邊誤證保護）。有漢字時仍走 kanaMin＋佔比門檻。
+  const kanaOk = c.kana >= t.kanaMin || (c.cjk === 0 && c.kana >= 2);
   // 有漢字時：假名相對漢字佔比；純假名時：只要達到最小假名數即可
   const ratio = c.cjk > 0 ? c.kana / c.cjk : 1;
   if (kanaOk && ratio >= t.kanaRatio) {

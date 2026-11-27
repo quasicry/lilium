@@ -312,10 +312,17 @@ export default class VerticalWriterPlugin extends Plugin {
   }
 
   async saveSettings(): Promise<void> {
-    // lilium 不再寫 vw 命名空間（settings 頁的 dict/反饋/贊助寫入走 dict.saveSettings
-    // 與本方法的折衷：uiLang/feedbackEmail/sponsorshipUrl 仍屬 VWSettings，寫 vw 鍵以延續）
+    // lilium 設定寫頂層 dict 鍵（dict.saveSettings）；本方法只寫 vw 命名空間的
+    // VWSettings 白名單五鍵——整包 this.settings 含 dict 合併鍵會重複進 vw
+    //（data.json 兩處並存，舊版讀取端淺合併順序不同＝語義漂移）。
     await this.dataMutex.mutate((raw) => {
-      raw.vw = this.settings;
+      raw.vw = {
+        uiLang: this.settings.uiLang,
+        feedbackEmail: this.settings.feedbackEmail,
+        sponsorshipUrl: this.settings.sponsorshipUrl,
+        enableTransliteration: this.settings.enableTransliteration,
+        translitVisibleGroups: this.settings.translitVisibleGroups,
+      };
     });
   }
 

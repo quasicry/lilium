@@ -182,6 +182,7 @@ export class DictService {
     this.order = this.order.filter((x) => x !== id);
     this.activeDictIds.delete(id);
     this.suggestTrees.delete(id);
+    this.buildingTrees.delete(id); // 分幀建樹進度同清（殘留＝對舊實例續建）
   }
 
   clear(): void {
@@ -197,6 +198,7 @@ export class DictService {
     this.order = [];
     this.activeDictIds.clear();
     this.suggestTrees.clear();
+    this.buildingTrees.clear(); // 分幀建樹進度同清
   }
 
   get(id: string): LiDict | undefined {
@@ -404,34 +406,51 @@ export class DictService {
     return out;
   }
 
-  /** 批次丁（UI 執行緒效能）：建樹中標誌——防 idle 分幀回調與同步查詢重入。 */
-  private buildingTrees = new Set<string>();
+  /** 批次丁（UI 執行緒效能）：建樹中標誌——分幀建樹進度態：部分建好的樹＋下一批起點。
+   *  建樹中途即可被 suggestSimilar 搜（部分樹建議可能不全，總比整幀卡頓好）。 */
+  private buildingTrees = new Map<string, { tree: BKTree; words: string[]; next: number }>();
   /** idle 建樹排程（requestIdleCallback 句柄，防重複排程） */
   private treeBuildScheduled = false;
+  /** 單幀建樹批量（詞數）——大辭典一次 O(n·edges) 同步建樹會卡幀，分幀消化。 */
+  private static TREE_BATCH = 1500;
 
   /**
    * 批次丁：把各啟用辭典的 BK-tree 懶建排到 idle 幀（setTimeout 分幀兜底）。
-   * 建樹中標誌防重入：idle 回調觸發時若詞典已在建，跳過；同步路徑
-   * suggestSimilar 遇 building 標誌直接略過該辭典（本輪無建議，下一輪可用）。
+   * 建樹中標誌防重入：idle 回調觸發時若詞典已在建，續建下一批而非重頭；
+   * 同步路徑 suggestSimilar 遇 building 標誌改搜部分樹（不再整輪無建議）。
    */
   private scheduleTreeBuild(): void {
     if (this.treeBuildScheduled) return;
     this.treeBuildScheduled = true;
     const build = () => {
       this.treeBuildScheduled = false;
+      let didWork = false;
       for (const d of this.enabled) {
         const id = d.meta.id;
-        if (this.suggestTrees.has(id) || this.buildingTrees.has(id)) continue;
-        const words = d.prefix('', 8000);
-        if (!words.length) continue;
-        this.buildingTrees.add(id);
-        // 建樹本身仍同步（一次 d.prefix + BKTree 構造），但已移出查詢熱路徑所在的幀
-        try {
-          this.suggestTrees.set(id, { tree: new BKTree(words), words });
-        } finally {
+        if (this.suggestTrees.has(id)) continue;
+        let prog = this.buildingTrees.get(id);
+        if (!prog) {
+          // d.prefix 一次拉詞頭本身也重（8000 條）；同幀只起一個新辭典的詞頭拉取
+          if (didWork) continue;
+          const words = d.prefix('', 8000);
+          if (!words.length) continue;
+          prog = { tree: new BKTree([]), words, next: 0 };
+          this.buildingTrees.set(id, prog);
+        }
+        // 分幀消化：每幀每辭典最多 TREE_BATCH 詞
+        const end = Math.min(prog.next + DictService.TREE_BATCH, prog.words.length);
+        for (let i = prog.next; i < end; i++) prog.tree.add(prog.words[i], i);
+        prog.next = end;
+        didWork = true;
+        if (prog.next >= prog.words.length) {
+          // 建完：轉正 entry、清進度態
+          this.suggestTrees.set(id, { tree: prog.tree, words: prog.words });
           this.buildingTrees.delete(id);
         }
       }
+      // 還有辭典沒建完（或還沒起建）→ 續排下一幀
+      const pending = this.enabled.some((d) => !this.suggestTrees.has(d.meta.id));
+      if (pending) this.scheduleTreeBuild();
     };
     const w = window as unknown as {
       requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number;
@@ -448,8 +467,17 @@ export class DictService {
       const entry = this.suggestTrees.get(d.meta.id);
       if (!entry) {
         // 批次丁：樹未建好——不再同步建樹（建樹成本移到 idle 幀），
-        // 排程後台建樹並跳過本辭典（本輪無該辭典建議，下次查詢即有）。
+        // 排程後台建樹；建到一半的樹也可先搜（部分建議，總比無好）。
         this.scheduleTreeBuild();
+        const prog = this.buildingTrees.get(d.meta.id);
+        if (!prog || prog.next === 0) continue;
+        for (const hit of prog.tree.search(word, 2, limit)) {
+          const key = hit.word.toLowerCase();
+          if (seen.has(key)) continue;
+          seen.add(key);
+          out.push({ word: hit.word, dictName: this.displayName(d), distance: hit.distance });
+          if (out.length >= limit) return out;
+        }
         continue;
       }
       for (const hit of entry.tree.search(word, 2, limit)) {
@@ -464,8 +492,13 @@ export class DictService {
   }
 
   invalidateSuggestTree(dictId?: string): void {
-    if (dictId) this.suggestTrees.delete(dictId);
-    else this.suggestTrees.clear();
+    if (dictId) {
+      this.suggestTrees.delete(dictId);
+      this.buildingTrees.delete(dictId); // 分幀進度同清
+    } else {
+      this.suggestTrees.clear();
+      this.buildingTrees.clear();
+    }
   }
 
   // ------------------------------------------------------------ full-text

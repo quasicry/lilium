@@ -23,7 +23,7 @@ export * from "../src/zanabazar";
 export * from "../src/soyombo";
 export * from "../src/subjoin-line-height";
 export * from "../src/dict/store";
-export { LANGS, DICT } from "../src/i18n";
+export { LANGS, DICT, t } from "../src/i18n";
 export { dictScopeId, isolateCSS } from "../src/dict/css-isolate";
 export { rewriteResourceRefs } from "../src/dict/mdd-assets";
 export { playAudioSession, registerAudioPlayer, stopAll, hasActiveAudio } from "../src/dict/audio-session";

@@ -457,8 +457,9 @@ export function transliterateLongText(
     // Wylie a-chung 修復：' 既是孤立符號鍵（檢字表單獨輸入 a-chung）也是詞內
     // 第二後加字標記（pa'i 藏文屬格）。前者是孤立上下文，後者前必貼拉丁字母——
     // 詞內的 ' 不做 token 命中，留在詞緩衝整詞送引擎（否則 pa'i 被切 pa|'|i，
-    // 孤立 i 借 ཨ 組合成 པའཨི，往返破碎）。
-    if (native && !(ch === "'" && i > 0 && /[A-Za-z\u00C0-\u024F]/.test(text[i - 1])) && scheme.romanTokenRe) {
+    // 孤立 i 借 ཨ 組合成 པའཨི，往返破碎）。字符類對齊 HAS_LATIN_LETTER/LATIN_SHAPE：
+    // ṃ（1E43）等擴展拉丁＋修飾符字母後的 ' 同屬詞內（"ṃ'a" 詞首撇號破碎實錘）。
+    if (native && !(ch === "'" && i > 0 && /[A-Za-z\u00C0-\u024F\u02B0-\u02FF\u1E00-\u1EFF\u2C60-\u2C7F]/.test(text[i - 1])) && scheme.romanTokenRe) {
       // 最長命中限長 32 碼元：token 皆短（;100<jm>;4=10、<..>=4），限長既
       // 防禦病態正則也把每次命中測試成本封頂 O(32²)；超過限長的 candidate
       // 不可能匹配全錨定 token 正則（聲明處註明 token 至多 32 字符）。
@@ -752,7 +753,7 @@ export interface TranslitRunResult {
   stats: RunResult | null;
   schemeId: string;
   ms: number;
-  reason?: "too-long" | "no-text" | "need-scheme" | "unknown-scheme";
+  reason?: "too-long" | "no-text" | "need-scheme" | "unknown-scheme" | "exception";
 }
 
 /** 方案池：主方案排前，讓轉換率打平時由主方案勝出（非決定性，只是加一道偏好） */
@@ -824,16 +825,12 @@ export function transliterateText(
   // 段尾音節缺 tsheg（用戶主訴：詞尾/段落尾空格不轉 tsheg）。頭部縮進不補：
   // 行首 tsheg 非藏文正字法。
   const trailingWs = text.slice(src.length).match(/\s+$/)?.[0] ?? "";
-  // E5：羅馬→原生時單純補空格讓段尾音節補出 tsheg，但探針實測 'bod\n' 的尾隨
-  // 換行會被引擎吃成 tsheg（輸出 'བོད་' 丟 \n）。修法：入向仍補一個空格
-  // （維持段尾補 tsheg 設計不退回），出向後把尾隨空白中的「換行類字符」原樣
-  // 補回——純空格仍由引擎轉 tsheg，換行不該轉 tsheg 故逐字還原。
-  const trailingNewlines = toNative ? (trailingWs.match(/[\n\r]+/g)?.join("") ?? "") : "";
-  // E5/G-T1e 交互修正：入向文本尾已是 <ts> token（G-T1e 顯式 tsheg）時不再補空格——
-  // <ts> 已產生段尾 tsheg，再補空格會轉出第二個 tsheg（'bod<ts>\n' → 'བོད་་\n' 實錘）。
-  const padSpace = toNative && trailingWs && !/<ts>$/.test(src);
+  // E5：羅馬→原生時段尾補空格讓尾音節補出 tsheg——僅對「恰 1 個空格」啟用（用戶
+  // 詞分隔意圖補償）。其餘尾隨空白（≥2 空格/tab/換行）一律原樣透傳：引擎 G-T1
+  // 已正確處理（≥2 原樣、換行原樣；探針實證 'bod\n'→'བོད\n'、'bod  '→'བོད  '），
+  // 舊版全量 padSpace＋事後補換行的 workaround 會吞掉多餘空格（'bod  ' 丟 1 空格）。
+  const padSpace = toNative && trailingWs === " " && !/<ts>$/.test(src);
   const stats = transliterateLongText(src + (padSpace ? " " : trailingWs), scheme, toNative, { tibAmbig, xApprox, agBackForm });
-  // padSpace=false 時引擎輸入已含尾空白（原樣透傳），再補 trailingNewlines 會重複——僅補空格路徑需還原換行
-  const outText = stats.text + (toNative && padSpace ? trailingNewlines : "");
+  const outText = stats.text;
   return { ok: true, text: outText, stats, schemeId: usedId, ms: Date.now() - t0 };
 }

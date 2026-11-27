@@ -477,7 +477,10 @@ export function createModeScrollSync(host: ModeScrollSyncHost) {
           const view = w?.view;
           if (!view) return false;
           const mode = detectViewMode(view);
-          if (!mode || mode === job.fromMode) return mode === job.fromMode ? false : true;
+          // mode null＝過渡中類型偵測不出（leaf 未掛完）→ 續等；fromMode 回 false 續等、
+          // 其它真實模式（非過渡又非目標）放棄（return true 停輪詢）。
+          if (mode === null) return false;
+          if (mode === job.fromMode) return false;
           if (mode !== lastSeen) { lastSeen = mode; return false; } // 過渡中：續等
           // 目標模式渲染就緒偵測＋恢復
           if (mode === "source") {

@@ -8,6 +8,7 @@
 
 import { LookupHit } from './service';
 import { t, LangCode } from '../i18n';
+import { ASSET_FOLDER } from './loader';
 
 const W = 900;
 const PAD = 36;
@@ -53,6 +54,19 @@ function escapeStrip(html: string): string {
 
 const INLINE_COLOR_RE = /(?:^|;)\s*color\s*:\s*([^;]+)/;
 const INLINE_BG_RE = /(?:^|;)\s*(?:background(?:-color)?|BACKGROUND)\s*:\s*([^;]+)/;
+
+/** 分享圖 img src 清洗：decode 失敗保留原字面（畸形容編碼不致命）；
+ *  路徑限定辭典資產目錄（ASSET_FOLDER 下）——惡意詞典可用 ../../ 把 vault
+ *  任意檔案（含 .obsidian 設定）織進用戶分享出去的 PNG。越界 src 直接丟棄。 */
+function safeShareImgSrc(src: string): string | null {
+  let p = src;
+  try { p = decodeURIComponent(src); } catch { /* 保留原字面 */ }
+  const norm = p.replace(/\\/g, '/').split('/').filter((s) => s !== '.');
+  if (norm.some((s) => s === '..')) return null;
+  const joined = norm.join('/');
+  if (!joined.toLowerCase().startsWith(ASSET_FOLDER.toLowerCase() + '/')) return null;
+  return joined;
+}
 /** 驗證並規範化 CSS 顏色（去 !important；非法值回 null——canvas fillStyle 賦無效值會靜默保留舊值造成色條）。 */
 function safeColor(raw: string | null | undefined): string | null {
   if (!raw) return null;
@@ -114,7 +128,7 @@ function extractRich(html: string): { lines: DrawnLine[]; images: Array<{ src: s
     const style = flattenInline(el, carry);
     if (tag === 'img') {
       const src = el.getAttribute('src') || '';
-      if (src && !/^(data:|https?:)/.test(src)) images.push({ src: decodeURIComponent(src), lineIdx: lines.length });
+      if (src && !/^(data:|https?:)/.test(src)) { const s = safeShareImgSrc(src); if (s) images.push({ src: s, lineIdx: lines.length }); }
       return;
     }
     if (tag === 'br') {
@@ -159,7 +173,7 @@ function extractRich(html: string): { lines: DrawnLine[]; images: Array<{ src: s
         }
         if (c.tagName.toLowerCase() === 'img') {
           const src = c.getAttribute('src') || '';
-          if (src && !/^(data:|https?:)/.test(src)) images.push({ src: decodeURIComponent(src), lineIdx: lines.length });
+          if (src && !/^(data:|https?:)/.test(src)) { const s = safeShareImgSrc(src); if (s) images.push({ src: s, lineIdx: lines.length }); }
           continue;
         }
         const sub = flattenInline(c, carry);
@@ -180,7 +194,7 @@ function extractRich(html: string): { lines: DrawnLine[]; images: Array<{ src: s
         const c = node as Element;
         if (c.tagName.toLowerCase() === 'img') {
           const src = c.getAttribute('src') || '';
-          if (src && !/^(data:|https?:)/.test(src)) imgs.push({ src: decodeURIComponent(src), lineIdx });
+          if (src && !/^(data:|https?:)/.test(src)) { const s = safeShareImgSrc(src); if (s) imgs.push({ src: s, lineIdx }); }
           continue;
         }
         if (c.tagName.toLowerCase() === 'br') {

@@ -32,9 +32,14 @@ const ALLOWED_ATTRS = new Set([
 const URL_ATTRS = new Set(['href', 'src', 'srcset', 'background']);
 
 function safeUrl(value: string): string | null {
-  const v = value.trim();
+  // 先剝除全部 C0 控制字元與空白再測 scheme：HTML 屬性值中的 tab/LF/CR
+  // 會被瀏覽器 URL 解析剝除（'jav\tascript:' ⇒ javascript:），黑名單錨定
+  // 開頭就會被中間插空白繞過；剝除後的 v 才是瀏覽器實際看到的 scheme 形態。
+  // （srcset 由調用端逐候選拆分後各自過本函數，見 processAttrs。）
+  // eslint-disable-next-line no-control-regex -- C0 剝除是本函數職責本身
+  const v = value.replace(/[\u0000-\u0020]+/g, "");
   if (/^(javascript|data\s*:\s*text\/html|vbscript):/i.test(v)) return null;
-  if (/^data:image\/(png|jpe?g|gif|webp|bmp|svg\+xml);/i.test(v)) return v;
+  if (/^data:image\/(png|jpe?g|gif|webp|bmp);/i.test(v)) return v;
   return v;
 }
 
@@ -79,6 +84,20 @@ export function sanitizeHtml(html: string): string {
         continue;
       }
       if (URL_ATTRS.has(name)) {
+        // srcset 語法＝逗號分隔多組「URL descriptor」——整值只檢第一個 URL
+        // 會放行後續候選（^ 錨定），逐候選拆分各自過 safeUrl。
+        if (name === 'srcset') {
+          const candidates = attr.value.split(',');
+          let bad = false;
+          const checked = candidates.map((c) => {
+            const url = c.trim().split(/\s+/)[0] || '';
+            if (!url || safeUrl(url) === null) { bad = true; return c; }
+            return c;
+          });
+          if (bad) { el.removeAttribute(attr.name); continue; }
+          el.setAttribute(attr.name, checked.join(','));
+          continue;
+        }
         const safe = safeUrl(attr.value);
         if (safe === null) {
           el.removeAttribute(attr.name);

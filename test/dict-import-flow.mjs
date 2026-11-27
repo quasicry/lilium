@@ -68,6 +68,10 @@ function makeVault() {
       return nodeAt(p);
     },
     async createFolder(p) { dirs.add(p); },
+    /** 對齊 Obsidian vault.createBinary：寫入 files 索引（getFiles()/nodeAt 即時可見） */
+    async createBinary(p, buf) { files.set(p, Buffer.from(buf)); },
+    /** 對齊 Obsidian vault.modifyBinary：覆蓋既有 TFile 內容 */
+    async modifyBinary(file, buf) { files.set(file?.path ?? file, Buffer.from(buf)); },
     async read(file) {
       const b = files.get(file?.path ?? file);
       if (!b) throw new Error(`no such file: ${file?.path ?? file}`);

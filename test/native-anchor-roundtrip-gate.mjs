@@ -610,6 +610,49 @@ console.log("[④b 摩尼文方案 — L2/11-123R 記法往返]");
   ok(bOk === bTot && bTot > 0, `④f EDBMT PDF byte 破譯鏈閉合: ${bOk}/${bTot}`);
 }
 
+/* ---------- ⑤ 批4 轉寫引擎修復固化 ---------- */
+// 0F0C NFKC 保護：nampar tsik 帶 compat 分解 <noBreak> 0F0B，入口 NFKC 吞碼位實錘——
+// 修復後 n2r 出 <;>（ext）／原樣（純版標點透傳體例）、r2n <;> 還原 0F0C。
+{
+  const nts = String.fromCodePoint(0x0f0c);
+  const extN = lib.tibetanExtToWylie(nts);
+  ok(extN === "<;>", `⑤a 0F0C ext n2r=<;>: ${JSON.stringify(extN)}`);
+  const back = lib.wylieExtToTibetan("<;>");
+  ok(back === nts, `⑤a 0F0C ext r2n(<;>) 還原: ${[...back].map((c) => (c.codePointAt(0) ?? 0).toString(16)).join(" ")}`);
+  // tsheg 主鍵不回歸
+  ok(lib.tibetanExtToWylie(String.fromCodePoint(0x0f0b)) === "<ts>", "⑤a 0F0B 仍 <ts>");
+}
+// <s-*> 雙鍵體例：規範 EWTS 單字母 <s-k>＋兼容全名 <s-ka> 皆命中 0F90
+{
+  const hexs = (s) => [...s].map((c) => (c.codePointAt(0) ?? 0).toString(16)).join(" ");
+  ok(hexs(lib.wylieExtToTibetan("<s-k>")) === "f90", "⑤b <s-k> 規範鍵→f90");
+  ok(hexs(lib.wylieExtToTibetan("<s-ka>")) === "f90", "⑤b <s-ka> 全名兼容→f90");
+  ok(hexs(lib.wylieExtToTibetan("<s-kha>")) === "f91", "⑤b <s-kha> 全名兼容→f91");
+  ok(lib.tibetanExtToWylie(String.fromCodePoint(0x0f90)) === "<s-k>", "⑤b 出向仍 EWTS 單字母體例");
+}
+// 撇號守門：擴展拉丁（ṃ 1E43）後的 ' 是詞內字符——整詞送引擎原樣透傳，不再切分破碎
+{
+  const r1 = lib.transliterateText("xṃ'a", "tibetan-wylie", true);
+  ok(r1.ok && r1.text === "xṃ'a", `⑤c ṃ 後撇號不破碎: ${JSON.stringify(r1.text)}`);
+  const r2 = lib.transliterateText("ka'a", "tibetan-wylie", true);
+  ok(r2.ok && r2.text === "ཀའ", `⑤c 詞內 a-chung 仍命中: ${JSON.stringify(r2.text)}`);
+  const r3 = lib.transliterateText("bod pa'i", "tibetan-wylie", true);
+  ok(r3.ok && r3.text === "བོད་པའི", `⑤c pa'i 屬格不回歸: ${JSON.stringify(r3.text)}`);
+}
+// 尾隨空白：單空格→tsheg；多空格/tab/換行→原樣透傳（不吞失）
+{
+  const rt = (s) => lib.transliterateText(s, "tibetan-wylie", true).text;
+  ok(rt("bod ") === "བོད་", `⑤d 單空格→tsheg: ${JSON.stringify(rt("bod "))}`);
+  ok(rt("bod  ") === "བོད  ", `⑤d 雙空格原樣: ${JSON.stringify(rt("bod  "))}`);
+  ok(rt("bod\n") === "བོད\n", `⑤d 換行原樣: ${JSON.stringify(rt("bod\n"))}`);
+  ok(rt("bod\t") === "བོད\t", `⑤d tab 原樣: ${JSON.stringify(rt("bod\t"))}`);
+}
+// i18n $& 特殊序列不展開（函數形式替換）
+{
+  const s = lib.t("en", "dict.removed", { name: "$&" });
+  ok(s.includes("$&"), `⑤e vars $& 原樣插入: ${JSON.stringify(s)}`);
+}
+
 console.log(`\n結果: ${pass} 通过, ${fail} 失败`);
 if (fail > 0) {
   console.log("失敗清單（前 20）：");

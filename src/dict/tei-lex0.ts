@@ -57,11 +57,15 @@ function esc(s: string): string {
 }
 
 /** 數字字元實體還原（&#xHH; 十六進位／&#DD; 十進位）。
- *  非法值（非十六進位、0、超出碼位範圍、代理對半區）原樣保留不動。 */
+ *  非法值（非十六進位、0、超出碼位範圍、代理對半區）原樣保留不動。
+ *  U+0001–U+0008 同樣不解碼：該區間是 oVar/pVar 佔位符還原的私有哨兵
+ *  （見 buildArticle），實體形式解碼會讓語料可偽造哨兵、在 esc 後的還原
+ *  步驟注入任意屬性/結構；XML 規範本就禁止這些碼位，保留原樣即契約內容。 */
 function decodeNumericEntities(s: string): string {
   return s.replace(/&(?:#x([0-9A-Fa-f]+)|#([0-9]+));/g, (m, hex?: string, dec?: string) => {
     const cp = hex ? parseInt(hex, 16) : parseInt(dec!, 10);
     if (!Number.isFinite(cp) || cp <= 0 || cp > 0x10ffff || (cp >= 0xd800 && cp <= 0xdfff)) return m;
+    if (cp >= 0x0001 && cp <= 0x0008) return m;
     return String.fromCodePoint(cp);
   });
 }
