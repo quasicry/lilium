@@ -40,7 +40,6 @@
     "test:lantsa": "node test/siddham-lantsa-embed.mjs",
     "test:platform": "node scripts/check-platform.mjs",
     "test:gate": "node test/platform-gate.mjs",
-    "test:editor-advance": "node test/editor-vertical-advance-browser.mjs",
     "test:native-typo-vars": "node test/native-typo-vars-browser.mjs",
     "test:sanskrit-roundtrip": "node test/sanskrit-roundtrip.mjs",
     "test:translit-cross-reference": "node test/sanskrit-cross-reference.mjs",

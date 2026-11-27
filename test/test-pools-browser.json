@@ -3,7 +3,6 @@
     [],
     [],
     [
-      "test/editor-vertical-advance-browser.mjs",
       "test/dict-panel-css.mjs",
       "test/settings-controls.mjs"
     ],

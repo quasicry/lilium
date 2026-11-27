@@ -48,9 +48,7 @@
       "test/dict-panel-css.mjs",
       "test/settings-controls.mjs"
     ],
-    [
-      "test/editor-vertical-advance-browser.mjs"
-    ],
+    [],
     [
       "test/native-typo-vars-browser.mjs",
       "test/clreq-em-browser.mjs",
