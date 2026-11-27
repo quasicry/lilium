@@ -96,6 +96,18 @@ export class MdictReader {
    * 此時所有查詢自動退回原本的線性掃描，行為與舊版一致。
    */
   private keyIndex: SortedKeyIndex | null = null;
+  /**
+   * record block 解壓快取（詞條卡片加載卡頓修復）：
+   * 每次查詢的每條 hit（含 @@@LINK 跟讀每跳）都經 readRecordBytes→decodeBlock 整塊
+   * 解壓（zlib/lzo），同塊反覆重解壓在移動端 CPU 上以十毫秒計，多典多 hit 疊加可達秒級。
+   * 快取鍵＝record block 索引；Map 插入序＝訪問序（命中即移尾），按 unpacked 總字節
+   * 封頂淘汰最舊（真 LRU）。MdictEntry 的 record offset 是解壓塊內偏移，同一塊內
+   * 多條目共享一次解壓。
+   */
+  private recordBlockCache = new Map<number, Uint8Array>();
+  private recordBlockCacheBytes = 0;
+  /** 快取 unpacked 總量封頂：容大詞典最熱若干塊，記憶體可控（移動端友好）。 */
+  private static RECORD_BLOCK_CACHE_MAX_BYTES = 48 * 1024 * 1024;
 
   constructor(data: Uint8Array, ext?: 'mdx' | 'mdd') {
     this.buf = data;
@@ -359,6 +371,9 @@ export class MdictReader {
       keyBlockStart: number; recordStart: number; lzoOk: boolean;
     };
     const r = Object.create(MdictReader.prototype) as MdictReader;
+    // 類欄位初始化器不會在 Object.create 路徑執行——restore 重建的新快取欄位須手動補齊。
+    (r as unknown as { recordBlockCache: Map<number, Uint8Array> }).recordBlockCache = new Map();
+    (r as unknown as { recordBlockCacheBytes: number }).recordBlockCacheBytes = 0;
     (r as unknown as { buf: Uint8Array }).buf = data;
     (r as unknown as { numWidth: number }).numWidth = o.version >= 2.0 ? 8 : 4;
     (r as unknown as { encrypt: number }).encrypt = 0;
@@ -495,10 +510,39 @@ export class MdictReader {
   readRecordBytes(entry: MdictEntry): Uint8Array | null {
     const ri = this.recordInfos[entry.recordIdx];
     if (!ri) return null;
+    const block = this.recordBlock(entry.recordIdx, ri);
+    if (!block) return null;
+    return block.subarray(entry.recordStart, entry.recordEnd);
+  }
+
+  /**
+   * record block 取得（帶 LRU 解壓快取）：命中直接回快取視圖，未命中解壓一次後入快取。
+   * 單塊 unpacked 超過封頂值時不快取（超大塊只出現於格式異常檔，直接解壓避免快取溢出）。
+   */
+  private recordBlock(idx: number, ri: RecordBlockInfo): Uint8Array | null {
+    const cached = this.recordBlockCache.get(idx);
+    if (cached) {
+      // 真 LRU：命中移尾（delete＋set 重插）。
+      this.recordBlockCache.delete(idx);
+      this.recordBlockCache.set(idx, cached);
+      return cached;
+    }
     const packed = this.buf.subarray(this.recordStart + ri.compAcc, this.recordStart + ri.compAcc + ri.compSize);
     try {
       const block = this.decodeBlock(packed, ri.unpackSize);
-      return block.subarray(entry.recordStart, entry.recordEnd);
+      if (ri.unpackSize <= MdictReader.RECORD_BLOCK_CACHE_MAX_BYTES) {
+        this.recordBlockCache.set(idx, block);
+        this.recordBlockCacheBytes += ri.unpackSize;
+        while (this.recordBlockCacheBytes > MdictReader.RECORD_BLOCK_CACHE_MAX_BYTES && this.recordBlockCache.size > 1) {
+          const oldest = this.recordBlockCache.keys().next();
+          if (oldest.done) break;
+          this.recordBlockCache.delete(oldest.value);
+          // 淘汰量按該塊 unpacked 實際大小扣減（快取鍵＝recordInfos 索引）。
+          const info = this.recordInfos[oldest.value];
+          if (info) this.recordBlockCacheBytes -= Math.min(info.unpackSize, this.recordBlockCacheBytes);
+        }
+      }
+      return block;
     } catch {
       return null;
     }
@@ -606,13 +650,9 @@ export class MdictReader {
     for (const [idx, infos] of perBlock) {
       const ri = this.recordInfos[idx];
       if (!ri) continue;
-      const packed = this.buf.subarray(this.recordStart + ri.compAcc, this.recordStart + ri.compAcc + ri.compSize);
-      let block: Uint8Array;
-      try {
-        block = this.decodeBlock(packed, ri.unpackSize);
-      } catch {
-        continue;
-      }
+      // 走帶 LRU 快取的 recordBlock——headwords 全表遍歷與查詢路徑共享解壓成果。
+      const block = this.recordBlock(idx, ri);
+      if (!block) continue;
       for (const e of infos) {
         yield { keyText: e.keyText, text: this.decoder.decode(block.subarray(e.recordStart, e.recordEnd)) };
       }
@@ -647,6 +687,8 @@ export class MdictReader {
     this.buf = new Uint8Array(0);
     this.entries = [];
     this.keyIndex = null;
+    this.recordBlockCache.clear();
+    this.recordBlockCacheBytes = 0;
   }
 }
 
