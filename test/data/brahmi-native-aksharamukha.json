@@ -3,32 +3,26 @@
  "samples": [
   {
    "id": "hultzsch-r1",
-   "iast": "iyaṃ dhaṃmalipī devānaṃpriyena piyadasinā lājina visatī vā lasitī",
    "native": "𑀇𑀬𑀁 𑀥𑀁𑀫𑀮𑀺𑀧𑀻 𑀤𑁂𑀯𑀸𑀦𑀁𑀧𑁆𑀭𑀺𑀬𑁂𑀦 𑀧𑀺𑀬𑀤𑀲𑀺𑀦𑀸 𑀮𑀸𑀚𑀺𑀦 𑀯𑀺𑀲𑀢𑀻 𑀯𑀸 𑀮𑀲𑀺𑀢𑀻"
   },
   {
    "id": "hultzsch-r2",
-   "iast": "evam āyājāṃ dhaṃmacājāṃ samājāṃ damacājāṃ soṇājāṃ vā",
    "native": "𑀏𑀯𑀫𑁆 𑀆𑀬𑀸𑀚𑀸𑀁 𑀥𑀁𑀫𑀘𑀸𑀚𑀸𑀁 𑀲𑀫𑀸𑀚𑀸𑀁 𑀤𑀫𑀘𑀸𑀚𑀸𑀁 𑀲𑁄𑀡𑀸𑀚𑀸𑀁 𑀯𑀸"
   },
   {
    "id": "hultzsch-r3",
-   "iast": "savata viyasi hida bhāgāṃ ca ce pitinā kamālipī",
    "native": "𑀲𑀯𑀢 𑀯𑀺𑀬𑀲𑀺 𑀳𑀺𑀤 𑀪𑀸𑀕𑀸𑀁 𑀘 𑀘𑁂 𑀧𑀺𑀢𑀺𑀦𑀸 𑀓𑀫𑀸𑀮𑀺𑀧𑀻"
   },
   {
    "id": "rummindei",
-   "iast": "devānaṃpiyena piyadasinā lājina vīsativasābhisitena",
    "native": "𑀤𑁂𑀯𑀸𑀦𑀁𑀧𑀺𑀬𑁂𑀦 𑀧𑀺𑀬𑀤𑀲𑀺𑀦𑀸 𑀮𑀸𑀚𑀺𑀦 𑀯𑀻𑀲𑀢𑀺𑀯𑀲𑀸𑀪𑀺𑀲𑀺𑀢𑁂𑀦"
   },
   {
    "id": "bairat-calcutta",
-   "iast": "mangalam aṃbodhi sakhā cha imāni dhaṃmagambhīrāni",
    "native": "𑀫𑀦𑁆𑀕𑀮𑀫𑁆 𑀅𑀁𑀩𑁄𑀥𑀺 𑀲𑀔𑀸 𑀙 𑀇𑀫𑀸𑀦𑀺 𑀥𑀁𑀫𑀕𑀫𑁆𑀪𑀻𑀭𑀸𑀦𑀺"
   },
   {
    "id": "dhauli-sep",
-   "iast": "devānaṃpriya priyadasi lājā ṭarāṃ vīyāsasitā",
    "native": "𑀤𑁂𑀯𑀸𑀦𑀁𑀧𑁆𑀭𑀺𑀬 𑀧𑁆𑀭𑀺𑀬𑀤𑀲𑀺 𑀮𑀸𑀚𑀸 𑀝𑀭𑀸𑀁 𑀯𑀻𑀬𑀸𑀲𑀲𑀺𑀢𑀸"
   }
  ]

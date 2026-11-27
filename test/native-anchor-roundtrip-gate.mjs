@@ -11,8 +11,9 @@
  *   T3 R2N(roman) 輸出不得與輸入 roman 全等（確實產生了原生文字）。
  *
  * 語料來源（全部引擎外部獨立）：
- *   婆羅米：aksharamukha（PyPI 第三方轉換器）自 Hultzsch IAST（UD_Prakrit-DIPI，
- *          GPLv3）產生之原生 Brahmi 錨 —— brahmi-native-aksharamukha.json
+ *   婆羅米：aksharamukha（PyPI 第三方轉換器）產生之原生 Brahmi 錨（僅原生側，
+ *          roman 側語料已去除；IAST 權威真值層另見 brahmi-hultzsch-samples.json）
+ *          —— brahmi-native-aksharamukha.json
  *   僧伽羅：UD_Sinhala-STB/Appuwa（官方 treebank，原生 text + UCSC translit 欄）
  *          —— sinhala-ud-native.json
  *   回鶻：現代維吾爾 UEY 阿拉伯原生（uey-pairs 抽樣＋TS 語料）＋舊回鶻字母
