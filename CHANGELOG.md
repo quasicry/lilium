@@ -1,3 +1,24 @@
+## 0.3.8
+
+### 新增
+- **移動端發音熱點覆蓋層**：Capacitor WebView 對 srcdoc iframe 內 click/touch 透傳不可靠，詞條音頻（sound://）改為宿主 DOM 熱點覆蓋層——平台無關的可靠點擊面，桌面端不受影響。
+- **詞條發音兜底 ▶**：詞條 HTML 含音頻但非可點連結形態（純文字引用/變體寫法）時，行動列自動放置 ▶ 按鈕，點擊走與內嵌播放器同管線（resolveAsset→readBinary→spx 解碼→blob 播放）。
+- **詞條目錄入口宿主按鈕**：詞條含 entry:// 目錄鏈接（鏈接文本含「目錄」）時在行動列提供宿主側入口（移動端 WebView 內 click 透傳不可靠的同類根治）。
+- **懸停彈窗位置記憶與拖拽**：固定（pinned）狀態下拖拽移動彈窗，位置跨彈窗記憶；多彈窗同時開啟時 Esc 一鍵全收。
+- **書籤卡片「複製」鈕**：與「筆記」並列，純樣式無框按鈕跟隨主題色。
+- **摩尼文 Wiktionary 語料**：62 詞條雙向對照語料入測試錨。
+
+### 修復
+- **原位發音根治**：音頻連結保留原始資源路徑（data-li-snd），點擊直接走 resolveAsset→readBinary→spx 解碼→blob 播放管線，不再依賴 app:// href 正則還原 vault 路徑（Obsidian 1.14+ 對 app:// 的限制致移動端發音失效的根因）；data-li-snd 補入 sanitize 白名單。
+- **發音按鈕播放回饋**：播放中顯示 ‖，結束復原 ▶。
+- **行動列按鈕無框化**：li-mini-btn / li-bm-plain-btn 去背景框跟隨主題色（與無框視覺規範統一）。
+- **摩尼文轉寫改進**：EDBMT-12 碑銘逐句對照（145 句級對齊），縮寫雙點「,」規範化映射 <blw>（U+10AE6）。
+- **梵文引擎收編**：indic.ts/siddham.ts 獨立梵文棧撤除（462 行），梵文轉寫全量走 brahmic 通用棧，行為以既有語料門禁固化（雙向 1,876 斷言全綠）。
+- **Doulos SIL 字體子集化**：woff2 306KB→186KB（-39%），按聲明的 IPA/音標區段＋IAST 拉丁擴展＋修飾字母全段保留 1,614 碼位；GSUB/GPOS/name 表完整保留（OFL 合規）；main.js 瘦身約 164KB。
+- **語料純化**：Aksharamukha 官方記法殘留 90 項全刪（婆羅米/天城/僧伽羅/悉曇/蘭札語料 chars 表＋gate 豁免同步）；12 個語料檔名清除「aksharamukha」字眼；語料 source 欄中性化。
+- **命名統一**：蒙古文「學術拉丁」、摩尼文「學界拉丁」統一為「拉丁/Latin」（7 語言欄＋兩份 README）；README 轉寫方案補摩尼文行（17→18 套）；FONT-LICENSES 補 Noto Sans Manichaean。
+- **測試基建清理**：8 個死測試/死 gate 退場（font-glyph-box、column-fill-vertical、editor-vertical 家族、clreq-em——所測場景已拆除或 mock 漂移恆紅）；.gitignore 補簡體「附录」目錄與 /fonts-subset/。
+
 ## 0.3.7
 
 ### 新增
