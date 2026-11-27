@@ -17,7 +17,7 @@
 
 | 字型 | 覆蓋文種 | 版權所有者 |
 |---|---|---|
-| Noto Sans Mongolian | 蒙古文 / 滿文 / 錫伯文 | Google LLC |
+| Noto Sans Mongolian | 蒙古文 / 滿文 | Google LLC |
 | Noto Serif Old Uyghur | 回鶻文 | Google LLC |
 | Noto Serif Tibetan | 藏文 | Google LLC |
 | Noto Sans Devanagari | 天城文（梵文 / 巴利文） | Google LLC |
