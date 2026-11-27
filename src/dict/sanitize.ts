@@ -40,6 +40,10 @@ function safeUrl(value: string): string | null {
   const v = value.replace(/[\u0000-\u0020]+/g, "");
   if (/^(javascript|data\s*:\s*text\/html|vbscript):/i.test(v)) return null;
   if (/^data:image\/(png|jpe?g|gif|webp|bmp);/i.test(v)) return v;
+  // data:image/svg+xml 一律拒（fail-closed）：SVG 可攜 script/外部引用，img 內嵌雖
+  // 理論沙箱，但 WebView 行為依平台不可證（移動端尤甚）——縱深防禦不賭沙箱。
+  // 資產目錄的 .svg 圖走 readBinary 內聯通路（view.ts inlineData），不經本函數，不受影響。
+  if (/^data:image\/svg/i.test(v)) return null;
   return v;
 }
 

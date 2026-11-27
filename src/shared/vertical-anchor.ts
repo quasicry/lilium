@@ -503,10 +503,9 @@ export function observeWritingModeChanges(
 
   // 每幀合併：連續 resize / 多次 class 變動只重算一次
   let pending = false;
-  const g0 = window as unknown as {
-    requestAnimationFrame?: (cb: () => void) => number;
-    setTimeout?: (cb: () => void, ms: number) => unknown;
-  };
+  const g0 = (typeof window !== "undefined" ? window : undefined) as
+    | { requestAnimationFrame?: (cb: () => void) => number; setTimeout?: (cb: () => void, ms: number) => unknown }
+    | undefined;
   const schedule = () => {
     if (pending) return;
     pending = true;
@@ -517,8 +516,8 @@ export function observeWritingModeChanges(
       onLayoutChange(a);
     };
     try {
-      if (typeof g0.requestAnimationFrame === "function") g0.requestAnimationFrame(run);
-      else if (typeof g0.setTimeout === "function") g0.setTimeout(run, 16);
+      if (typeof g0?.requestAnimationFrame === "function") g0.requestAnimationFrame(run);
+      else if (typeof g0?.setTimeout === "function") g0.setTimeout(run, 16);
       else run();
     } catch {
       run();
@@ -526,14 +525,14 @@ export function observeWritingModeChanges(
   };
 
   const disposers: Array<() => void> = [];
-  const g = window as unknown as {
+  const g = (typeof window !== "undefined" ? window : undefined) as unknown as {
     MutationObserver?: typeof MutationObserver;
     addEventListener?: typeof addEventListener;
     removeEventListener?: typeof removeEventListener;
-  };
+  } | undefined;
 
   const body = ownerBody(el);
-  if (g.MutationObserver && body) {
+  if (g?.MutationObserver && body) {
     try {
       const mo = new g.MutationObserver(() => schedule());
       mo.observe(body, { attributes: true, attributeFilter: ["class", "style"], subtree: false });
@@ -541,7 +540,7 @@ export function observeWritingModeChanges(
     } catch { /* 忽略 */ }
   }
 
-  if (g.addEventListener && g.removeEventListener) {
+  if (g?.addEventListener && g?.removeEventListener) {
     const handler = () => schedule();
     for (const evt of ["resize", "orientationchange"] as const) {
       try {

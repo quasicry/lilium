@@ -419,6 +419,9 @@ function mkPopup({ w = 300, h = 80, vw = W, vh = H } = {}) {
   const el = {
     style: {},
     dataset: {},
+    // 對齊真實寫入路徑（官方審核 no-static-styles-assignment：動態樣式走 setCssStyles）
+    setCssStyles(styles) { Object.assign(el.style, styles); },
+    removeClass() {},
     getBoundingClientRect: () => ({ left: 0, top: 0, right: w, bottom: h, width: w, height: h }),
     ownerDocument: { defaultView: { innerWidth: vw, innerHeight: vh } },
   };
@@ -438,7 +441,6 @@ test("直排錨點 → 寫入左側座標，並標註 data-placement", () => {
     assert.strictEqual(p.placement, "left");
     assert.strictEqual(popup.style.left, `${900 - POPUP_GAP - 300}px`);
     assert.strictEqual(popup.style.top, "100px");
-    assert.strictEqual(popup.style.visibility, "visible");
     assert.strictEqual(popup.dataset.placement, "left", "data-placement 供 CSS 微調箭頭方向");
   } finally {
     globalThis.getComputedStyle = g;
@@ -472,7 +474,7 @@ test("錨點失效（元素 detached）→ 回傳 null 且隱藏彈窗", () => {
     parentElement: null, getBoundingClientRect: () => ({ left: 0, top: 0, right: 0, bottom: 0 }) };
   const p = applyPopupPosition(popup, { left: 100, top: 100, right: 180, bottom: 120 }, staleEl);
   assert.strictEqual(p, null, "失效錨點應回傳 null");
-  assert.strictEqual(popup.style.visibility, "hidden", "並隱藏彈窗");
+  assert.strictEqual(popup.dataset.placement, undefined, "失效錨點不寫 placement（顯隱歸調用端）");
 });
 
 test("錨點失效（rect 尺寸歸零）→ 回傳 null", () => {
@@ -500,7 +502,11 @@ test("錨點仍連接且有尺寸 → 正常定位，不誤判為失效", () => 
 });
 
 test("彈窗量測失敗（無 getBoundingClientRect）→ 用預設 300×80", () => {
-  const popup = { style: {}, dataset: {}, ownerDocument: { defaultView: { innerWidth: W, innerHeight: H } } };
+  const popup = { style: {}, dataset: {},
+    // 對齊真實寫入路徑（setCssStyles）；量測失敗場景不提供 getBoundingClientRect
+    setCssStyles(styles) { Object.assign(popup.style, styles); },
+    removeClass() {},
+    ownerDocument: { defaultView: { innerWidth: W, innerHeight: H } } };
   const p = applyPopupPosition(popup, { left: 900, top: 100, right: 920, bottom: 260 }, null);
   assert.ok(Number.isFinite(p.left) && Number.isFinite(p.top));
   assert.strictEqual(popup.style.top, `${260 + POPUP_GAP}px`, "以預設高度計算橫排下方");
