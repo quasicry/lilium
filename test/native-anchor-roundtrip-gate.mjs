@@ -323,6 +323,12 @@ console.log("[④b 摩尼文方案 — L2/11-123R 記法往返]");
   // EDBMT 語料句錨（ʿspwrgʾʾrn ẅ rʾsṯʾn）：入向無透傳
   const edb = S.romanToNative("ʿspwrgʾʾrn ẅ rʾsṯʾn");
   ok(!Array.from(edb).some((c) => c === "ẅ" || c === "ṯ"), "④b EDBMT 句錨無透傳", edb);
+  // 分解式（NFD）輸入不尾隨透傳組合符——入向 NFC 正規化
+  const nfdTail = ["ṭ", "ž", "ẅ", "ṯ", "ś", "š", "k̇", "q̇"].every((c) => {
+    const r = S.romanToNative(c.normalize("NFD"));
+    return ![...r].some((x) => { const cp = x.codePointAt(0) ?? 0; return cp >= 0x300 && cp <= 0x36f; });
+  });
+  ok(nfdTail, "④b NFD 分解式輸入無組合符透傳");
 }
 
 // ============ ④c 摩尼文 VATEC man 段錨（Manichäisch-Türkische Texte 抽樣）============

@@ -326,6 +326,10 @@ export function looksLikeManichaeanLatin(text: string): boolean {
 
 /** 拉丁轉寫 → 摩尼文 Unicode。 */
 export function latinToManichaean(input: string, opts?: ManichaeanTranslitOptions): string {
+  // 記法鍵以 NFC 預組合為主（ṭ/ž/ẅ/ṯ/š/ś），分解式輸入（t+U+0323、z+U+030C 等）
+  // 會尾隨透傳組合符——入向統一 NFC 正規化後匹配（k̇/k̈/j̈/q̇/q̈ 無預組合碼位，
+  // NFC 保持組合序列＝鍵本就是組合序列，不受影響）。
+  input = input.normalize("NFC");
   const mode = markModeOf(opts);
   const MAX_KEY_LEN = Math.max(
     ...LETTER_KEYS.map((k) => k.length),
