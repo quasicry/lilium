@@ -345,10 +345,14 @@ export class HoverLookupController {
       const vh = (this.doc?.defaultView ?? window).innerHeight;
       const x = Math.min(Math.max(e.clientX - this.drag.offX, 8), vw - 32);
       const y = Math.min(Math.max(e.clientY - this.drag.offY, 8), vh - 24);
-      this.popupEl.style.left = `${x}px`;
-      this.popupEl.style.top = `${y}px`;
-      this.popupEl.style.right = 'auto';
-      this.popupEl.style.bottom = 'auto';
+      // 拖拽定位＝覆寫 position() 的計算結果：left/top 給實測座標，right/bottom 清權重
+      //（官方審核規範：樣式設定走 setCssStyles，不直寫 style 屬性）。
+      this.popupEl.setCssStyles({
+        left: `${x}px`,
+        top: `${y}px`,
+        right: 'auto',
+        bottom: 'auto',
+      });
       this.draggedPos = { x, y };
     });
     const endDrag = (e: PointerEvent) => {
@@ -372,10 +376,13 @@ export class HoverLookupController {
       const vh = (this.doc?.defaultView ?? window).innerHeight;
       const x = Math.min(Math.max(this.draggedPos.x, 8), Math.max(vw - 32, 8));
       const y = Math.min(Math.max(this.draggedPos.y, 8), Math.max(vh - 24, 8));
-      this.popupEl.style.left = `${x}px`;
-      this.popupEl.style.top = `${y}px`;
-      this.popupEl.style.right = 'auto';
-      this.popupEl.style.bottom = 'auto';
+      // 記憶位置套用：與拖拽即時段同一組屬性（官方審核規範：樣式設定走 setCssStyles）。
+      this.popupEl.setCssStyles({
+        left: `${x}px`,
+        top: `${y}px`,
+        right: 'auto',
+        bottom: 'auto',
+      });
       return;
     }
     // 錨點失效（切換佈局後 DOM 重建、元素被移除）→ 隱藏而非錯位顯示
