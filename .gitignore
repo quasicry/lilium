@@ -19,6 +19,7 @@ main.js
 /docs/
 # 附錄（退役功能凍結源碼＋本地語料）全數隔離：門禁已改為「檔案不應回到 src/」反向守衛，不需附錄檔
 /附錄/
+/附录/
 /插件安裝包/
 /落地記錄/
 /落地記錄-*.md
@@ -37,3 +38,5 @@ __pycache__/
 
 # src/ 下 .js 均為 .ts 編譯產物（tsc/esbuild 再生，不入庫）
 src/**/*.js
+# 字體子集化中間產物（fonts-subset/fonts-src 不入版）
+/fonts-subset/
