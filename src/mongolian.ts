@@ -357,12 +357,12 @@ function buildMongolianCharTable(): CharTableEntry[] {
 const mongolianAcademic: TransliterationScheme = {
   id: "mongolian",
   label: {
-    zh: "蒙古文（学术拉丁 ↔ Unicode）",
-    "zh-TW": "蒙古文（學術拉丁 ↔ Unicode）",
+    zh: "蒙古文（拉丁 ↔ Unicode）",
+    "zh-TW": "蒙古文（拉丁 ↔ Unicode）",
     mn: "ᠮᠣᠩᠭᠣᠯ ᠪᠢᠴᠢᠭ",
-    en: "Mongolian (Academic Latin ↔ Unicode)",
-    ja: "モンゴル文字（学術ラテン↔Unicode）", ko: "몽골 문자(학술 라틴 ↔ Unicode)",
-  fr: "Mongol (latin académique ↔ Unicode)", de: "Mongolisch (akademisches Latein ↔ Unicode)", },
+    en: "Mongolian (Latin ↔ Unicode)",
+    ja: "モンゴル文字（ラテン↔Unicode）", ko: "몽골 문자(라틴 ↔ Unicode)",
+  fr: "Mongol (latin ↔ Unicode)", de: "Mongolisch (Latein ↔ Unicode)", },
   group: "mongolian",
   primary: true,
   description: "傳統蒙古文學術拉丁轉寫 ↔ Unicode（U+1820–U+1842）；FVS/MVS 以 <f1>…<f4>/<mvs> 標記，往返無損；輸出端掛 IME 正字法校正",

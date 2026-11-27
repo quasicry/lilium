@@ -32,9 +32,9 @@
 | Ali-Gali | borrowed-letter IAST (Mongolian/Manchu) |
 | Uyghur | ULY ↔ UEY |
 | Old Uyghur | Latin ↔ Unicode |
-| Mongolian | Academic Latin ↔ Unicode |
+| Mongolian | Latin ↔ Unicode |
 | ʼPhags-pa | Poppe ↔ Unicode |
-| Manichaean | scholarly Latin ↔ Unicode |
+| Manichaean | Latin ↔ Unicode |
 
 **Note: Transliteration is an experimental feature and provides only an approximate mapping.**
 

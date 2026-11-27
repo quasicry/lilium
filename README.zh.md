@@ -32,9 +32,9 @@
 | 阿禮嘎禮 Ali-Gali | 蒙/滿借音字母 IAST |
 | 維吾爾文 Uyghur | ULY ↔ UEY |
 | 回鶻文 Old Uyghur | 拉丁 ↔ Unicode |
-| 蒙古文 Mongolian | 學術拉丁 ↔ Unicode |
+| 蒙古文 Mongolian | 拉丁 ↔ Unicode |
 | 八思巴字 ʼPhags-pa | Poppe ↔ Unicode |
-| 摩尼文 Manichaean | 學界拉丁 ↔ Unicode |
+| 摩尼文 Manichaean | 拉丁 ↔ Unicode |
 
 **注意：轉寫為實驗性功能，近似映射！**
 
