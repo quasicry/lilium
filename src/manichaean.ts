@@ -175,6 +175,11 @@ const SPECIAL_SEQUENCES: Record<string, string> = {
   //   manichaeanToLatin 的 LIGATURES 段。
   "śy": cp(MANI_LETTER.YODH) + cp(MANI_LETTER.SADHE),
   "śn": cp(MANI_LETTER.NUN) + cp(MANI_LETTER.SADHE),
+  // 學界記法別名（n3378 §4.2、EDBMT 語料實錘）——入向正規化至方案主記法：
+  //   ẅ ＝ WAW+ABOVE 縮寫組合（ʾw 縮寫形 'and'，出向主記法 w<abv>）；
+  //   ṯ ＝ TAW 記法異體（主鍵 t）。缺映射會原樣透傳（U+1E85/U+1E6F 拉丁擴展字元）。
+  "ẅ": cp(MANI_LETTER.WAW) + cp(MANI_ABBV.ABOVE),
+  "ṯ": cp(MANI_LETTER.TAW),
 };
 
 /** 縮寫符的無損標記（與 olduyghur `<dN>`、蒙古文 `<fN>` 同構） */
@@ -223,11 +228,13 @@ const LETTER_TO_LATIN: Record<string, string> = (() => {
 /** 所有拉丁 token（含變音符鍵），最長在前 */
 const LETTER_KEYS = Object.keys(LATIN_TO_LETTER).sort((a, b) => b.length - a.length);
 const SPECIAL_KEYS = Object.keys(SPECIAL_SEQUENCES).sort((a, b) => b.length - a.length);
-/** 專字碼位 → 拉丁 token（SPECIAL_SEQUENCES 反查） */
+/** 專字碼位 → 拉丁 token（SPECIAL_SEQUENCES 反查；排除記法別名——別名鍵（ẅ/ṯ）
+ *  值與主鍵（w<abv>/t）的碼位重疊，若進反查會遮蔽主鍵出向（10AE4 應回 t 非 ṯ）） */
+const SPECIAL_ALIAS_KEYS = new Set(["ẅ", "ṯ"]);
 const SPECIAL_TO_LATIN: Record<string, string> = (() => {
   const rev: Record<string, string> = {};
   for (const [k, v] of Object.entries(SPECIAL_SEQUENCES)) {
-    if (rev[v] === undefined) rev[v] = k;
+    if (!SPECIAL_ALIAS_KEYS.has(k) && rev[v] === undefined) rev[v] = k;
   }
   return rev;
 })();

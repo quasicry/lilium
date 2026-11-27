@@ -315,6 +315,14 @@ console.log("[④b 摩尼文方案 — L2/11-123R 記法往返]");
   // 專字 UD（10AC8）雙向閉環（缺出向映射會原樣透傳）
   ok(S.nativeToRoman("\u{10AC8}") === "<ud>", "④b 專字 UD 出向", S.nativeToRoman("\u{10AC8}"));
   ok(S.nativeToRoman(S.romanToNative("b<ud>")) === "b<ud>", "④b 專字 UD 往返閉環", S.nativeToRoman(S.romanToNative("b<ud>")));
+  // 學界記法別名（n3378 §4.2／EDBMT 體例）：ẅ＝w<abv>（正規化至主記法）、ṯ＝t——
+  // 入向別名不透傳；別名不進出向反查（TAW 出向仍是主鍵 t）
+  ok(S.nativeToRoman(S.romanToNative("ẅ")) === "w<abv>", "④b 別名 ẅ 正規化", S.nativeToRoman(S.romanToNative("ẅ")));
+  ok((Array.from(S.romanToNative("ṯ")).map((c) => (c.codePointAt(0) ?? 0).toString(16)).join(" ")) === "10ae4", "④b 別名 ṯ 入向", S.romanToNative("ṯ"));
+  ok(S.nativeToRoman("\u{10AE4}") === "t", "④b TAW 出向主鍵 t 不遮蔽", S.nativeToRoman("\u{10AE4}"));
+  // EDBMT 語料句錨（ʿspwrgʾʾrn ẅ rʾsṯʾn）：入向無透傳
+  const edb = S.romanToNative("ʿspwrgʾʾrn ẅ rʾsṯʾn");
+  ok(!Array.from(edb).some((c) => c === "ẅ" || c === "ṯ"), "④b EDBMT 句錨無透傳", edb);
 }
 
 // ============ ④c 摩尼文 VATEC man 段錨（Manichäisch-Türkische Texte 抽樣）============
