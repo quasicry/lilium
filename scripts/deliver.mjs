@@ -185,11 +185,11 @@ if (!skipTests) {
     // [凍結] run("3/5 test:hanging-browser", "node", ["test/hanging-browser.mjs"]);  // 缺上游功能面模組（主控 2026-11-06 親跑盤點）
     // （審核收口）：瀏覽器型門禁補入 ——
     // punct-center-browser：點號置中跨字體（P1，此前只在 test:all 裡，交付時沒跑）；
-    // clreq-em-browser：CLReq 固定 em 寬的 CSS 消費端（P1 接線的另一半）。
     // （leaf-scope-browser 已於 A7 改寫為 leaf-gate 退役鎖定——純 Node 斷言，不需瀏覽器，
     //  故從瀏覽器門移出；該測試原先打包已不存在的 src/leaf-gate.ts 而凍結於此。）
     // [凍結] run("3/5 test:punct-center-browser", "node", ["test/punct-center-browser.mjs"]);  // 缺上游功能面模組（主控 2026-11-06 親跑盤點）
-    run("3/5 test:clreq-em-browser", "node", ["test/clreq-em-browser.mjs"]);
+    // [凍結] run("3/5 test:clreq-em-browser", "node", ["test/clreq-em-browser.mjs"]);  // 缺上游功能面模組（src/vertical-punct.ts 已拆除、styles.css li-punct-em 規則不在）
+    //   （上游拆除後此消費端測試失效，測試檔連同 parallel pools 條目一併移除。）
     // LI-TS-103：`——`/`……` 不可分離 —— 實測 Chromium 自己有禁則，此檔是守衛而非修補
     run("3/5 test:clreq-unbreakable-browser", "node", ["test/clreq-unbreakable-browser.mjs"]);
     // 這兩項此前「只寫在交付清單裡、從未進流水線」——
@@ -200,7 +200,7 @@ if (!skipTests) {
     // [凍結 v0.1.100] run("3/5 test:reader-pager-browser", "node", ["test/reader-pager-browser.mjs"]);  // 缺上游功能面模組（主控 2026-11-06 親跑盤點）
     run("3/5 test:vertical-fill-browser", "node", ["test/vertical-fill-browser.mjs"]);
   } else {
-    console.log(`  （跳過 theme-compat / ui-surfaces / punct-orientation / settings-controls / itemview-chars-lock / punct-center-browser / clreq-em-browser / clreq-unbreakable-browser / reader-pager-browser / vertical-fill-browser：未找到 ${chrome}，設 CHROME_BIN 可啟用）`);
+    console.log(`  （跳過 theme-compat / ui-surfaces / punct-orientation / settings-controls / itemview-chars-lock / punct-center-browser / clreq-unbreakable-browser / reader-pager-browser / vertical-fill-browser：未找到 ${chrome}，設 CHROME_BIN 可啟用）`);
   }
 }
 

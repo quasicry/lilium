@@ -51,7 +51,6 @@
     [],
     [
       "test/native-typo-vars-browser.mjs",
-      "test/clreq-em-browser.mjs",
       "test/clreq-unbreakable-browser.mjs"
     ]
   ]
