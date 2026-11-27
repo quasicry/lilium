@@ -1,0 +1,135 @@
+{
+ "_comment": [
+  "EDBMT（Database of Manichaean Texts, manichaeism.de, Lieu/Henning BBB 校訂本）逐句對照語料。",
+  "PDF 內嵌 Manichean 字體無 Unicode 映射——字形輪廓比對＋roman 註釋行對照破譯抽取。",
+  "roman 欄＝EDBMT 學術轉寫（Durkin-Meisterernst 體例：,＝縮寫雙點）；mani_bytes 欄＝PDF 內容流視覺 byte 序。",
+  "僅供 lilium 轉寫方案對照測試研究用途（署名出處，見本註釋）；隨插件分發須另取授權。抓取日期 2026-11-27。"
+ ],
+ "sentences": [
+  {
+   "bbb": "39",
+   "roman": "!w by m!ny xwd!wn",
+   "mani_bytes": "Nwadwx ynam yb wa"
+  },
+  {
+   "bbb": "39",
+   "roman": "nmbrym !w pr wzrg",
+   "mani_bytes": "rp wa Myrbmn Grzw"
+  },
+  {
+   "bbb": "31",
+   "roman": "by xwd!y m!ny",
+   "mani_bytes": "ynam yadwx yb Mwda$"
+  },
+  {
+   "bbb": "40",
+   "roman": "yt br!z!g !wrw!rym",
+   "mani_bytes": "tyo arb Gaz Myrawrwa"
+  },
+  {
+   "bbb": "28",
+   "roman": "ywjdhr prystg!n wzrg",
+   "mani_bytes": null
+  },
+  {
+   "bbb": "30",
+   "roman": "!w tw n!m pwr!m",
+   "mani_bytes": null
+  },
+  {
+   "bbb": "43",
+   "roman": "!bz!r!n",
+   "mani_bytes": null
+  },
+  {
+   "bbb": "44",
+   "roman": "s!s-!r mytrq",
+   "mani_bytes": null
+  },
+  {
+   "bbb": "63",
+   "roman": "n p!yd !wm rw!n",
+   "mani_bytes": null
+  },
+  {
+   "bbb": "64",
+   "roman": "bwjyd dhydwm",
+   "mani_bytes": null
+  },
+  {
+   "bbb": "65",
+   "roman": "!g!dg qyrbg",
+   "mani_bytes": null
+  },
+  {
+   "bbb": "66",
+   "roman": "!nwg rwn why",
+   "mani_bytes": null
+  },
+  {
+   "bbb": "67",
+   "roman": "!w tw",
+   "mani_bytes": null
+  },
+  {
+   "bbb": "68",
+   "roman": "%s-!ym yy,w",
+   "mani_bytes": null
+  },
+  {
+   "bbb": "69",
+   "roman": "!w tw !pwr!m m!ny",
+   "mani_bytes": null
+  },
+  {
+   "bbb": "70",
+   "roman": "rwn rwc!g rwc",
+   "mani_bytes": null
+  },
+  {
+   "bbb": "71",
+   "roman": "bwd rwn rwc!g",
+   "mani_bytes": null
+  },
+  {
+   "bbb": "72",
+   "roman": "rwc bwd x(wd!y m!ny",
+   "mani_bytes": null
+  },
+  {
+   "bbb": "73",
+   "roman": "!gr!w n!m!ny",
+   "mani_bytes": null
+  },
+  {
+   "bbb": "75",
+   "roman": "rwn ,$ry!!r",
+   "mani_bytes": null
+  },
+  {
+   "bbb": "76",
+   "roman": ",hry!r!n pws!ny",
+   "mani_bytes": null
+  },
+  {
+   "bbb": "77",
+   "roman": "m!ny xwd!wn",
+   "mani_bytes": null
+  },
+  {
+   "bbb": "78",
+   "roman": "xwd!wn!rwn ,hry!r",
+   "mani_bytes": null
+  },
+  {
+   "bbb": "79",
+   "roman": "!s-!yn !rz!!n",
+   "mani_bytes": null
+  },
+  {
+   "bbb": "80",
+   "roman": "!yy tw",
+   "mani_bytes": null
+  }
+ ]
+}

@@ -526,6 +526,62 @@ console.log("[④b 摩尼文方案 — L2/11-123R 記法往返]");
   ok(sOk === synth.length, `④e 缺失字母合成組合詞閉合: ${sOk}/${synth.length}`);
 }
 
+// ============ ④f EDBMT 逐句對照語料（manichaeism.de BBB 校訂本破譯抽取） ============
+{
+  const { readFileSync } = await import("node:fs");
+  const corpus = JSON.parse(readFileSync(new URL("./data/manichaean-edbmt-corpus.json", import.meta.url), "utf8"));
+  const S = lib.getScheme("manichaean");
+  let eOk = 0;
+  for (const r of corpus.sentences) {
+    const roman = r.roman;
+    // `,`→<blw> 是規範化（EDBMT 體例吸收）：含 , 的輸入以二次閉合驗證
+    const one = S.nativeToRoman(S.romanToNative(roman));
+    const back = S.nativeToRoman(S.romanToNative(one));
+    if (back === one && (one === roman || roman.includes(","))) eOk++;
+    else fail++, failures.push(`④f EDBMT 往返: ${roman} → ${one} → ${back}`);
+  }
+  pass += eOk;
+  ok(eOk === corpus.sentences.length, `④f EDBMT 語料 R→N→R 閉合: ${eOk}/${corpus.sentences.length}`);
+  // EDBMT 體例 `,`（縮寫雙點）→ <blw> 別名：閉合性＋碼位正確
+  const n = S.romanToNative("rw,n");
+  ok(n === "𐫡𐫇𐫦𐫗", "④f EDBMT `,` 別名→縮寫符 BELOW（U+10AE6，r=U+10AE1）", JSON.stringify([...n].map(c=>c.codePointAt(0).toString(16))));
+  ok(S.nativeToRoman(n) === "rw<blw>n", "④f EDBMT `,` 輸出規範 <blw> 標記");
+  // 詞首體例 ,hry!r
+  const n2 = S.romanToNative(",hry!r");
+  ok(n2.startsWith("𐫦"), "④f EDBMT 詞首 `,` 亦映射 BELOW");
+  // mani_bytes 欄破譯反轉鏈閉合（byte 串反轉→記法→native→記法）
+  const upper = { B:"b", C:"c", D:"d", E:"", G:"g", K:"k", M:"m", N:"n", Q:"q", S:"s", T:"t" };
+  const special = { "$":"", "¥":"", "†":"", "©":"", "º":"" };
+  const bytesToRoman = (m) => {
+    const s = m.split("").reverse().join("");
+    let out = "", i = 0;
+    while (i < s.length) {
+      const c = s[i], nxt = s[i+1] || "";
+      if (c === "a") {
+        if (nxt && /[NMDbwGryTa]/.test(nxt)) { out += "!" + (upper[nxt] ?? nxt); i += 2; continue; }
+        out += "!"; i += 1; continue;
+      }
+      if (c in upper) { out += upper[c]; i += 1; continue; }
+      if (c in special) { i += 1; continue; }
+      if (/[a-z]/.test(c)) { out += c; i += 1; continue; }
+      i += 1;
+    }
+    return out;
+  };
+  let bOk = 0, bTot = 0;
+  for (const r of corpus.sentences) {
+    if (!r.mani_bytes) continue;
+    bTot++;
+    const conv = bytesToRoman(r.mani_bytes);
+    const native = S.romanToNative(conv);
+    const back = S.nativeToRoman(native);
+    if (back === conv && /[\u{10AC0}-\u{10AFF}]/u.test(native)) bOk++;
+    else fail++, failures.push(`④f EDBMT byte 鏈: ${r.mani_bytes} → ${conv} → ${back}`);
+  }
+  pass += bOk;
+  ok(bOk === bTot && bTot > 0, `④f EDBMT PDF byte 破譯鏈閉合: ${bOk}/${bTot}`);
+}
+
 console.log(`\n結果: ${pass} 通过, ${fail} 失败`);
 if (fail > 0) {
   console.log("失敗清單（前 20）：");

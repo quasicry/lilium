@@ -329,6 +329,16 @@ export function latinToManichaean(input: string, opts?: ManichaeanTranslitOption
     }
     if (matched) continue;
 
+    // EDBMT 體例別名（Durkin-Meisterernst Database of Manichaean Texts 記法）：
+    // `,`＝縮寫雙點（詞首/詞中/詞尾皆可：rw,n、why,、,hry!r；EDBMT 65 頁全量無獨立逗號用法）→ 縮寫符 BELOW。
+    // 摩尼文無 ASCII 逗號原生碼位（此前 `,` 為字面透傳降級容錯）——吸收後 `,`→
+    // BELOW 碼位→`<blw>` 記法閉合，往返無損性不降級。輸出側仍用規範 `<blw>` 標記。
+    if (rest.startsWith(",")) {  // 詞首 `,hry!r` 亦映射（EDBMT 全量 `,` 恆為縮寫雙點）
+      out += cp(MANI_ABBV.BELOW);
+      i += 1;
+      continue;
+    }
+
     // 縮寫符標記 <abv>/<blw>
     const am = ABBV_MARK_RE.exec(rest);
     if (am) {
