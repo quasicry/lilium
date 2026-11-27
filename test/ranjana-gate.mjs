@@ -1,8 +1,7 @@
-/* ---------- 蘭札體語料門禁（Aksharamukha describe/Ranjana：122 字＋36 詞＋6 句） ----------
+/* ---------- 蘭札體語料門禁（104 字＋36 詞＋6 句） ----------
  * 語料 test/data/ranjana-corpus.json（r44n 抓取存檔）。
  * 三條標準：IAST 是 IAST、蘭札（Devanagari 編碼）是蘭札、杜絕原樣透傳、往返一致。
- * 豁免：Aksharamukha「X : Approximate equivalent」近似等價集（ĕ/ŏ/æ/ô、南印
- * 副音、nukta 異讀、k_ha、ḵ）——單向壓縮映射非雙向可逆，表達力極限不扭曲映射（鐵律）。
+ * 豁免：無（Aksharamukha 擴展記法項已自語料移除）。
  * 句讀慣例：Aksharamukha 語料的 '.'/'..' 歸一為 lilium IAST 出版慣例 '|'||'。
  */
 import { readFileSync } from "node:fs";
@@ -26,9 +25,9 @@ execFileSync(join(ROOT, "node_modules", ".bin", "esbuild"), [
 ]);
 const { iastToDevanagari, devanagariToIast } = await import(url.pathToFileURL(join(TMP, "lib.mjs")).href);
 
-const X_APPROX = new Set(["ĕ","ŏ","æ","ǣ","ô","kĕ","kŏ","kæ","kǣ","kô",
-  "ḻa","ṟa","ṉa","l̤a","qa","k͟ha","ġa","za","r̤a","r̤ha","fa","ẏa",
-  "n̆ga","n̆ja","n̆ḍa","n̆da","m̆ba","k_ha","ḵ"]);
+const X_APPROX = new Set([
+  
+  ]);
 const norm = (s) => s.replace(/\.\./g, "||").replace(/\./g, "|").replace(/ +([।॥])/g, "$1");
 
 let pass = 0, fail = 0, passthrough = 0;

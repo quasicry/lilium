@@ -1,10 +1,8 @@
-/* ---------- 天城體語料門禁（121 字＋36 詞＋6 句，IAST 進出） ----------
+/* ---------- 天城體語料門禁（104 字＋36 詞＋6 句，IAST 進出） ----------
  * 語料 test/data/devanagari-aksharamukha-corpus.json。
  * 三條標準：拉丁是拉丁、天城體是天城體、杜絕原樣透傳、往返一致。
- * 豁免：
- * ① X-近似（自標 Approximate equivalent）：ĕ/ŏ/æ/ô、南印 ḻa/ṟa/ṉa、
- *    nukta 異讀 qa/ġa/za/fa/ẏ/ẏa、拼出 CV kĕ/kŏ/kæ/kô、ḵ——單向壓縮映射；n2r 端對
- *    缺項字符輸出 \uXXXX esc 標註（lilium 透傳審計慣例）＝表達力極限不扭曲映射（鐵律）。
+ * 豁免：Aksharamukha 擴展記法項（X-近似集/南印副音/nukta 異讀/拼出 CV/ḵ）
+ * 已自語料移除，豁免同步撤除；句讀慣例歸一保留。
  * ② 句讀慣例歸一：'.'/'..' ↔ '।'/'॥'，lilium IAST 出向統一 '|'||'（danda 出版慣例）；
  *    danda 緊貼前詞（indic.ts 出版慣例）→ 語料端存檔時去 danda 前空格。
  */
@@ -29,9 +27,7 @@ execFileSync(join(ROOT, "node_modules", ".bin", "esbuild"), [
 ]);
 const { iastToDevanagari, devanagariToIast } = await import(url.pathToFileURL(join(TMP, "lib.mjs")).href);
 
-const EXEMPT_CHARS = new Set([
-  "ĕ","ŏ","æ","ô","ḻa","ṟa","ṉa","qa","ġa","za","fa","ẏ","ẏa","kĕ","kŏ","kæ","kô","ḵ",
-]);
+const EXEMPT_CHARS = new Set([]); // Aksharamukha 擴展記法項已自語料移除
 const norm = (s) => s.replace(/\.\./g, "||").replace(/\./g, "|");
 
 let pass = 0, fail = 0, passthrough = 0;
@@ -58,5 +54,5 @@ for (const [i0, d0] of corpus.chars) {
 for (const [i0, d0] of corpus.words) rt("word", i0, d0);
 for (const [i0, d0] of corpus.sentences) rt("sentence", i0, d0);
 
-console.log(`devanagari-gate: ${pass} pass / ${fail} fail / 透傳 ${passthrough}（豁免 X-近似 17 條＋句讀/danda 慣例歸一）`);
+console.log(`devanagari-gate: ${pass} pass / ${fail} fail / 透傳 ${passthrough}（豁免句讀/danda 慣例歸一）`);
 if (fail || passthrough) { for (const f of fails) console.error("GATE-FAIL: " + f); process.exit(1); }

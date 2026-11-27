@@ -1,10 +1,7 @@
-/* ---------- 僧伽羅語料門禁（Aksharamukha describe/Sinhala：119 字＋36 詞＋6 句，IAST 進出） ----------
+/* ---------- 僧伽羅語料門禁（103 字＋36 詞＋6 句，IAST 進出） ----------
  * 語料 test/data/sinhala-aksharamukha-corpus.json。
- * 豁免：
- * ① X-近似（Aksharamukha 自標 Approximate equivalent）：ĕ/ŏ/æ/ô、口語副音 ළ·/ර·/න·、
- *    借詞 qa/ġa/za/ẏa/fa、拼出形 kḷ/kḹ/kĕ/kŏ/kæ/kô、特殊符 oṃ/ḵ/'、獨立長母音字母
- *    e→ඒ/o→ඕ（lilium SINHALA 表僅 එ=e 短式，C-B3 出版慣例）——單向壓縮映射，
- *    表達力極限不扭曲映射（鐵律）。
+ * 豁免：Unicode 標準 vocalic（ḷ/ḹ/kḷ/kḹ）。
+ * Aksharamukha 擴展記法項（X-近似集/口語副音/借詞/avagraha 括注）已自語料移除。
  * ② 語義恆等歸一（fold 判準）：ZWJ 可見連結符 vs virama 形（同碼位序列差 U+200D）；
  *    長 e/o 短式 ෙ/ො（lilium C-B3 輸出慣例，頁面 Notes 自證）；嚴式鼻音歸化
  *    ṃ+同部位塞音→鼻音（brahmic.ts:262-268 strictNasal 刻意設計）。
@@ -39,10 +36,8 @@ const r2nFn = (s) => schemePali.romanToNative(s);
 const n2rFn = (s) => schemePali.nativeToRoman(s);
 
 const EXEMPT_CHARS = new Set([
-  "ḷ","ḹ","ĕ","ŏ","æ","ô","ḻa","ṟa","ṉa","qa","ġa","za","fa","ẏa",
-  "kḷ","kḹ","kĕ","kŏ","kæ","kô","'","oṃ","ḵ","e","o",
-  // e→ඒ/o→ඕ＝Aksharamukha 短標法（頁面把獨立長式字母配短音標）；ē/ō 已收編
-  // ē↔ඒ、ō↔ඕ 走真映射測試。
+  "ḷ","ḹ","kḷ","kḹ",
+  // Aksharamukha 擴展記法項（ĕŏæôḻaṟaṉaqaġazaẏaḵ 及 avagraha 括注）已自語料移除，豁免同步撤除
 ]);
 const ZWJ = "\u200D";
 const LONG2SHORT = { "ේ": "ෙ", "ෝ": "ො", "ඒ": "එ", "ඕ": "ඔ", "ē": "e", "ō": "o" };
@@ -92,5 +87,5 @@ for (const [i0, d0] of corpus.words) {
 }
 for (const [i0, d0] of corpus.sentences) rt("sentence", norm(i0), norm(d0));
 
-console.log(`sinhala-gate: ${pass} pass / ${fail} fail / 透傳 ${passthrough}（豁免 X-近似 25 條＋語義恆等 fold 判準）`);
+console.log(`sinhala-gate: ${pass} pass / ${fail} fail / 透傳 ${passthrough}（豁免 vocalic 4 條＋語義恆等 fold 判準）`);
 if (fail || passthrough) { for (const f of fails) console.error("GATE-FAIL: " + f); process.exit(1); }
