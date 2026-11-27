@@ -1,6 +1,6 @@
 {
   "name": "lilium",
-  "version": "0.3.10",
+  "version": "0.3.11",
   "description": "Lilium — universal dictionary & transliteration for Obsidian.",
   "main": "main.js",
   "scripts": {
