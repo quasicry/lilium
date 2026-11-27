@@ -232,7 +232,7 @@ console.log("[③c VATEC 舊回鶻語料抽樣 — 學術轉寫映射，非原�
   console.log(`  vatec 抽樣 ${sample.length} 案：往返剝 ALEPH 閉合 ${rtOk}，差異 ${rtLost}（abjad 語義差異行另計，不計失敗——VATEC 記法與引擎記法不同源，差異行為預期內）`);
 }
 
-// ============ ④ VATEC 雙向記法兼容（A 裁定）＋摩尼文方案 ============
+// ============ ④ VATEC 雙向記法兼容＋摩尼文方案 ============
 // ④a olduyghur VATEC 入向：TL 欄直接餵方案（不再外部預映射）——vteNormalize 生效驗證；
 //     canonical 記法輸入恒等（鐵律）。
 console.log("[④a VATEC 雙向記法 — TL 直入 olduyghur 方案]");
@@ -302,6 +302,16 @@ console.log("[④b 摩尼文方案 — L2/11-123R 記法往返]");
   // TATWEEL（U+0640 詞形圖形延伸）透傳往返
   const nt = S.nativeToRoman("\u{10AC1}\u0640\u{10AC2}");
   ok(nt.includes("\u0640"), "④b TATWEEL 透傳", JSON.stringify(nt));
+  // 兩個標準強制連字（L2/11-123R §4.2）：śy＝YODH+SADHE、śn＝NUN+SADHE——
+  // 入向 śy/śn 不落 SSHIN；出向連字序列不拆 yc/nc；雙向閉環。
+  const ligN = S.romanToNative("śy");
+  ok((Array.from(ligN).map((c) => (c.codePointAt(0) ?? 0).toString(16)).join(" ")) === "10acf 10add", "④b 連字 śy N2R", ligN);
+  const ligN2 = S.romanToNative("śn");
+  ok((Array.from(ligN2).map((c) => (c.codePointAt(0) ?? 0).toString(16)).join(" ")) === "10ad7 10add", "④b 連字 śn N2R", ligN2);
+  ok(S.nativeToRoman("\u{10ACF}\u{10ADD}") === "śy", "④b 連字 YODH+SADHE R2N", S.nativeToRoman("\u{10ACF}\u{10ADD}"));
+  ok(S.nativeToRoman("\u{10AD7}\u{10ADD}") === "śn", "④b 連字 NUN+SADHE R2N", S.nativeToRoman("\u{10AD7}\u{10ADD}"));
+  ok(S.nativeToRoman(S.romanToNative("śy")) === "śy" && S.nativeToRoman(S.romanToNative("śn")) === "śn", "④b 連字往返閉環");
+  ok((Array.from(S.romanToNative("ś")).map((c) => (c.codePointAt(0) ?? 0).toString(16)).join(" ")) === "10ae3", "④b 單 ś 仍 SSHIN", S.romanToNative("ś"));
 }
 
 // ============ ④c 摩尼文 VATEC man 段錨（Manichäisch-Türkische Texte 抽樣）============

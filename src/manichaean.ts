@@ -8,7 +8,8 @@
  * *Second revised proposal for encoding the Manichaean script in the SMP of the UCS*,
  * UTC L2/11-123R（§3 Names and ordering 的 Latin 欄、§4 縮寫符、§4.1 VS-1 變體、§5 數字、§7 標點）。
  * 核心規範：The Unicode Standard Ch 10 §10.5「Manichaean」（10.5.1 U+10AC0–U+10AFF）——
- * 連寫整形（Table 10-4~7 雙連/右連/左連/不連四組）、兩個強制連字（SADHE+YODH/NUN，Table 10-8）、
+ * 連寫整形（Table 10-4~7 雙連/右連/左連/不連四組）、兩個強制連字（SADHE+YODH/NUN，Table 10-8；
+ * 拉丁 śy/śn 雙向映射見 SPECIAL_SEQUENCES／LIGATURES 段）、
  * ALEPH 通常僅右連 BETH/BHETH（偶 GIMEL），斷連以 U+200C ZWNJ（透傳保留，見 VS_VARIANTS 段註釋）、
  * 詞形圖形延伸可用 U+0640 ARABIC TATWEEL（透傳保留）、標點語義（10AF2 大單位/節末、10AF3 小單位/
  * 半節末、10AF4 句內子單位、10AF0/10AF1/10AF5 標題題注起訖、10AF6 行填充省略號）。
@@ -167,6 +168,13 @@ const LATIN_TO_LETTER: Record<string, number> = {
  */
 const SPECIAL_SEQUENCES: Record<string, string> = {
   "<ud>": cp(MANI_LETTER.UD),
+  // L2/11-123R §4.2 兩個標準強制連字（obligatory ligatures）：ś 音由 SADHE 承載——
+  //   śy ＝ YODH+SADHE（logical 序）、śn ＝ NUN+SADHE。學界轉寫（Henning 表、
+  //   Sundermann、EDBMT）śy/śn 一律指此連字組合；不加特例會錯拼成 SSHIN+YODH/NUN
+  //   （字形身份層錯誤：SSHIN 是獨立字母，連字環境不用它）。出向對稱映射見
+  //   manichaeanToLatin 的 LIGATURES 段。
+  "śy": cp(MANI_LETTER.YODH) + cp(MANI_LETTER.SADHE),
+  "śn": cp(MANI_LETTER.NUN) + cp(MANI_LETTER.SADHE),
 };
 
 /** 縮寫符的無損標記（與 olduyghur `<dN>`、蒙古文 `<fN>` 同構） */
@@ -402,7 +410,17 @@ export function manichaeanToLatin(input: string, opts?: ManichaeanTranslitOption
   const chars = Array.from(input);
   let out = "";
   let i = 0;
+  // L2/11-123R §4.2 兩個標準強制連字（logical 序）：YODH+SADHE＝śy、NUN+SADHE＝śn。
+  // 拉丁慣例 śy/śn 一律指此組合（見入向 SPECIAL_SEQUENCES 註釋）——不特判會拆成
+  // y+c/n+c，學界讀者無法辨認連字。單獨 y/n/c 不受影響。
+  const LIGATURES: Array<[string, string]> = [
+    [cp(MANI_LETTER.YODH) + cp(MANI_LETTER.SADHE), "śy"],
+    [cp(MANI_LETTER.NUN) + cp(MANI_LETTER.SADHE), "śn"],
+  ];
   while (i < chars.length) {
+    const two = chars.slice(i, i + 2).join("");
+    const lig = LIGATURES.find(([seq]) => seq === two);
+    if (lig) { out += lig[1]; i += 2; continue; }
     const ch = chars[i];
 
     // 標點
@@ -504,6 +522,9 @@ function buildManichaeanCharTable(): CharTableEntry[] {
     rows.push({ native: cp(v), roman: k, note: notes[k], section: "字母" });
   }
   rows.push({ native: cp(MANI_LETTER.UD), roman: "<ud>", note: "專拼 ud 'and' 的字母", section: "字母" });
+  // 兩個標準強制連字（L2/11-123R §4.2）——組合序列條目，供查閱
+  rows.push({ native: cp(MANI_LETTER.YODH) + cp(MANI_LETTER.SADHE), roman: "śy", note: "強制連字：yodh+sadhe（ś 音由 sadhe 承載）", section: "字母" });
+  rows.push({ native: cp(MANI_LETTER.NUN) + cp(MANI_LETTER.SADHE), roman: "śn", note: "強制連字：nun+sadhe（ś 音由 sadhe 承載）", section: "字母" });
   for (const [mark, code] of Object.entries(MARK_TO_ABBV)) {
     rows.push({ native: cp(code), roman: mark, note: "縮寫符（拼寫縮略標記）", section: "縮寫符" });
   }
