@@ -446,12 +446,18 @@ export class LiDictView extends ItemView {
   private panelX = 0;
 
   private switchPanel(panel: Panel): void {
-    // 方向感：子分頁順序 lookup→history→bookmarks→manage，前進左滑、後退右滑；
-    // 跨頂層（dict↔translit）不帶方向，純淡入。
+    // 方向感：①子分頁順序 lookup→history→bookmarks→manage，前進左滑、後退右滑；
+    // ②頂層辭典↔轉寫同帶方向：辭典→轉寫＝前進左滑、轉寫→辭典＝後退右滑（📖/🌐 切換體感一致）。
     const ORDER: Panel[] = ['lookup', 'history', 'bookmarks', 'manage'];
     const oi = ORDER.indexOf(this.panel);
     const ni = ORDER.indexOf(panel);
-    this.panelX = oi >= 0 && ni >= 0 ? (ni > oi ? -16 : ni < oi ? 16 : 0) : 0;
+    if (oi >= 0 && ni >= 0) {
+      this.panelX = ni > oi ? -16 : ni < oi ? 16 : 0;
+    } else {
+      const fromDict = this.isDictChild(this.panel);
+      const toDict = this.isDictChild(panel);
+      this.panelX = fromDict && !toDict ? -16 : !fromDict && toDict ? 16 : 0;
+    }
     if (this.isDictChild(panel)) this.subTab = panel;
     this.panel = panel;
     this.renderShell();
