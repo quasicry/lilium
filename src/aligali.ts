@@ -345,7 +345,7 @@ function buildCharTable(): CharTableEntry[] {
   rows.push({
     native: "\u1820\u180B",
     roman: "a（音節基底）",
-    note: "蒙古基字 A＋FVS1：Ali Gali 借音 a 的音節基底形（aksharamukha 語料形；引擎 a↔ᠠ᠋ 閉環），Ali Gali 專碼位 1887 為字典形",
+    note: "蒙古基字 A＋FVS1：Ali Gali 借音 a 的音節基底形（外部語料形；引擎 a↔ᠠ᠋ 閉環），Ali Gali 專碼位 1887 為字典形",
     section: "音節基底（蒙古基字＋FVS1）",
   });
   // 覆蓋率補列：Todo 元音條目（e/i/o/u roman）的反向撞 Hudum 基字路徑

@@ -1,7 +1,7 @@
 /* ---------- 天城體語料門禁（104 字＋36 詞＋6 句，IAST 進出） ----------
- * 語料 test/data/devanagari-aksharamukha-corpus.json。
+ * 語料 test/data/devanagari-corpus.json。
  * 三條標準：拉丁是拉丁、天城體是天城體、杜絕原樣透傳、往返一致。
- * 豁免：Aksharamukha 擴展記法項（X-近似集/南印副音/nukta 異讀/拼出 CV/ḵ）
+ * 豁免：外部語料擴展記法項（X-近似集/南印副音/nukta 異讀/拼出 CV/ḵ）
  * 已自語料移除，豁免同步撤除；句讀慣例歸一保留。
  * ② 句讀慣例歸一：'.'/'..' ↔ '।'/'॥'，lilium IAST 出向統一 '|'||'（danda 出版慣例）；
  *    danda 緊貼前詞（indic.ts 出版慣例）→ 語料端存檔時去 danda 前空格。
@@ -19,7 +19,7 @@ import os from "node:os";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, "..");
-const corpus = JSON.parse(readFileSync(join(ROOT, "test", "data", "devanagari-aksharamukha-corpus.json"), "utf8"));
+const corpus = JSON.parse(readFileSync(join(ROOT, "test", "data", "devanagari-corpus.json"), "utf8"));
 const TMP = mkdtempSync(join(tmpdir(), "li-deva-"));
 execFileSync(join(ROOT, "node_modules", ".bin", "esbuild"), [
   join(ROOT, "test", "lib-export.ts"), "--bundle", "--format=esm",
@@ -27,7 +27,7 @@ execFileSync(join(ROOT, "node_modules", ".bin", "esbuild"), [
 ]);
 const { iastToDevanagari, devanagariToIast } = await import(url.pathToFileURL(join(TMP, "lib.mjs")).href);
 
-const EXEMPT_CHARS = new Set([]); // Aksharamukha 擴展記法項已自語料移除
+const EXEMPT_CHARS = new Set([]); // 外部語料擴展記法項已自語料移除
 const norm = (s) => s.replace(/\.\./g, "||").replace(/\./g, "|");
 
 let pass = 0, fail = 0, passthrough = 0;

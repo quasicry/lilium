@@ -11,9 +11,9 @@
  *   T3 R2N(roman) 輸出不得與輸入 roman 全等（確實產生了原生文字）。
  *
  * 語料來源（全部引擎外部獨立）：
- *   婆羅米：aksharamukha（PyPI 第三方轉換器）產生之原生 Brahmi 錨（僅原生側，
+ *   婆羅米：第三方轉換器產生之原生 Brahmi 錨（僅原生側，
  *          roman 側語料已去除；IAST 權威真值層另見 brahmi-hultzsch-samples.json）
- *          —— brahmi-native-aksharamukha.json
+ *          —— brahmi-native.json
  *   僧伽羅：UD_Sinhala-STB/Appuwa（官方 treebank，原生 text + UCSC translit 欄）
  *          —— sinhala-ud-native.json
  *   回鶻：現代維吾爾 UEY 阿拉伯原生（uey-pairs 抽樣＋TS 語料）＋舊回鶻字母
@@ -100,11 +100,11 @@ const ARABIC_R = [
   [0x06fa, 0x06ff], [0x0750, 0x077f], [0xfb50, 0xfdff], [0xfe70, 0xfeff],
 ];
 
-// ============ ① 婆羅米（brahmi-iast；原生錨 aksharamukha）============
-console.log("[① 婆羅米 — aksharamukha 原生錨]");
+// ============ ① 婆羅米（brahmi-iast；第三方轉換器原生錨）============
+console.log("[① 婆羅米 — 第三方轉換器原生錨]");
 {
   const S = lib.getScheme("brahmi-iast");
-  const data = JSON.parse(readFileSync(join(DATA, "brahmi-native-aksharamukha.json"), "utf8"));
+  const data = JSON.parse(readFileSync(join(DATA, "brahmi-native.json"), "utf8"));
   for (const s of data.samples) {
     const native = norm(s.native);
     const roman = S.nativeToRoman(native);

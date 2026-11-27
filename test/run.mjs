@@ -437,7 +437,7 @@ test(`八思巴蒙古文標點 native↔roman 轉寫`, () => {
   // roman 逗號鍵入 → U+1802
   assert.ok(sc.romanToNative("a,b").includes("\u1802"));
 });
-/* ---------- Ali Gali 音節級轉寫（aksharamukha 語料） ---------- */
+/* ---------- Ali Gali 音節級轉寫（外部語料） ---------- */
 test(`Ali Gali 音節級出向＋往返恆等`, () => {
   const ag = lib.aliGaliToIast;
   const r2n = lib.romanToAliGali;
@@ -587,8 +587,8 @@ test(`r53 subjoinPadForText：與編輯態 fence 檔位表逐檔一致`, () => {
   assert.equal(m.subjoinPadForText(userCase), 1.75);
 });
 
-/* ---------- 藏文梵咒語料（aksharamukha 逐碼位語料）二次出向恆等 ----------
- * 語料 test/data/tibetan-aksharamukha-mantracorpus.txt（麥經 gter ma 咒集，aksh
+/* ---------- 藏文梵咒語料（外部逐碼位語料）二次出向恆等 ----------
+ * 語料 test/data/tibetan-mantracorpus.txt（麥經 gter ma 咒集，aksh
  * describe/Tibetan 逐碼位）。斷言：每詞 n2r→r2n→n2r 二次出向恆等 ≥92/94——
  * 3 條豁免＝Wylie 拼式表達力極限：
  *   ① ནིརྡེ nairde/nirde 拼式歧義（無 tsheg 元音歸屬兩讀；歧義面板 vowel-root
@@ -608,7 +608,7 @@ test(`r53 subjoinPadForText：與編輯態 fence 檔位表逐檔一致`, () => {
  */
 test(`藏文梵咒語料二次出向恆等（透傳修復回歸門禁）`, () => {
   const s = lib.getScheme("tibetan-wylie");
-  const corpus = fs.readFileSync(path.join(ROOT, "test", "data", "tibetan-aksharamukha-mantracorpus.txt"), "utf8");
+  const corpus = fs.readFileSync(path.join(ROOT, "test", "data", "tibetan-mantracorpus.txt"), "utf8");
   let total = 0, bad = 0;
   for (const line of corpus.split("\n")) {
     for (const w of line.split(/\s+/)) {
@@ -1223,7 +1223,7 @@ test(`Zanabazar virama（11A34 死輔音，非疊字）＋final mark（11A33）`
   const n2 = lib.zanabazarRomanToNative("na'i");
   assert.equal(n2, "\u{11A1D}\u{11A33}\u{11A01}", "na+finalMark+i");
   assert.equal(lib.zanabazarNativeToRoman(n2), "na'i", "final mark 往返");
-  // tshek（r-e 語義變更）：顯式 token <ts> ↔ 11A41；空格透傳（Aksharamukha
+  // tshek（r-e 語義變更）：顯式 token <ts> ↔ 11A41；空格透傳（外部語料
   // 語料 0x20 分詞慣例，native(0x20)→" "→11A41 往返互吞實錘——test/zanabazar-corpus-gate.mjs）
   assert.equal(lib.zanabazarRomanToNative("ka<ts>ka"), "\u{11A0B}\u{11A41}\u{11A0B}", "<ts>→tshek 11A41");
   assert.equal(lib.zanabazarNativeToRoman("\u{11A0B}\u{11A41}\u{11A0B}"), "ka<ts>ka", "tshek 往返");
@@ -1861,7 +1861,7 @@ console.log(`\n结果: ${passed} 通过, ${failures.length} 失败`);
   }
 }
 
-// ── zanabazar Aksharamukha 真實語料門禁（oṃ 往返不一致實錘語料固化：雙向恆等＋鍵級抽查）──
+// ── zanabazar 外部真實語料門禁（oṃ 往返不一致實錘語料固化：雙向恆等＋鍵級抽查）──
 {
   const { spawnSync } = await import("node:child_process");
   const g = spawnSync(process.execPath, [path.join(path.dirname(import.meta.filename), "zanabazar-corpus-gate.mjs")], { encoding: "utf8" });
@@ -1872,7 +1872,7 @@ console.log(`\n结果: ${passed} 通过, ${failures.length} 失败`);
   }
 }
 
-// ── soyombo Aksharamukha 真實語料門禁（與 zanabazar 同構：雙向恆等＋鍵級抽查）──
+// ── soyombo 外部真實語料門禁（與 zanabazar 同構：雙向恆等＋鍵級抽查）──
 {
   const { spawnSync } = await import("node:child_process");
   const g = spawnSync(process.execPath, [path.join(path.dirname(import.meta.filename), "soyombo-corpus-gate.mjs")], { encoding: "utf8" });
@@ -1883,7 +1883,7 @@ console.log(`\n结果: ${passed} 通过, ${failures.length} 失败`);
   }
 }
 
-// ── soyombo Aksharamukha 單字表門禁（syllabary＋conjuncts 9074 項逐項往返）──
+// ── soyombo 外部 單字表門禁（syllabary＋conjuncts 9074 項逐項往返）──
 {
   const { spawnSync } = await import("node:child_process");
   const g = spawnSync(process.execPath, [path.join(path.dirname(import.meta.filename), "soyombo-syllabary-gate.mjs")], { encoding: "utf8" });
@@ -1894,7 +1894,7 @@ console.log(`\n结果: ${passed} 通过, ${failures.length} 失败`);
   }
 }
 
-// ── zanabazar＋phagspa 單字表＋句子語料門禁（Aksharamukha 11530＋6162 項＋雙句子雙向）──
+// ── zanabazar＋phagspa 單字表＋句子語料門禁（外部 11530＋6162 項＋雙句子雙向）──
 {
   const { spawnSync } = await import("node:child_process");
   const g = spawnSync(process.execPath, [path.join(path.dirname(import.meta.filename), "zana-phags-corpus-gate.mjs")], { encoding: "utf8" });
@@ -1905,7 +1905,7 @@ console.log(`\n结果: ${passed} 通过, ${failures.length} 失败`);
   }
 }
 
-// ── script-matrix 14 方案字元表門禁（Aksharamukha script-matrix 冪等往返）──
+// ── script-matrix 14 方案字元表門禁（外部 script-matrix 冪等往返）──
 {
   const { spawnSync } = await import("node:child_process");
   const g = spawnSync(process.execPath, [path.join(path.dirname(import.meta.filename), "script-matrix-gate.mjs")], { encoding: "utf8" });
@@ -1916,7 +1916,7 @@ console.log(`\n结果: ${passed} 通过, ${failures.length} 失败`);
   }
 }
 
-// ── script-matrix 經典文本門禁（Aksharamukha texts 10 經典 × 13 文種 7,644 行收斂往返）──
+// ── script-matrix 經典文本門禁（外部 texts 10 經典 × 13 文種 7,644 行收斂往返）──
 {
   const { spawnSync } = await import("node:child_process");
   const g = spawnSync(process.execPath, [path.join(path.dirname(import.meta.filename), "script-texts-gate.mjs")], { encoding: "utf8" });
@@ -1927,7 +1927,7 @@ console.log(`\n结果: ${passed} 通过, ${failures.length} 失败`);
   }
 }
 
-// ── conjuncts1 門禁（Aksharamukha conjuncts1：Brahmi/Kharoshthi/Marchen 26,994 項往返）──
+// ── conjuncts1 門禁（外部語料 conjuncts1：Brahmi/Kharoshthi/Marchen 26,994 項往返）──
 {
   const { spawnSync } = await import("node:child_process");
   const g = spawnSync(process.execPath, [path.join(path.dirname(import.meta.filename), "conjuncts1-gate.mjs")], { encoding: "utf8" });
@@ -1938,7 +1938,7 @@ console.log(`\n结果: ${passed} 通过, ${failures.length} 失败`);
   }
 }
 
-// ── 蘭札體語料門禁（Aksharamukha describe/Ranjana：122 字＋36 詞＋6 句往返）──
+// ── 蘭札體語料門禁（外部 describe/Ranjana：122 字＋36 詞＋6 句往返）──
 {
   const { spawnSync } = await import("node:child_process");
   const g = spawnSync(process.execPath, [path.join(path.dirname(import.meta.filename), "ranjana-gate.mjs")], { encoding: "utf8" });
@@ -1949,7 +1949,7 @@ console.log(`\n结果: ${passed} 通过, ${failures.length} 失败`);
   }
 }
 
-// ── 悉曇體語料門禁（Aksharamukha describe/Siddham：121 字＋36 詞＋6 句，IAST 進出）──
+// ── 悉曇體語料門禁（外部 describe/Siddham：121 字＋36 詞＋6 句，IAST 進出）──
 {
   const { spawnSync } = await import("node:child_process");
   const g = spawnSync(process.execPath, [path.join(path.dirname(import.meta.filename), "siddham-gate.mjs")], { encoding: "utf8" });
@@ -1960,7 +1960,7 @@ console.log(`\n结果: ${passed} 通过, ${failures.length} 失败`);
   }
 }
 
-// ── 婆羅米語料門禁（Aksharamukha describe/Brahmi：134 字＋36 詞＋6 句，IAST 進出）──
+// ── 婆羅米語料門禁（外部 describe/Brahmi：134 字＋36 詞＋6 句，IAST 進出）──
 {
   const { spawnSync } = await import("node:child_process");
   const g = spawnSync(process.execPath, [path.join(path.dirname(import.meta.filename), "brahmi-aksha-gate.mjs")], { encoding: "utf8" });
@@ -1993,7 +1993,7 @@ console.log(`\n结果: ${passed} 通过, ${failures.length} 失败`);
   }
 }
 
-// ── 僧伽羅語料門禁（Aksharamukha describe/Sinhala：119 字＋36 詞＋6 句，IAST 進出）──
+// ── 僧伽羅語料門禁（外部 describe/Sinhala：119 字＋36 詞＋6 句，IAST 進出）──
 {
   const { spawnSync } = await import("node:child_process");
   const g = spawnSync(process.execPath, [path.join(path.dirname(import.meta.filename), "sinhala-aksha-gate.mjs")], { encoding: "utf8" });
@@ -2004,7 +2004,7 @@ console.log(`\n结果: ${passed} 通过, ${failures.length} 失败`);
   }
 }
 
-// ── 天城體語料門禁（Aksharamukha describe/Devanagari：121 字＋36 詞＋6 句，IAST 進出）──
+// ── 天城體語料門禁（外部 describe/Devanagari：121 字＋36 詞＋6 句，IAST 進出）──
 {
   const { spawnSync } = await import("node:child_process");
   const g = spawnSync(process.execPath, [path.join(path.dirname(import.meta.filename), "devanagari-aksha-gate.mjs")], { encoding: "utf8" });
@@ -2029,7 +2029,7 @@ console.log(`\n结果: ${passed} 通过, ${failures.length} 失败`);
   console.log(`olduyghur-ambiguity-gate: ${ambOk}/${data.cases.length}（L2/13-071 表8 寫本歧義：t/d 混用＝TAW 兼表、aleph 有無＝matres lectionis，read 模式讀音歸一）`);
 }
 
-// ── 原生文字錨雙向往返門禁（婆羅米 aksharamukha 錨＋僧伽羅 UD 錨＋回鶻 UEY/TS 錨；透傳防杜 T1-T3）──
+// ── 原生文字錨雙向往返門禁（婆羅米第三方錨＋僧伽羅 UD 錨＋回鶻 UEY/TS 錨；透傳防杜 T1-T3）──
 {
   const { spawnSync } = await import("node:child_process");
   const g = spawnSync(process.execPath, [path.join(path.dirname(import.meta.filename), "native-anchor-roundtrip-gate.mjs")], { encoding: "utf8" });

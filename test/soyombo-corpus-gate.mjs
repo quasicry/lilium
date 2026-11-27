@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Copyright (C) 2026 quasicry
 
-/* Soyombo 真實語料門禁（Aksharamukha 梵/巴利語料往返嚴格；與 zanabazar-corpus-gate 同構）
+/* Soyombo 真實語料門禁（外部語料 梵/巴利語料往返嚴格；與 zanabazar-corpus-gate 同構）
  *
  * ── 語料來源 ────────────────────────────────────────────────────────────
- *   test/data/soyombo-aksharamukha.txt —— Aksharamukha 官網
- *   (aksharamukha.com/describe/Soyombo) 梵文《緣起偈》＋巴利《緣起偈》
+ *   test/data/soyombo-corpus.txt —— 外部語料站
+ *   (describe/Soyombo) 梵文《緣起偈》＋巴利《緣起偈》
  *   原生文全文（lilium 轉寫測試語料）。
  *
  * ── 斷言 ────────────────────────────────────────────────────────────────
@@ -36,7 +36,7 @@ execFileSync(path.join(ROOT, "node_modules", ".bin", "esbuild"), [
 const lib = await import(path.join(TMP, "lib.mjs"));
 const { transliterateText } = lib;
 
-const native = fs.readFileSync(path.join(ROOT, "test", "data", "soyombo-aksharamukha.txt"), "utf-8");
+const native = fs.readFileSync(path.join(ROOT, "test", "data", "soyombo-corpus.txt"), "utf-8");
 
 let passed = 0;
 let total = 0;

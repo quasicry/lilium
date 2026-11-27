@@ -1,5 +1,5 @@
 {
- "source": "原生 Brahmi 錨由第三方轉換器 aksharamukha (PyPI) 從 Hultzsch IAST 權威碑銘轉寫（UD_Prakrit-DIPI 學術定本）產生；與 lilium 引擎完全獨立",
+ "source": "原生 Brahmi 錨由第三方轉換器 (PyPI) 從 Hultzsch IAST 權威碑銘轉寫（UD_Prakrit-DIPI 學術定本）產生；與 lilium 引擎完全獨立",
  "samples": [
   {
    "id": "hultzsch-r1",

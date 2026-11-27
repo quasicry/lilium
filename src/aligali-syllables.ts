@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Copyright (C) 2026 quasicry
 /**
- * Ali Gali 音節表——aksharamukha.com/describe/Mongolian 語料逐碼位提取＋長音泛化。
+ * Ali Gali 音節表——外部蒙古文音節語料逐碼位提取＋長音泛化。
  * 鍵＝native（蒙古文區段碼位序列，含 FVS1 U+180B / FVS4 U+180E），值＝梵文 IAST。
  * Ali Gali 轉寫是音節級：輔音（Ali Gali 字母或帶 FVS1 的蒙古基字）＋元音組合，
  * 碼位級獨立映射會讓基字透傳（實錘）。aksh 表 CV 音節僅示範 KA 段，長音形（kā=

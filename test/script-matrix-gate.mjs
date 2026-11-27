@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Copyright (C) 2026 quasicry
 
-/* Script Matrix 語料門禁（Aksharamukha script-matrix 14 方案字元表逐項往返）
+/* Script Matrix 語料門禁（外部 script-matrix 14 方案字元表逐項往返）
  *
- * 語料：test/data/script-matrix/*.txt（Aksharamukha script_mapping.json 匯出，
+ * 語料：test/data/script-matrix/*.txt（外部 script_mapping.json 匯出，
  * 每行「類別\t子類\t字元」）。涵蓋 lilium 全部 14 個有 matrix 語料的方案：
  *   brahmi / tamilbrahmi / siddham / marchen / soyombo / zanabazarsquare /
  *   phagspa / tibetan / tibetanloc / sinhala / kharoshthi / mongolian /

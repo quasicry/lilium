@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Copyright (C) 2026 quasicry
 
-/* Script Matrix 經典文本語料門禁（Aksharamukha texts 頁 10 經典 × 13 目標文種）
+/* Script Matrix 經典文本語料門禁（外部 texts 頁 10 經典 × 13 目標文種）
  *
  * 語料：test/data/script-matrix/texts/（130 檔、7,644 行）
- *   源文＝Aksharamukha texts.vue 內嵌天城體經典（dhammachakka / heart / karanda /
+ *   源文＝外部 texts.vue 內嵌天城體經典（dhammachakka / heart / karanda /
  *   khuddakapatha / lalitavistara / lotus / nilakantha / panchavimsati /
  *   triratnanusmriti / ushnisha），經官方 /api/convert（Devanagari→目標）生成。
  *   udhr（敘利亞源文）非 lilium 印度系語料，不收。

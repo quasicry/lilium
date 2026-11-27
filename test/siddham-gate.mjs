@@ -2,8 +2,8 @@
  * 語料 test/data/siddham-corpus.json（r44n 抓取存檔）。
  * 三條標準：IAST 是 IAST、蘭札（Devanagari 編碼）是蘭札、杜絕原樣透傳、往返一致。
  * 豁免：語義恆等異形（組合符 ॢ/ॣ vs 拼出形、OM 專用碼位 vs 拼出形）。
- * Aksharamukha 擴展記法項（X-近似集/南印副音/nukta 異讀/k_ha/ḵ）已自語料移除。
- * 句讀慣例：Aksharamukha 語料的 '.'/'..' 歸一為 lilium IAST 出版慣例 '|'||'。
+ * 外部語料擴展記法項（X-近似集/南印副音/nukta 異讀/k_ha/ḵ）已自語料移除。
+ * 句讀慣例：外部語料的 '.'/'..' 歸一為 lilium IAST 出版慣例 '|'||'。
  */
 import { readFileSync } from "node:fs";
 import { mkdtempSync } from "node:fs";

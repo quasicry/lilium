@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Copyright (C) 2026 quasicry
 
-/* Soyombo 單字表門禁（Aksharamukha syllabary 578 compounds＋34 輔音＋17 元音
+/* Soyombo 單字表門禁（外部 syllabary 578 compounds＋34 輔音＋17 元音
  * ＋conjuncts2 八元音符號矩陣，去重後 9074 項逐項 native→roman→native 恆等）
- * 資料：test/data/soyombo-aksharamukha-syllabary.txt（每行一項） */
+ * 資料：test/data/soyombo-syllabary.txt（每行一項） */
 
 import assert from "node:assert";
 import { execFileSync } from "node:child_process";
@@ -22,7 +22,7 @@ execFileSync(path.join(ROOT, "node_modules", ".bin", "esbuild"), [
 ]);
 const lib = await import(path.join(TMP, "lib.mjs"));
 
-const lines = fs.readFileSync(path.join(ROOT, "test", "data", "soyombo-aksharamukha-syllabary.txt"), "utf-8")
+const lines = fs.readFileSync(path.join(ROOT, "test", "data", "soyombo-syllabary.txt"), "utf-8")
   .split("\n").filter(l => l.length > 0);
 assert.ok(lines.length >= 9000, `單字表行數 ${lines.length} >= 9000`);
 

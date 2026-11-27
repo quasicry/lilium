@@ -113,7 +113,7 @@ const SIGN_CP: Record<string, number> = {
 const PUNCT_CP: Record<string, number> = {
   "<": 0x11a3f, ">": 0x11a40,       // initial/closing head mark（0FD3/0FD4 對應）
   "<||>": 0x11a45, "<//>": 0x11a46, // double-lined 變體
-  "<ts>": 0x11a41, // tshek（r-e：出向顯式 token <ts>——舊「空格↔tshek」與 Aksharamukha
+  "<ts>": 0x11a41, // tshek（r-e：出向顯式 token <ts>——舊「空格↔tshek」與外部語料
                    // 語料慣例（0x20 分詞）互撞，native(0x20)→" "→11A41 往返有損實錘；
                    // <ts> 與 <lts> 對稱，雙向無損。Wylie 藏文空格慣例不適用此語料域）
   "|": 0x11a42, "||": 0x11a43, // shad / double shad

@@ -1,19 +1,19 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Copyright (C) 2026 quasicry
 
-/* Zanabazar ＋ PhagsPa 單字表與句子語料門禁（Aksharamukha 官方資料）
+/* Zanabazar ＋ PhagsPa 單字表與句子語料門禁（外部官方資料）
  *
- *   zanabazar-aksharamukha-syllabary.txt   11530 項（syllabary 646+34+18 ＋ conjuncts2 15 檔）
- *   phagspa-aksharamukha-syllabary.txt      6162 項（syllabary 418+38+11 ＋ conjuncts2 15 檔）
- *   zanabazar-aksharamukha-sentences.txt    《緣起偈》句子語料（官方 API Velthuis→ZanabazarSquare）
- *   phagspa-aksharamukha.txt                《緣起偈》句子語料（官方 API Velthuis→PhagsPa；^ 殘留已清）
+ *   zanabazar-syllabary.txt   11530 項（syllabary 646+34+18 ＋ conjuncts2 15 檔）
+ *   phagspa-syllabary.txt      6162 項（syllabary 418+38+11 ＋ conjuncts2 15 檔）
+ *   zanabazar-sentences.txt    《緣起偈》句子語料（官方 API Velthuis→ZanabazarSquare）
+ *   phagspa-corpus.txt                《緣起偈》句子語料（官方 API Velthuis→PhagsPa；^ 殘留已清）
  *
  * 逐項／逐行 native→roman→native 恆等（phagspa 用 phagspa-poppe scheme）。
  *
  * 語料正規化註記：PhagsPa syllabary 中 36 項「t(A848)+s(A85B) 疊字並列」已正規化為
  * tsa 單字母（A850）——兩形出向 roman 同為 "ts"（Poppe 體系真實一對多歧義，
  * Unicode 並列無專碼、Poppe 拼法無區分），正規化無資訊損。
- * 另：phagspa-aksharamukha.txt 之 Velthuis "hu^m" 轉換殘留 "^" 已清（官方 API 瑕疵）。 */
+ * 另：phagspa-corpus.txt 之 Velthuis "hu^m" 轉換殘留 "^" 已清（官方 API 瑕疵）。 */
 
 import assert from "node:assert";
 import { execFileSync } from "node:child_process";
@@ -69,13 +69,13 @@ function checkSentence(label, file, scheme) {
   }
 }
 
-checkLines("zanabazar syllabary", "zanabazar-aksharamukha-syllabary.txt",
+checkLines("zanabazar syllabary", "zanabazar-syllabary.txt",
   lib.zanabazarNativeToRoman, lib.zanabazarRomanToNative, 11000);
 const ph = lib.getScheme("phagspa-poppe");
-checkLines("phagspa syllabary", "phagspa-aksharamukha-syllabary.txt",
+checkLines("phagspa syllabary", "phagspa-syllabary.txt",
   s => ph.nativeToRoman(s), s => ph.romanToNative(s), 6000);
-checkSentence("zanabazar 句子語料", "zanabazar-aksharamukha-sentences.txt", "zanabazar");
-checkSentence("phagspa 句子語料", "phagspa-aksharamukha.txt", "phagspa-poppe");
+checkSentence("zanabazar 句子語料", "zanabazar-sentences.txt", "zanabazar");
+checkSentence("phagspa 句子語料", "phagspa-corpus.txt", "phagspa-poppe");
 
 console.log(`zana-phags-corpus-gate: 通过 ${passed}/${total}`);
 if (passed !== total) process.exit(1);

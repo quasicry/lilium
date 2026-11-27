@@ -20,7 +20,7 @@ export interface TransliterationOptions {
   /** 罕見字符策略；命令層從設置讀取後傳入 */
   rarePolicy?: RarePolicy;
   /**
-   * X-近似歧義偏好（r45c）：出向對「Aksharamukha 自標 Approximate equivalent」
+   * X-近似歧義偏好（r45c）：出向對「來源自標 Approximate equivalent」
    * 多值點的取樣。auto＝引擎默認（拼出形/短式統一）；"spelled"＝強制拼出形；
    * "codepoint"＝缺項/專用碼位以 \uXXXX esc 標註保留（可逆）；
    * "longvowel"＝長式優先（sinhala ඒ/ඕ 出 ē/ō，非短式統一）。

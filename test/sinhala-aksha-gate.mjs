@@ -1,14 +1,14 @@
 /* ---------- 僧伽羅語料門禁（103 字＋36 詞＋6 句，IAST 進出） ----------
- * 語料 test/data/sinhala-aksharamukha-corpus.json。
+ * 語料 test/data/sinhala-corpus.json。
  * 豁免：Unicode 標準 vocalic（ḷ/ḹ/kḷ/kḹ）。
- * Aksharamukha 擴展記法項（X-近似集/口語副音/借詞/avagraha 括注）已自語料移除。
+ * 外部語料擴展記法項（X-近似集/口語副音/借詞/avagraha 括注）已自語料移除。
  * ② 語義恆等歸一（fold 判準）：ZWJ 可見連結符 vs virama 形（同碼位序列差 U+200D）；
  *    長 e/o 短式 ෙ/ො（lilium C-B3 輸出慣例，頁面 Notes 自證）；嚴式鼻音歸化
  *    ṃ+同部位塞音→鼻音（brahmic.ts:262-268 strictNasal 刻意設計）。
  * ③ 複核（r156 sinhala ṁ）：n2r 出向無鍵 ṁ（U+1E43）非缺口——
  *    brahmic.ts NIGGAHITA_ALIASES（r56 行註釋載明）巴利 ṃ/ṁ 同義、輸入端
  *    一併接受、輸出端統一發 ṃ（IAST）；word16 實錘屬文檔化正規化（exempt）。
- * 句讀慣例：Aksharamukha 語料的 '.'/'..' 歸一為 lilium IAST 出版慣例 '|'||'。
+ * 句讀慣例：外部語料的 '.'/'..' 歸一為 lilium IAST 出版慣例 '|'||'。
  */
 import { readFileSync } from "node:fs";
 import { mkdtempSync } from "node:fs";
@@ -23,7 +23,7 @@ import os from "node:os";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, "..");
-const corpus = JSON.parse(readFileSync(join(ROOT, "test", "data", "sinhala-aksharamukha-corpus.json"), "utf8"));
+const corpus = JSON.parse(readFileSync(join(ROOT, "test", "data", "sinhala-corpus.json"), "utf8"));
 const TMP = mkdtempSync(join(tmpdir(), "li-sin-"));
 execFileSync(join(ROOT, "node_modules", ".bin", "esbuild"), [
   join(ROOT, "test", "lib-export.ts"), "--bundle", "--format=esm",
@@ -37,7 +37,7 @@ const n2rFn = (s) => schemePali.nativeToRoman(s);
 
 const EXEMPT_CHARS = new Set([
   "ḷ","ḹ","kḷ","kḹ",
-  // Aksharamukha 擴展記法項（ĕŏæôḻaṟaṉaqaġazaẏaḵ 及 avagraha 括注）已自語料移除，豁免同步撤除
+  // 外部語料擴展記法項（ĕŏæôḻaṟaṉaqaġazaẏaḵ 及 avagraha 括注）已自語料移除，豁免同步撤除
 ]);
 const ZWJ = "\u200D";
 const LONG2SHORT = { "ේ": "ෙ", "ෝ": "ො", "ඒ": "එ", "ඕ": "ඔ", "ē": "e", "ō": "o" };

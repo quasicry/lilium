@@ -4,8 +4,8 @@
 /* Zanabazar Square 真實語料門禁
  *
  * ── 語料來源 ────────────────────────────────────────────────────────────
- *   test/data/zanabazar-aksharamukha.txt —— Aksharamukha 官網
- *   (aksharamukha.com/describe/ZanabazarSquare) 梵文《緣起偈》＋巴利《緣起偈》
+ *   test/data/zanabazar-corpus.txt —— 外部語料站
+ *   (describe/ZanabazarSquare) 梵文《緣起偈》＋巴利《緣起偈》
  *   原生文全文。344 碼位，體積小，
  *   隨 repo 提交（非外部 corpus 目錄）。
  *
@@ -40,7 +40,7 @@ execFileSync(path.join(ROOT, "node_modules", ".bin", "esbuild"), [
 const lib = await import(path.join(TMP, "lib.mjs"));
 const { transliterateText } = lib;
 
-const native = fs.readFileSync(path.join(ROOT, "test", "data", "zanabazar-aksharamukha.txt"), "utf-8");
+const native = fs.readFileSync(path.join(ROOT, "test", "data", "zanabazar-corpus.txt"), "utf-8");
 
 let passed = 0;
 let total = 0;

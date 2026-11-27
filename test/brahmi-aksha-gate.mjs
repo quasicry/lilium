@@ -1,9 +1,9 @@
 /* ---------- 婆羅米文語料門禁（115 字＋36 詞＋6 句，IAST 進出） ----------
- * 語料 test/data/brahmi-aksharamukha-corpus.json。
+ * 語料 test/data/brahmi-corpus.json。
  * 三條標準：IAST 是 IAST、蘭札（Devanagari 編碼）是蘭札、杜絕原樣透傳、往返一致。
  * 豁免：拼式歧義（kṣ/jñ 詞尾固有 a 無附標，出向 IAST 拼式長鍵＝引擎刻意設計）。
- * Aksharamukha 擴展記法項（近似等價集/南印副音/nukta 異讀/k_ha/ḵ）已自語料移除。
- * 句讀慣例：Aksharamukha 語料的 '.'/'..' 歸一為 lilium IAST 出版慣例 '|'||'。
+ * 外部語料擴展記法項（近似等價集/南印副音/nukta 異讀/k_ha/ḵ）已自語料移除。
+ * 句讀慣例：外部語料的 '.'/'..' 歸一為 lilium IAST 出版慣例 '|'||'。
  */
 import { readFileSync } from "node:fs";
 import { mkdtempSync } from "node:fs";
@@ -18,7 +18,7 @@ import os from "node:os";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, "..");
-const corpus = JSON.parse(readFileSync(join(ROOT, "test", "data", "brahmi-aksharamukha-corpus.json"), "utf8"));
+const corpus = JSON.parse(readFileSync(join(ROOT, "test", "data", "brahmi-corpus.json"), "utf8"));
 const TMP = mkdtempSync(join(tmpdir(), "li-ran-"));
 execFileSync(join(ROOT, "node_modules", ".bin", "esbuild"), [
   join(ROOT, "test", "lib-export.ts"), "--bundle", "--format=esm",
