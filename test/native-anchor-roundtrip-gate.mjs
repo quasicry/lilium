@@ -312,6 +312,9 @@ console.log("[④b 摩尼文方案 — L2/11-123R 記法往返]");
   ok(S.nativeToRoman("\u{10AD7}\u{10ADD}") === "śn", "④b 連字 NUN+SADHE R2N", S.nativeToRoman("\u{10AD7}\u{10ADD}"));
   ok(S.nativeToRoman(S.romanToNative("śy")) === "śy" && S.nativeToRoman(S.romanToNative("śn")) === "śn", "④b 連字往返閉環");
   ok((Array.from(S.romanToNative("ś")).map((c) => (c.codePointAt(0) ?? 0).toString(16)).join(" ")) === "10ae3", "④b 單 ś 仍 SSHIN", S.romanToNative("ś"));
+  // 專字 UD（10AC8）雙向閉環（缺出向映射會原樣透傳）
+  ok(S.nativeToRoman("\u{10AC8}") === "<ud>", "④b 專字 UD 出向", S.nativeToRoman("\u{10AC8}"));
+  ok(S.nativeToRoman(S.romanToNative("b<ud>")) === "b<ud>", "④b 專字 UD 往返閉環", S.nativeToRoman(S.romanToNative("b<ud>")));
 }
 
 // ============ ④c 摩尼文 VATEC man 段錨（Manichäisch-Türkische Texte 抽樣）============

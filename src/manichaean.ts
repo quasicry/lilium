@@ -223,6 +223,14 @@ const LETTER_TO_LATIN: Record<string, string> = (() => {
 /** 所有拉丁 token（含變音符鍵），最長在前 */
 const LETTER_KEYS = Object.keys(LATIN_TO_LETTER).sort((a, b) => b.length - a.length);
 const SPECIAL_KEYS = Object.keys(SPECIAL_SEQUENCES).sort((a, b) => b.length - a.length);
+/** 專字碼位 → 拉丁 token（SPECIAL_SEQUENCES 反查） */
+const SPECIAL_TO_LATIN: Record<string, string> = (() => {
+  const rev: Record<string, string> = {};
+  for (const [k, v] of Object.entries(SPECIAL_SEQUENCES)) {
+    if (rev[v] === undefined) rev[v] = k;
+  }
+  return rev;
+})();
 
 /* ---------------- 標點與數字 ---------------- */
 
@@ -423,6 +431,10 @@ export function manichaeanToLatin(input: string, opts?: ManichaeanTranslitOption
     if (lig) { out += lig[1]; i += 2; continue; }
     const ch = chars[i];
 
+    // 專字（UD＝SPECIAL_SEQUENCES 反向；缺此映射會原樣透傳＝檢字表條目往返斷鏈）
+    const sp = SPECIAL_TO_LATIN[ch];
+    if (sp !== undefined) { out += sp; i += 1; continue; }
+
     // 標點
     const p = PUNCT_TO_LATIN[ch];
     if (p !== undefined) { out += p; i += 1; continue; }
@@ -559,7 +571,7 @@ const manichaeanScheme: TransliterationScheme = {
   group: "manichaean",
   primary: true,
   description:
-    "摩尼文（U+10AC0–U+10AFF，Unicode 14.0）↔ 學界拉丁轉寫；依 Unicode L2/11-123R。字形變體（VS-1）與縮寫符以 <v1>/<abv>/<blw> 標記保留（strip 可剝）",
+    "摩尼文（U+10AC0–U+10AFF，Unicode 14.0）↔ 拉丁轉寫；依 Unicode L2/11-123R。字形變體（VS-1）與縮寫符以 <v1>/<abv>/<blw> 標記保留（strip 可剝）",
   romanToNative: (input: string, opts?: TransliterationOptions) =>
     latinToManichaean(input, opts as ManichaeanTranslitOptions | undefined),
   nativeToRoman: (input: string, opts?: TransliterationOptions) =>
