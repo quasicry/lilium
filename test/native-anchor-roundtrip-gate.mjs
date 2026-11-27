@@ -486,6 +486,46 @@ console.log("[④b 摩尼文方案 — L2/11-123R 記法往返]");
     "fb-narrow ③ 熱點覆蓋層仍為移動端連結形態主入口");
 }
 
+// ============ ④d 摩尼文原生 Unicode 語料雙向往返（Wiktionary 詞條實錄） ============
+// 語料＝test/data/manichaean-wiktionary-corpus.json：Parthian/Middle Persian/Sogdian
+// 原生摩尼文詞條＋頁內 alt 形（62 詞；出處授權見語料檔註釋）。全量 native→roman→native。
+{
+  const { readFileSync } = await import("node:fs");
+  const corpus = JSON.parse(readFileSync(new URL("./data/manichaean-wiktionary-corpus.json", import.meta.url), "utf8"));
+  const rows = corpus.rows;
+  const S = lib.getScheme("manichaean");
+  let mOk = 0;
+  for (const r of rows) {
+    const roman = S.nativeToRoman(r.native);
+    const back = S.romanToNative(roman);
+    if (back === r.native) mOk++;
+    else fail++, failures.push(`④d 摩尼原生往返: ${r.native} → ${roman} → ${back}`);
+  }
+  pass += mOk;
+  ok(mOk === rows.length, `④d 摩尼原生語料全量閉合: ${mOk}/${rows.length}`);
+  // 字級涵蓋報告（語料自然涵蓋 25/36；缺字母層由 ④b 字母全表往返＋④e 合成組合詞補強）
+  const letters = ["ʾ","b","β","g","γ","d","h","w","z","ž","j","j̈","x","ṭ","y","k","k̇","k̈","l","δ","θ","m","n","s","ʿ","ʿ̈","p","f","c","q","q̇","q̈","r","š","ś","t"];
+  const seen = new Set();
+  for (const r of rows) {
+    const roman = S.nativeToRoman(r.native);
+    for (const L of letters) if (roman.includes(L)) seen.add(L);
+  }
+  ok(seen.size >= 25, `④d 語料字級涵蓋: ${seen.size}/${letters.length}`);
+  // ④e 缺失字母合成組合詞（CL/CLC 閃源詞根結構）roman→native→roman 詞級往返
+  const missing = letters.filter((l) => !seen.has(l));
+  const anchors = ["ʾ", "m", "n", "y", "d", "r", "š"];
+  const synth = [];
+  for (const L of missing) for (const A of anchors) { synth.push(L + A); synth.push(A + L + A); }
+  let sOk = 0;
+  for (const w of synth) {
+    const back = S.nativeToRoman(S.romanToNative(w));
+    if (back === w) sOk++;
+    else fail++, failures.push(`④e 摩尼合成往返: ${w} → ${back}`);
+  }
+  pass += sOk;
+  ok(sOk === synth.length, `④e 缺失字母合成組合詞閉合: ${sOk}/${synth.length}`);
+}
+
 console.log(`\n結果: ${pass} 通过, ${fail} 失败`);
 if (fail > 0) {
   console.log("失敗清單（前 20）：");

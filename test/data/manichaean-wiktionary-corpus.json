@@ -1,0 +1,259 @@
+{
+ "_comment": [
+  "摩尼文原生 Unicode 語料（Manichaean U+10AC0–U+10AFF）——Wiktionary 原生詞條實錄。",
+  "來源：en.wiktionary.org 分類 Parthian_lemmas / Middle_Persons…（逐詞 source 欄標記語言分類），",
+  "另含詞條頁內 alt/redirect 形（source=wiktionary-page-content）。",
+  "僅供 lilium 轉寫方案對照測試研究用途（署名出處，見本註釋）；隨插件分發須另取授權。",
+  "抓取日期：2026-11-27。測試：native→roman→native 全量閉合（native-anchor-roundtrip-gate【mani-corpus】）。"
+ ],
+ "rows": [
+  {
+   "native": "𐫀𐫀𐫛",
+   "source": "Sogdian"
+  },
+  {
+   "native": "𐫀𐫇𐫗𐫃𐫓𐫏𐫇𐫗",
+   "source": "Sogdian"
+  },
+  {
+   "native": "𐫀𐫉𐫀𐫀𐫗",
+   "source": "wiktionary-page-content"
+  },
+  {
+   "native": "𐫀𐫉𐫗",
+   "source": "Middle_Persian"
+  },
+  {
+   "native": "𐫀𐫋𐫇𐫗",
+   "source": "Sogdian"
+  },
+  {
+   "native": "𐫀𐫘𐫗𐫃",
+   "source": "Parthian"
+  },
+  {
+   "native": "𐫀𐫘𐫗𐫃𐫘𐫡",
+   "source": "wiktionary-page-content"
+  },
+  {
+   "native": "𐫀𐫘𐫗𐫃𐫡𐫏𐫉𐫃",
+   "source": "wiktionary-page-content"
+  },
+  {
+   "native": "𐫀𐫘𐫗𐫗𐫃",
+   "source": "wiktionary-page-content"
+  },
+  {
+   "native": "𐫀𐫢𐫗𐫇𐫍𐫡",
+   "source": "wiktionary-page-content"
+  },
+  {
+   "native": "𐫁𐫀𐫗",
+   "source": "Parthian"
+  },
+  {
+   "native": "𐫁𐫃𐫛𐫇𐫍𐫡",
+   "source": "Parthian"
+  },
+  {
+   "native": "𐫁𐫏𐫇𐫡",
+   "source": "Middle_Persian"
+  },
+  {
+   "native": "𐫁𐫡",
+   "source": "Parthian"
+  },
+  {
+   "native": "𐫁𐫡𐫁𐫀𐫗",
+   "source": "Parthian"
+  },
+  {
+   "native": "𐫁𐫡𐫏𐫗𐫉",
+   "source": "Middle_Persian"
+  },
+  {
+   "native": "𐫃𐫇𐫘𐫀𐫗",
+   "source": "Parthian"
+  },
+  {
+   "native": "𐫅𐫏𐫇",
+   "source": "Middle_Persian"
+  },
+  {
+   "native": "𐫅𐫡",
+   "source": "Middle_Persian"
+  },
+  {
+   "native": "𐫅𐫡𐫁𐫀𐫗",
+   "source": "wiktionary-page-content"
+  },
+  {
+   "native": "𐫉𐫡𐫅𐫇𐫢𐫤",
+   "source": "Middle_Persian"
+  },
+  {
+   "native": "𐫋𐫗𐫗𐫃",
+   "source": "Middle_Persian"
+  },
+  {
+   "native": "𐫍𐫀𐫇𐫗𐫅",
+   "source": "wiktionary-page-content"
+  },
+  {
+   "native": "𐫍𐫀𐫇𐫘𐫀𐫡",
+   "source": "Parthian"
+  },
+  {
+   "native": "𐫍𐫀𐫇𐫘𐫀𐫡𐫃",
+   "source": "wiktionary-page-content"
+  },
+  {
+   "native": "𐫍𐫀𐫖",
+   "source": "wiktionary-page-content"
+  },
+  {
+   "native": "𐫍𐫀𐫖𐫍𐫏𐫡𐫉",
+   "source": "Parthian"
+  },
+  {
+   "native": "𐫍𐫏𐫡𐫉𐫏𐫅",
+   "source": "wiktionary-page-content"
+  },
+  {
+   "native": "𐫍𐫘𐫀𐫡",
+   "source": "wiktionary-page-content"
+  },
+  {
+   "native": "𐫖𐫀𐫘𐫏𐫀𐫃",
+   "source": "Sogdian"
+  },
+  {
+   "native": "𐫖𐫇𐫍𐫡",
+   "source": "Middle_Persian"
+  },
+  {
+   "native": "𐫖𐫇𐫡𐫇",
+   "source": "Middle_Persian"
+  },
+  {
+   "native": "𐫗𐫀𐫖",
+   "source": "Middle_Persian"
+  },
+  {
+   "native": "𐫗𐫍𐫗𐫃",
+   "source": "Middle_Persian"
+  },
+  {
+   "native": "𐫗𐫖𐫏𐫍𐫐",
+   "source": "Middle_Persian"
+  },
+  {
+   "native": "𐫗𐫟𐫗𐫐",
+   "source": "wiktionary-page-content"
+  },
+  {
+   "native": "𐫘𐫀𐫡",
+   "source": "wiktionary-page-content"
+  },
+  {
+   "native": "𐫘𐫇𐫄𐫔𐫏𐫀𐫇",
+   "source": "Sogdian"
+  },
+  {
+   "native": "𐫘𐫛𐫀𐫍",
+   "source": "wiktionary-page-content"
+  },
+  {
+   "native": "𐫘𐫡",
+   "source": "wiktionary-page-content"
+  },
+  {
+   "native": "𐫙𐫏𐫇",
+   "source": "Middle_Persian"
+  },
+  {
+   "native": "𐫙𐫏𐫡",
+   "source": "Parthian"
+  },
+  {
+   "native": "𐫙𐫘𐫛𐫀𐫅",
+   "source": "Parthian"
+  },
+  {
+   "native": "𐫙𐫢𐫗𐫇𐫍𐫡",
+   "source": "Middle_Persian"
+  },
+  {
+   "native": "𐫙𐫢𐫗𐫇𐫍𐫡𐫃",
+   "source": "wiktionary-page-content"
+  },
+  {
+   "native": "𐫙𐫢𐫗𐫇𐫍𐫡𐫏𐫆",
+   "source": "wiktionary-page-content"
+  },
+  {
+   "native": "𐫙𐫢𐫗𐫇𐫍𐫡𐫏𐫏",
+   "source": "wiktionary-page-content"
+  },
+  {
+   "native": "𐫙𐫢𐫗𐫇𐫍𐫡𐫝𐫗",
+   "source": "wiktionary-page-content"
+  },
+  {
+   "native": "𐫛𐫀𐫅",
+   "source": "Parthian"
+  },
+  {
+   "native": "𐫛𐫅𐫐𐫡",
+   "source": "Parthian"
+  },
+  {
+   "native": "𐫛𐫅𐫞𐫡",
+   "source": "wiktionary-page-content"
+  },
+  {
+   "native": "𐫛𐫇𐫡",
+   "source": "Middle_Persian"
+  },
+  {
+   "native": "𐫛𐫍𐫏𐫐𐫡",
+   "source": "wiktionary-page-content"
+  },
+  {
+   "native": "𐫝𐫢𐫖𐫏",
+   "source": "Sogdian"
+  },
+  {
+   "native": "𐫞𐫀𐫄𐫔𐫀",
+   "source": "Sogdian"
+  },
+  {
+   "native": "𐫟𐫀𐫗𐫃",
+   "source": "Middle_Persian"
+  },
+  {
+   "native": "𐫟𐫀𐫡",
+   "source": "wiktionary-page-content"
+  },
+  {
+   "native": "𐫟𐫀𐫡𐫤𐫀𐫃",
+   "source": "Parthian"
+  },
+  {
+   "native": "𐫟𐫏𐫡",
+   "source": "wiktionary-page-content"
+  },
+  {
+   "native": "𐫢𐫃𐫡",
+   "source": "Middle_Persian"
+  },
+  {
+   "native": "𐫢𐫡𐫇𐫄",
+   "source": "Sogdian"
+  },
+  {
+   "native": "𐫤𐫀𐫃",
+   "source": "wiktionary-page-content"
+  }
+ ]
+}
