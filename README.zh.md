@@ -13,7 +13,7 @@
 - **管理**：拖放導入辭典（虛線框可見提示）、書籤、查詞歷史、跨條目跳轉（`entry://`、`bword://`、TEI `xr` 目標）
 - **導出**：當前條目導出為 Obsidian 慣例 Markdown 筆記（ruby→注音標註、上下標慣例）
 
-### 轉寫——17 套方案
+### 轉寫——18 套方案
 
 | 文種 | 方案 |
 |---|---|
@@ -34,6 +34,7 @@
 | 回鶻文 Old Uyghur | 拉丁 ↔ Unicode |
 | 蒙古文 Mongolian | 學術拉丁 ↔ Unicode |
 | 八思巴字 ʼPhags-pa | Poppe ↔ Unicode |
+| 摩尼文 Manichaean | 學界拉丁 ↔ Unicode |
 
 **注意：轉寫為實驗性功能，近似映射！**
 

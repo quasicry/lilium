@@ -30,6 +30,7 @@
 | Noto Sans Marchen | 瑪欽文 | Google LLC |
 | Noto Sans Zanabazar Square | 方形札那巴扎爾文 | Google LLC |
 | Noto Sans Soyombo | 索永布文 | Google LLC |
+| Noto Sans Manichaean | 摩尼文 | Google LLC |
 
 - 字型內嵌之著作權聲明（nameID 0）與授權條款（nameID 13/14）**完整保留 Noto 原始資訊**；
 - 依 OFL-1.1 §1，此處如實標註其真實出處。

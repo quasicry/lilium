@@ -13,7 +13,7 @@
 - **Management**: drag-and-drop import with visible drop zone, bookmarks, lookup history, cross-entry links (`entry://`, `bword://`, TEI `xr` targets)
 - **Export**: current entry as an Obsidian-friendly Markdown note (ruby → annotation, superscript/subscript conventions)
 
-### Transliteration — 17 schemes
+### Transliteration — 18 schemes
 
 | Script | Scheme |
 |---|---|
@@ -34,6 +34,7 @@
 | Old Uyghur | Latin ↔ Unicode |
 | Mongolian | Academic Latin ↔ Unicode |
 | ʼPhags-pa | Poppe ↔ Unicode |
+| Manichaean | scholarly Latin ↔ Unicode |
 
 **Note: Transliteration is an experimental feature and provides only an approximate mapping.**
 
