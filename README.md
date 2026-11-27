@@ -11,7 +11,7 @@
 - **Lookup**: hover word lookup while reading, full-text search across dictionaries, fuzzy and prefix matching (BK-tree)
 - **Styling**: dictionary CSS is isolated inside its own wrapper element — dictionaries can never restyle your notes
 - **Management**: drag-and-drop import with visible drop zone, bookmarks, lookup history, cross-entry links (`entry://`, `bword://`, TEI `xr` targets)
-- **Export**: current entry as an Obsidian-friendly Markdown note (ruby → annotation, superscript/subscript conventions)
+- **Export**: current entry as an Obsidian-friendly Markdown note 
 
 ### Transliteration — 18 schemes
 
