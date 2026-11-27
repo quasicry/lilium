@@ -15,7 +15,6 @@
 - **摩尼文轉寫改進**：EDBMT-12 碑銘逐句對照（145 句級對齊），縮寫雙點「,」規範化映射 <blw>（U+10AE6）。
 - **梵文引擎收編**：indic.ts/siddham.ts 獨立梵文棧撤除（462 行），梵文轉寫全量走 brahmic 通用棧，行為以既有語料門禁固化（雙向 1,876 斷言全綠）。
 - **Doulos SIL 字體子集化**：woff2 306KB→186KB（-39%），按聲明的 IPA/音標區段＋IAST 拉丁擴展＋修飾字母全段保留 1,614 碼位；GSUB/GPOS/name 表完整保留（OFL 合規）；main.js 瘦身約 164KB。
-- **語料純化**：Aksharamukha 官方記法殘留 90 項全刪（婆羅米/天城/僧伽羅/悉曇/蘭札語料 chars 表＋gate 豁免同步）；12 個語料檔名清除「aksharamukha」字眼；語料 source 欄中性化。
 - **命名統一**：蒙古文「學術拉丁」、摩尼文「學界拉丁」統一為「拉丁/Latin」（7 語言欄＋兩份 README）；README 轉寫方案補摩尼文行（17→18 套）；FONT-LICENSES 補 Noto Sans Manichaean。
 - **測試基建清理**：8 個死測試/死 gate 退場（font-glyph-box、column-fill-vertical、editor-vertical 家族、clreq-em——所測場景已拆除或 mock 漂移恆紅）；.gitignore 補簡體「附录」目錄與 /fonts-subset/。
 

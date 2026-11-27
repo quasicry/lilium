@@ -264,7 +264,7 @@ export class HoverLookupController {
 
   private showPopup(): void {
     const el = this.ensurePopup();
-    // 方案 A：曾拖拽過（記憶位置存在）→ 本次彈出先落在記憶點（pinned 生效後
+    // 曾拖拽過（記憶位置存在）→ 本次彈出先落在記憶點（pinned 生效後
     // position() 讓位）。未拖拽過＝undefined，維持貼詞定位（canonical 零變化）。
     const memo = this.opts.popupPosStore?.get();
     if (memo) this.draggedPos = { x: memo.x, y: memo.y };
@@ -321,9 +321,9 @@ export class HoverLookupController {
   }
 
   /**
-   * topBar 拖把拖拽（方案 A）：pointerdown 於把手（按鈕除外）啟動，
+   * topBar 拖把拖拽：pointerdown 於把手（按鈕除外）啟動，
    * pointer capture 全程追蹤；pointermove 直改 fixed left/top 並記錄視口位置，
-   * pointerup 寫回 popupPosStore（A 裁定：全彈窗共用一個記憶點）。
+   * pointerup 寫回 popupPosStore（全彈窗共用一個記憶點）。
    * 移動端 Pointer Events 一手覆蓋（touch-action: none 於 CSS）。
    */
   private attachDrag(handle: HTMLElement, _doc: Document): void {
@@ -360,7 +360,7 @@ export class HoverLookupController {
       this.drag = null;
       handle.removeClass('is-dragging');
       try { handle.releasePointerCapture(e.pointerId); } catch { /* 已釋放 */ }
-      // 記憶（方案 A 裁定）：寫回呼叫端 settings（不 pin 也記，下次 pinned 用）
+      // 記憶（裁定）：寫回呼叫端 settings（不 pin 也記，下次 pinned 用）
       if (this.draggedPos) this.opts.popupPosStore?.set(this.draggedPos);
     };
     handle.addEventListener('pointerup', endDrag);
@@ -369,7 +369,7 @@ export class HoverLookupController {
 
   private position(): void {
     if (!this.popupEl || !this.anchorRect) return;
-    // 方案 A：拖拽過的 pinned 彈窗保持自訂位置（不隨內容更新被拉回貼詞）；
+    // 拖拽過的 pinned 彈窗保持自訂位置（不隨內容更新被拉回貼詞）；
     // 記憶位置套用前做視口夾逼（螢幕變更防出界）。首次拖拽前行為逐字不變。
     if (this.pinned && this.draggedPos) {
       const vw = (this.doc?.defaultView ?? window).innerWidth;
