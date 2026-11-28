@@ -271,8 +271,13 @@ class EntryRenderer {
           const info = this.charDecl?.get(refId);
           // altTexts（非 standard mapping 備選文本）導出 data-galt 供上層 UI——不改變現有視覺輸出
           const galt = info?.altTexts?.length ? ` data-galt="${esc(info.altTexts.join('|'))}"` : '';
-          if (info?.text) this.parts.push(`<span class="li-lex0-g" data-gref="${esc(refId)}"${galt}>${esc(info.text)}</span>`);
+          // CBETA 式 charDecl（unicode/PUA 碼位引用已解為實際字）無 standard mapping 時，
+          // 優先序：standard 文本→graphic 字形圖→altTexts 首項（mapping 聲明順序＝unicode 正字優先於 PUA）。
+          // 否則 <g> 退拍平為空＝缺字消失（CBETA 經文實錘）。
+          const gText = info?.text;
+          if (gText) this.parts.push(`<span class="li-lex0-g" data-gref="${esc(refId)}"${galt}>${esc(gText)}</span>`);
           else if (info?.graphic) this.parts.push(`<img class="li-lex0-g-img" src="${esc(info.graphic)}" alt="${esc(refId)}"${galt}>`);
+          else if (info?.altTexts?.length) this.parts.push(`<span class="li-lex0-g" data-gref="${esc(refId)}"${galt}>${esc(info.altTexts[0])}</span>`);
         }
         i = openEnd;
         continue;
@@ -533,8 +538,11 @@ class EntryRenderer {
         const info = this.charDecl?.get(refId);
         // altTexts（非 standard mapping 備選文本）導出 data-galt 供上層 UI——不改變現有視覺輸出
         const galt = info?.altTexts?.length ? ` data-galt="${esc(info.altTexts.join('|'))}"` : '';
-        if (info?.text) this.parts.push(`<span class="li-lex0-g" data-gref="${esc(refId)}"${galt}>${esc(info.text)}</span>`);
+        // 優先序同自閉合分支：standard 文本→graphic→altTexts 首項（CBETA 碼位引用已解字）
+        const gText = info?.text;
+        if (gText) this.parts.push(`<span class="li-lex0-g" data-gref="${esc(refId)}"${galt}>${esc(gText)}</span>`);
         else if (info?.graphic) this.parts.push(`<img class="li-lex0-g-img" src="${esc(info.graphic)}" alt="${esc(refId)}"${galt}>`);
+        else if (info?.altTexts?.length) this.parts.push(`<span class="li-lex0-g" data-gref="${esc(refId)}"${galt}>${esc(info.altTexts[0])}</span>`);
         else this.parts.push(`<span class="li-lex0-pc">${esc(textOf(inner))}</span>`);
         return;
       }
@@ -836,7 +844,15 @@ export class Lex0Reader {
       while ((mm = mapRe.exec(block))) {
         const attrs = mm[1];
         if (/\btype="standard"/.test(attrs)) continue;
-        const t = textOf(mm[2]);
+        // mapping 文本為純碼位引用（CBETA 經文慣例：「U+265A0」「U+F07BB」，可空格分隔多碼位）
+        // 時轉為實際字元——碼位字串對讀者無意義，渲染須是字本身。非碼位形態（真文字如
+        // KDR「normalized」正字）原樣保留。
+        const decodeCodepoints = (s: string): string =>
+          /^[Uu]\+[0-9A-Fa-f]{4,6}(\s+[Uu]\+[0-9A-Fa-f]{4,6})*$/.test(s.trim())
+            ? s.trim().split(/\s+/).map((cp) => String.fromCodePoint(parseInt(cp.slice(2), 16))).join('')
+            : s;
+        const t0 = textOf(mm[2]);
+        const t = t0 ? decodeCodepoints(t0) : t0;
         if (t && t !== info.text && !altTexts.includes(t)) altTexts.push(t);
       }
       // CBETA 缺字慣例（KDR 正法華經詞典實錘）：char 無 standard mapping 也無 graphic，
