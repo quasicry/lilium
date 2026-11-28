@@ -1883,6 +1883,114 @@ export const DICT: Record<string, Entry> = {
     "fr": "Import…",
     "de": "Importiere…"
   },
+  "dict.cbeta.title": {
+    "zh": "TEI 经文转词典（CBETA）",
+    "zh-TW": "TEI 經文轉辭典（CBETA）",
+    "ja": "TEI 経文→辞書変換（CBETA）",
+    "ko": "TEI 경문→사전 변환(CBETA)",
+    "en": "TEI sutra → dictionary (CBETA)",
+    "fr": "Sutra TEI → dictionnaire (CBETA)",
+    "de": "TEI-Sutra → Wörterbuch (CBETA)"
+  },
+  "dict.cbeta.file": {
+    "zh": "经文文件",
+    "zh-TW": "經文檔案",
+    "ja": "経文ファイル",
+    "ko": "경문 파일",
+    "en": "Sutra file",
+    "fr": "Fichier sutra",
+    "de": "Sutra-Datei"
+  },
+  "dict.cbeta.levels": {
+    "zh": "词条层级",
+    "zh-TW": "詞條層級",
+    "ja": "見出し階層",
+    "ko": "표제어 계층",
+    "en": "Headword levels",
+    "fr": "Niveaux de vedettes",
+    "de": "Stichwort-Ebenen"
+  },
+  "dict.cbeta.level1": {
+    "zh": "卷",
+    "zh-TW": "卷",
+    "ja": "巻",
+    "ko": "권",
+    "en": "Fascicle",
+    "fr": "Fascicule",
+    "de": "Faszikel"
+  },
+  "dict.cbeta.level2": {
+    "zh": "段",
+    "zh-TW": "段",
+    "ja": "段落",
+    "ko": "단락",
+    "en": "Paragraph",
+    "fr": "Paragraphe",
+    "de": "Absatz"
+  },
+  "dict.cbeta.level3": {
+    "zh": "偈颂",
+    "zh-TW": "偈頌",
+    "ja": "偈頌",
+    "ko": "게송",
+    "en": "Verse",
+    "fr": "Strophe",
+    "de": "Strophe"
+  },
+  "dict.cbeta.run": {
+    "zh": "转换并导入",
+    "zh-TW": "轉換並匯入",
+    "ja": "変換して取り込む",
+    "ko": "변환 후 가져오기",
+    "en": "Convert & import",
+    "fr": "Convertir et importer",
+    "de": "Konvertieren & importieren"
+  },
+  "dict.cbeta.cancel": {
+    "zh": "取消",
+    "zh-TW": "取消",
+    "ja": "キャンセル",
+    "ko": "취소",
+    "en": "Cancel",
+    "fr": "Annuler",
+    "de": "Abbrechen"
+  },
+  "dict.cbeta.progress": {
+    "zh": "转换中… {done}/{total} 段",
+    "zh-TW": "轉換中… {done}/{total} 段",
+    "ja": "変換中… {done}/{total} 段落",
+    "ko": "변환 중… {done}/{total} 단락",
+    "en": "Converting… {done}/{total} paragraphs",
+    "fr": "Conversion… {done}/{total} paragraphes",
+    "de": "Konvertiere… {done}/{total} Absätze"
+  },
+  "dict.cbeta.converted": {
+    "zh": "已转换 {n} 条",
+    "zh-TW": "已轉換 {n} 條",
+    "ja": "{n} 件を変換しました",
+    "ko": "{n}개 항목 변환 완료",
+    "en": "Converted {n} entries",
+    "fr": "{n} entrées converties",
+    "de": "{n} Einträge konvertiert"
+  },
+  "dict.cbeta.aborted": {
+    "zh": "已取消",
+    "zh-TW": "已取消",
+    "ja": "キャンセルされました",
+    "ko": "취소되었습니다",
+    "en": "Cancelled",
+    "fr": "Annulé",
+    "de": "Abgebrochen"
+  },
+  "dict.cbeta.err.noEntry": {
+    "zh": "转换结果为空——文件可能不是 TEI 经文",
+    "zh-TW": "轉換結果為空——檔案可能不是 TEI 經文",
+    "ja": "変換結果が空です——TEI 経文ではない可能性があります",
+    "ko": "변환 결과가 비었습니다——TEI 경문이 아닐 수 있습니다",
+    "en": "Conversion produced no entries — the file may not be a TEI sutra",
+    "fr": "Conversion sans résultat — le fichier n'est peut-être pas un sutra TEI",
+    "de": "Konvertierung ohne Ergebnis — Datei ist wohl kein TEI-Sutra"
+  },
   "dict.import.done": {
     "zh": "已导入 {n} 个文件 → {dir}",
     "zh-TW": "已匯入 {n} 個檔案 → {dir}",

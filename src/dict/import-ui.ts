@@ -17,6 +17,7 @@
  */
 
 import { liNotice } from '../ui-hig';
+import { convertCbetaToLex0 } from './cbeta-convert';
 import type { DictFeature } from './plugin';
 import type { LiDict } from './service';
 import {
@@ -158,6 +159,116 @@ export function buildDictImportZone(
   const hint = drop.createEl('p', { cls: 'setting-item-description li-dict-import-hint' });
   const status = drop.createDiv({ cls: 'li-dict-import-status' });
   const fileList = drop.createEl('ul', { cls: 'li-dict-file-list' });
+
+  // ── CBETA 經文轉辭典（摺疊段，默認收起——不干擾普通辭典導入主流；補錄模式不顯示）
+  let cbetaTeiFile: File | null = null;
+  let cbetaAbort = false;
+  if (!isSupplement) {
+    const cbetaWrap = drop.createEl('details', { cls: 'li-dict-cbeta' });
+    const cbetaSummary = cbetaWrap.createEl('summary', { cls: 'li-dict-cbeta-summary', text: T('dict.cbeta.title') });
+    void cbetaSummary;
+    const cbetaRow1 = cbetaWrap.createDiv({ cls: 'li-dict-import-row' });
+    cbetaRow1.createSpan({ cls: 'li-dict-import-label', text: T('dict.cbeta.file') });
+    const cbetaBtn = cbetaRow1.createEl('button', { cls: 'li-mini-btn', text: T('dict.import.browse') });
+    const cbetaName = cbetaRow1.createSpan({ cls: 'li-dict-file-name' });
+    const cbetaInput = cbetaWrap.createEl('input', { type: 'file' });
+    cbetaInput.addClass('li-u-hidden');
+    cbetaInput.setAttribute('accept', '.xml');
+    const cbetaRow2 = cbetaWrap.createDiv({ cls: 'li-dict-import-row' });
+    cbetaRow2.createSpan({ cls: 'li-dict-import-label', text: T('dict.cbeta.levels') });
+    const lv1 = cbetaRow2.createEl('label', { cls: 'li-dict-import-check' });
+    const lv1Box = lv1.createEl('input', { type: 'checkbox' });
+    lv1Box.checked = true;
+    lv1.appendText(' ' + T('dict.cbeta.level1'));
+    const lv2 = cbetaRow2.createEl('label', { cls: 'li-dict-import-check' });
+    const lv2Box = lv2.createEl('input', { type: 'checkbox' });
+    lv2Box.checked = true;
+    lv2.appendText(' ' + T('dict.cbeta.level2'));
+    const lv3 = cbetaRow2.createEl('label', { cls: 'li-dict-import-check' });
+    const lv3Box = lv3.createEl('input', { type: 'checkbox' });
+    lv3Box.checked = false;
+    lv3.appendText(' ' + T('dict.cbeta.level3'));
+    const cbetaRow3 = cbetaWrap.createDiv({ cls: 'li-dict-import-row' });
+    const cbetaRunBtn = cbetaRow3.createEl('button', { cls: 'li-mini-btn', text: T('dict.cbeta.run') });
+    cbetaRunBtn.disabled = true;
+    const cbetaCancelBtn = cbetaRow3.createEl('button', { cls: 'li-mini-btn', text: T('dict.cbeta.cancel') });
+    cbetaCancelBtn.addClass('li-u-hidden');
+    const cbetaStatus = cbetaWrap.createDiv({ cls: 'li-dict-import-status' });
+    const cbetaSetStatus = (msg: string, isError = false): void => {
+      cbetaStatus.empty();
+      if (!msg) return;
+      cbetaStatus.createEl('p', { cls: 'li-dict-import-msg' + (isError ? ' is-error' : ''), text: msg });
+    };
+    cbetaBtn.addEventListener('click', () => cbetaInput.click());
+    cbetaInput.addEventListener('change', () => {
+      cbetaTeiFile = Array.from(cbetaInput.files ?? [])[0] ?? null;
+      cbetaInput.value = '';
+      cbetaName.setText(cbetaTeiFile?.name ?? '');
+      cbetaRunBtn.disabled = !cbetaTeiFile;
+      cbetaSetStatus('');
+    });
+    cbetaRunBtn.addEventListener('click', () => {
+      void (async () => {
+        if (busy || !cbetaTeiFile) return;
+        busy = true;
+        cbetaAbort = false;
+        cbetaRunBtn.disabled = true;
+        cbetaCancelBtn.removeClass('li-u-hidden');
+        const levels: (1 | 2 | 3)[] = [];
+        if (lv1Box.checked) levels.push(1);
+        if (lv2Box.checked) levels.push(2);
+        if (lv3Box.checked) levels.push(3);
+        if (!levels.length) levels.push(1, 2);
+        try {
+          const teiXml = await cbetaTeiFile.text();
+          const result = await convertCbetaToLex0(teiXml, {
+            levels,
+            yieldFn: () => new Promise<void>((r) => window.setTimeout(r, 0)),
+            onProgress: (done, total) => cbetaSetStatus(T('dict.cbeta.progress', { done, total })),
+            shouldAbort: () => cbetaAbort,
+          });
+          if (result.aborted) {
+            cbetaSetStatus(T('dict.cbeta.aborted'), true);
+            return;
+          }
+          if (!result.entryCount) {
+            cbetaSetStatus(T('dict.cbeta.err.noEntry'), true);
+            return;
+          }
+          cbetaSetStatus(T('dict.cbeta.converted', { n: result.entryCount }));
+          const dictName = result.title;
+          const fname = `${dictName}.lex0.xml`;
+          const lex0File = new File([new TextEncoder().encode(result.xml)], fname, { type: 'text/xml' });
+          const report = await plugin.importDictFiles([lex0File], {
+            format: 'tei-lex0',
+            dictName,
+            overwrite: overwriteBox.checked,
+          });
+          if (!report.ok) {
+            const first = report.issues[0] ? describeIssue(T, report.issues[0]) : '';
+            for (const issue of report.issues) liNotice(describeIssue(T, issue), 10000);
+            cbetaSetStatus(first, true);
+            return;
+          }
+          liNotice(T('dict.import.done', { n: report.imported.length, dir: report.targetDir }), 8000);
+          cbetaSetStatus('');
+          cbetaTeiFile = null;
+          cbetaName.setText('');
+          cbetaRunBtn.disabled = true;
+          opts.onDone?.();
+        } catch (e) {
+          cbetaSetStatus(e instanceof Error ? e.message : String(e), true);
+        } finally {
+          busy = false;
+          cbetaCancelBtn.addClass('li-u-hidden');
+          cbetaRunBtn.disabled = !cbetaTeiFile;
+        }
+      })();
+    });
+    cbetaCancelBtn.addEventListener('click', () => {
+      cbetaAbort = true;
+    });
+  }
 
   const currentFormat = (): DictFormat | 'auto' => {
     if (isSupplement) return opts.fixedFormat ?? 'auto';
